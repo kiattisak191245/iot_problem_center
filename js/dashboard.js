@@ -1,88 +1,272 @@
-// ==================================================
-// ADMIN DASHBOARD
-// ==================================================
+// ============================================================
+// IoT PROBLEM CENTER
+// DASHBOARD.JS
+// ============================================================
 
+// ============================================================
+// GLOBAL
+// ============================================================
+
+let currentUser = null;
+let isAdmin = false;
 let allProblems = [];
-
-let currentProblemId = null;
-
-
-// ==================================================
-// ELEMENTS
-// ==================================================
-
-const problemTable =
-    document.getElementById("problemTable");
-
-const loading =
-    document.getElementById("loading");
-
-const adminEmail =
-    document.getElementById("adminEmail");
-
-const adminSearch =
-    document.getElementById("adminSearch");
+let editingProblemId = null;
 
 
-// ==================================================
-// CHECK ADMIN LOGIN
-// ==================================================
+// ============================================================
+// DOM HELPERS
+// ============================================================
+
+function $(id) {
+    return document.getElementById(id);
+}
+
+
+// ============================================================
+// ESCAPE HTML
+// ============================================================
+
+function escapeHtml(value) {
+
+    const div = document.createElement("div");
+
+    div.textContent = value ?? "";
+
+    return div.innerHTML;
+}
+
+
+// ============================================================
+// SHOW MESSAGE
+// ============================================================
+
+function showMessage(message, type = "info") {
+
+    let box = $("dashboardMessage");
+
+    if (!box) {
+
+        box = document.createElement("div");
+
+        box.id = "dashboardMessage";
+
+        box.style.position = "fixed";
+        box.style.top = "20px";
+        box.style.right = "20px";
+        box.style.zIndex = "99999";
+        box.style.padding = "15px 20px";
+        box.style.borderRadius = "10px";
+        box.style.fontSize = "16px";
+        box.style.maxWidth = "400px";
+        box.style.boxShadow = "0 5px 20px rgba(0,0,0,.2)";
+
+        document.body.appendChild(box);
+    }
+
+    box.textContent = message;
+
+    if (type === "success") {
+        box.style.background = "#16a34a";
+        box.style.color = "#fff";
+    }
+    else if (type === "error") {
+        box.style.background = "#dc2626";
+        box.style.color = "#fff";
+    }
+    else {
+        box.style.background = "#2563eb";
+        box.style.color = "#fff";
+    }
+
+    box.style.display = "block";
+
+    setTimeout(() => {
+
+        box.style.display = "none";
+
+    }, 4000);
+}
+
+
+// ============================================================
+// GET CURRENT USER
+// ============================================================
+
+async function getCurrentUser() {
+
+    try {
+
+        const {
+            data,
+            error
+        } = await supabaseClient.auth.getSession();
+
+        if (error) {
+
+            console.error(error);
+
+            return null;
+        }
+
+        if (!data.session) {
+
+            return null;
+        }
+
+        return data.session.user;
+
+    }
+    catch (error) {
+
+        console.error(
+            "GET USER ERROR:",
+            error
+        );
+
+        return null;
+    }
+}
+
+
+// ============================================================
+// CHECK ADMIN
+// ============================================================
 
 async function checkAdmin() {
 
-    const {
-        data,
-        error
-    } =
-        await supabaseClient.auth.getSession();
+    try {
+
+        currentUser =
+            await getCurrentUser();
+
+        // ------------------------------------------
+        // ยังไม่ได้ Login
+        // ------------------------------------------
+
+        if (!currentUser) {
+
+            window.location.href =
+                "login.html";
+
+            return false;
+        }
 
 
-    if (error) {
+        console.log(
+            "LOGIN USER:",
+            currentUser.id
+        );
 
-        console.error(error);
+        console.log(
+            "LOGIN EMAIL:",
+            currentUser.email
+        );
 
-        window.location.href =
-            "login.html";
 
-        return false;
+        // ==================================================
+        // วิธีตรวจ Admin
+        //
+        // ระบบนี้รองรับหลายรูปแบบ
+        // ==================================================
+
+        let adminResult = false;
+
+
+        // ==================================================
+        // วิธีที่ 1
+        // ตรวจจาก table admins
+        // ==================================================
+
+        try {
+
+            const {
+                data,
+                error
+            } =
+                await supabaseClient
+                    .from("admins")
+                    .select("user_id")
+                    .eq(
+                        "user_id",
+                        currentUser.id
+                    )
+                    .maybeSingle();
+
+
+            if (!error && data) {
+
+                adminResult = true;
+            }
+
+        }
+        catch (error) {
+
+            console.log(
+                "ไม่พบ/ไม่สามารถอ่าน admins table"
+            );
+
+        }
+
+
+        // ==================================================
+        // วิธีที่ 2
+        // ตรวจจาก user metadata
+        // ==================================================
+
+        if (!adminResult) {
+
+            const metadata =
+                currentUser.user_metadata || {};
+
+
+            if (
+                metadata.role === "admin" ||
+                metadata.is_admin === true
+            ) {
+
+                adminResult = true;
+            }
+        }
+
+
+        // ==================================================
+        // RESULT
+        // ==================================================
+
+        isAdmin =
+            adminResult;
+
+
+        console.log(
+            "IS ADMIN:",
+            isAdmin
+        );
+
+
+        if (!isAdmin) {
+
+            alert(
+                "บัญชีนี้ไม่มีสิทธิ์เข้า Admin Dashboard"
+            );
+
+            window.location.href =
+                "index.html";
+
+            return false;
+        }
+
+
+        updateUserArea();
+
+        return true;
 
     }
+    catch (error) {
 
-
-    if (!data.session) {
-
-        window.location.href =
-            "login.html";
-
-        return false;
-
-    }
-
-
-    const user =
-        data.session.user;
-
-
-    // แสดง Email
-    adminEmail.textContent =
-        user.email;
-
-
-    // ตรวจสอบ Role
-    const {
-        data: profile,
-        error: profileError
-    } =
-        await supabaseClient
-            .from("profiles")
-            .select("role")
-            .eq("id", user.id)
-            .single();
-
-
-    if (profileError) {
-
-        console.error(profileError);
+        console.error(
+            "CHECK ADMIN ERROR:",
+            error
+        );
 
         alert(
             "ไม่สามารถตรวจสอบสิทธิ์ Admin ได้"
@@ -92,41 +276,110 @@ async function checkAdmin() {
             "index.html";
 
         return false;
-
     }
-
-
-    if (profile.role !== "admin") {
-
-        alert(
-            "คุณไม่มีสิทธิ์เข้าหน้า Admin"
-        );
-
-        window.location.href =
-            "index.html";
-
-        return false;
-
-    }
-
-
-    return true;
-
 }
 
 
-// ==================================================
+// ============================================================
+// USER AREA
+// ============================================================
+
+function updateUserArea() {
+
+    const userArea =
+        $("userArea");
+
+    if (!userArea || !currentUser) {
+        return;
+    }
+
+
+    userArea.innerHTML = `
+
+        <span class="user-email">
+
+            👤 ${escapeHtml(
+                currentUser.email || "Admin"
+            )}
+
+        </span>
+
+        <button
+            id="logoutButton"
+            class="logout-button"
+            type="button"
+        >
+            ออกจากระบบ
+        </button>
+
+    `;
+
+
+    const logoutButton =
+        $("logoutButton");
+
+
+    if (logoutButton) {
+
+        logoutButton.addEventListener(
+            "click",
+            logout
+        );
+    }
+}
+
+
+// ============================================================
+// LOGOUT
+// ============================================================
+
+async function logout() {
+
+    try {
+
+        const {
+            error
+        } =
+            await supabaseClient.auth.signOut();
+
+
+        if (error) {
+
+            throw error;
+        }
+
+
+        window.location.href =
+            "login.html";
+
+    }
+    catch (error) {
+
+        console.error(error);
+
+        showMessage(
+            "ออกจากระบบไม่สำเร็จ: " +
+            error.message,
+            "error"
+        );
+    }
+}
+
+
+// ============================================================
 // LOAD PROBLEMS
-// ==================================================
+// ============================================================
 
 async function loadProblems() {
 
-    loading.style.display =
-        "block";
+    const loading =
+        $("loading");
 
+    if (loading) {
 
-    problemTable.innerHTML =
-        "";
+        loading.style.display =
+            "block";
+    }
 
 
     try {
@@ -159,7 +412,6 @@ async function loadProblems() {
         if (error) {
 
             throw error;
-
         }
 
 
@@ -167,174 +419,108 @@ async function loadProblems() {
             data || [];
 
 
-        updateStatistics();
+        console.log(
+            "PROBLEMS:",
+            allProblems
+        );
+
 
         renderProblems();
 
-    }
+        updateStatistics();
 
-    catch(error) {
+    }
+    catch (error) {
 
         console.error(
-            "โหลด Problems ไม่สำเร็จ:",
+            "LOAD PROBLEMS ERROR:",
             error
         );
 
 
-        problemTable.innerHTML = `
+        const list =
+            $("problemList");
 
-            <div class="no-result">
 
-                ❌ ไม่สามารถโหลดข้อมูลได้
+        if (list) {
 
-                <br>
+            list.innerHTML = `
 
-                ${escapeHtml(
-                    error.message
-                )}
+                <div class="no-result">
 
-            </div>
+                    ❌ โหลดข้อมูลไม่สำเร็จ
 
-        `;
+                    <br><br>
+
+                    ${escapeHtml(
+                        error.message
+                    )}
+
+                </div>
+
+            `;
+        }
+
+
+        showMessage(
+            "โหลดข้อมูลไม่สำเร็จ: " +
+            error.message,
+            "error"
+        );
 
     }
-
     finally {
 
-        loading.style.display =
-            "none";
+        if (loading) {
 
+            loading.style.display =
+                "none";
+        }
     }
-
 }
 
 
-// ==================================================
-// STATISTICS
-// ==================================================
-
-function updateStatistics() {
-
-    const total =
-        allProblems.length;
-
-
-    const pending =
-        allProblems.filter(
-            problem =>
-                problem.status ===
-                "pending"
-        ).length;
-
-
-    const published =
-        allProblems.filter(
-            problem =>
-                problem.status ===
-                "published"
-        ).length;
-
-
-    const rejected =
-        allProblems.filter(
-            problem =>
-                problem.status ===
-                "rejected"
-        ).length;
-
-
-    document.getElementById(
-        "totalProblems"
-    ).textContent =
-        total;
-
-
-    document.getElementById(
-        "pendingProblems"
-    ).textContent =
-        pending;
-
-
-    document.getElementById(
-        "publishedProblems"
-    ).textContent =
-        published;
-
-
-    document.getElementById(
-        "rejectedProblems"
-    ).textContent =
-        rejected;
-
-}
-
-
-// ==================================================
+// ============================================================
 // RENDER PROBLEMS
-// ==================================================
+// ============================================================
 
 function renderProblems() {
 
-    const search =
-        adminSearch.value
-            .trim()
-            .toLowerCase();
+    const list =
+        $("problemList");
 
 
-    const filtered =
-        allProblems.filter(
-            problem => {
+    if (!list) {
 
-                return (
-
-                    !search ||
-
-                    problem.title
-                        ?.toLowerCase()
-                        .includes(search)
-
-                    ||
-
-                    problem.description
-                        ?.toLowerCase()
-                        .includes(search)
-
-                    ||
-
-                    problem.category
-                        ?.toLowerCase()
-                        .includes(search)
-
-                );
-
-            }
+        console.warn(
+            "ไม่พบ #problemList"
         );
 
+        return;
+    }
 
-    problemTable.innerHTML =
+
+    list.innerHTML =
         "";
 
 
-    if (
-        filtered.length === 0
-    ) {
+    if (allProblems.length === 0) {
 
-        problemTable.innerHTML = `
+        list.innerHTML = `
 
             <div class="no-result">
 
-                ไม่พบข้อมูลปัญหา
+                ยังไม่มีข้อมูลปัญหา
 
             </div>
 
         `;
 
         return;
-
     }
 
 
-    filtered.forEach(
+    allProblems.forEach(
         problem => {
 
             const card =
@@ -344,12 +530,11 @@ function renderProblems() {
 
 
             card.className =
-                "admin-problem-card";
+                "problem-card";
 
 
             let statusText =
                 "รอตรวจสอบ";
-
 
             let statusClass =
                 "pending";
@@ -365,7 +550,6 @@ function renderProblems() {
 
                 statusClass =
                     "published";
-
             }
 
 
@@ -379,45 +563,24 @@ function renderProblems() {
 
                 statusClass =
                     "rejected";
-
             }
 
 
             card.innerHTML = `
 
-                <div class="admin-problem-info">
+                <div class="problem-card-header">
 
-                    <span
-                        class="problem-category"
-                    >
+                    <span class="problem-category">
+
                         ${escapeHtml(
                             problem.category ||
                             "ทั่วไป"
                         )}
+
                     </span>
 
-
-                    <h3>
-
-                        ${escapeHtml(
-                            problem.title
-                        )}
-
-                    </h3>
-
-
-                    <p>
-
-                        ${escapeHtml(
-                            problem.description ||
-                            "ไม่มีรายละเอียด"
-                        )}
-
-                    </p>
-
-
                     <span
-                        class="status-badge ${statusClass}"
+                        class="problem-status ${statusClass}"
                     >
 
                         ${statusText}
@@ -427,81 +590,92 @@ function renderProblems() {
                 </div>
 
 
-                <div
-                    class="admin-problem-actions"
-                >
+                <h3>
+
+                    ${escapeHtml(
+                        problem.title ||
+                        "ไม่มีชื่อปัญหา"
+                    )}
+
+                </h3>
+
+
+                <p>
+
+                    ${escapeHtml(
+                        problem.description ||
+                        "ไม่มีรายละเอียด"
+                    )}
+
+                </p>
+
+
+                <div class="problem-info">
+
+                    <small>
+
+                        ID:
+                        ${escapeHtml(
+                            problem.id
+                        )}
+
+                    </small>
+
+                </div>
+
+
+                <div class="problem-actions">
 
                     <button
-                        class="solution-button"
-                        data-id="${problem.id}"
-                    >
-                        🔧 วิธีแก้ไข
-                    </button>
-
-
-                    <button
-                        class="edit-button"
+                        type="button"
+                        class="edit-problem-button"
                         data-id="${problem.id}"
                     >
                         ✏️ แก้ไข
                     </button>
 
 
-                    ${
-                        problem.status ===
-                        "pending"
-                        ?
-
-                        `
-
-                        <button
-                            class="approve-button"
-                            data-id="${problem.id}"
-                        >
-                            ✅ อนุมัติ
-                        </button>
-
-
-                        <button
-                            class="reject-button"
-                            data-id="${problem.id}"
-                        >
-                            ❌ ไม่อนุมัติ
-                        </button>
-
-                        `
-
-                        :
-
-                        ""
-                    }
+                    <button
+                        type="button"
+                        class="solution-problem-button"
+                        data-id="${problem.id}"
+                    >
+                        🛠 วิธีแก้ไข
+                    </button>
 
 
                     ${
-                        problem.status ===
+                        problem.status !==
                         "published"
-
                         ?
 
                         `
-
                         <button
-                            class="reject-button"
+                            type="button"
+                            class="publish-problem-button"
                             data-id="${problem.id}"
                         >
-                            🚫 ยกเลิกเผยแพร่
+                            🟢 เผยแพร่
                         </button>
-
                         `
 
                         :
 
-                        ""
+                        `
+                        <button
+                            type="button"
+                            class="unpublish-problem-button"
+                            data-id="${problem.id}"
+                        >
+                            🔴 ยกเลิกเผยแพร่
+                        </button>
+                        `
                     }
 
 
                     <button
-                        class="delete-button"
+                        type="button"
+                        class="delete-problem-button"
                         data-id="${problem.id}"
                     >
                         🗑️ ลบ
@@ -512,109 +686,24 @@ function renderProblems() {
             `;
 
 
-            problemTable.appendChild(
-                card
-            );
-
+            list.appendChild(card);
         }
     );
 
 
-    // ==================================================
-    // BUTTON EVENTS
-    // ==================================================
+    bindProblemButtons();
+}
+
+
+// ============================================================
+// BIND PROBLEM BUTTONS
+// ============================================================
+
+function bindProblemButtons() {
 
     document
         .querySelectorAll(
-            ".approve-button"
-        )
-        .forEach(
-            button => {
-
-                button.addEventListener(
-                    "click",
-                    () => {
-
-                        approveProblem(
-                            button.dataset.id
-                        );
-
-                    }
-                );
-
-            }
-        );
-
-
-    document
-        .querySelectorAll(
-            ".reject-button"
-        )
-        .forEach(
-            button => {
-
-                button.addEventListener(
-                    "click",
-                    () => {
-
-                        rejectProblem(
-                            button.dataset.id
-                        );
-
-                    }
-                );
-
-            }
-        );
-
-
-    document
-        .querySelectorAll(
-            ".delete-button"
-        )
-        .forEach(
-            button => {
-
-                button.addEventListener(
-                    "click",
-                    () => {
-
-                        deleteProblem(
-                            button.dataset.id
-                        );
-
-                    }
-                );
-
-            }
-        );
-
-
-    document
-        .querySelectorAll(
-            ".solution-button"
-        )
-        .forEach(
-            button => {
-
-                button.addEventListener(
-                    "click",
-                    () => {
-
-                        openSolutions(
-                            button.dataset.id
-                        );
-
-                    }
-                );
-
-            }
-        );
-
-
-    document
-        .querySelectorAll(
-            ".edit-button"
+            ".edit-problem-button"
         )
         .forEach(
             button => {
@@ -629,239 +718,784 @@ function renderProblems() {
 
                     }
                 );
-
             }
         );
 
-}
 
+    document
+        .querySelectorAll(
+            ".solution-problem-button"
+        )
+        .forEach(
+            button => {
 
-// ==================================================
-// APPROVE PROBLEM
-// ==================================================
+                button.addEventListener(
+                    "click",
+                    () => {
 
-async function approveProblem(
-    problemId
-) {
+                        manageSolutions(
+                            button.dataset.id
+                        );
 
-    const confirmApprove =
-        confirm(
-            "ต้องการอนุมัติปัญหานี้และเผยแพร่หรือไม่?"
+                    }
+                );
+            }
         );
 
 
-    if (!confirmApprove) {
+    document
+        .querySelectorAll(
+            ".publish-problem-button"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        changeProblemStatus(
+                            button.dataset.id,
+                            "published"
+                        );
+
+                    }
+                );
+            }
+        );
+
+
+    document
+        .querySelectorAll(
+            ".unpublish-problem-button"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        changeProblemStatus(
+                            button.dataset.id,
+                            "pending"
+                        );
+
+                    }
+                );
+            }
+        );
+
+
+    document
+        .querySelectorAll(
+            ".delete-problem-button"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        deleteProblem(
+                            button.dataset.id
+                        );
+
+                    }
+                );
+            }
+        );
+}
+
+
+// ============================================================
+// UPDATE STATISTICS
+// ============================================================
+
+function updateStatistics() {
+
+    const total =
+        allProblems.length;
+
+
+    const pending =
+        allProblems.filter(
+            item =>
+                item.status ===
+                "pending"
+        ).length;
+
+
+    const published =
+        allProblems.filter(
+            item =>
+                item.status ===
+                "published"
+        ).length;
+
+
+    const rejected =
+        allProblems.filter(
+            item =>
+                item.status ===
+                "rejected"
+        ).length;
+
+
+    setText(
+        "totalProblems",
+        total
+    );
+
+    setText(
+        "pendingProblems",
+        pending
+    );
+
+    setText(
+        "publishedProblems",
+        published
+    );
+
+    setText(
+        "rejectedProblems",
+        rejected
+    );
+
+
+    // รองรับ ID แบบอื่นที่ Dashboard เดิมอาจใช้
+
+    setText(
+        "totalCount",
+        total
+    );
+
+    setText(
+        "pendingCount",
+        pending
+    );
+
+    setText(
+        "publishedCount",
+        published
+    );
+
+    setText(
+        "rejectedCount",
+        rejected
+    );
+}
+
+
+// ============================================================
+// SET TEXT
+// ============================================================
+
+function setText(id, value) {
+
+    const element =
+        $(id);
+
+    if (element) {
+
+        element.textContent =
+            value;
+    }
+}
+
+
+// ============================================================
+// OPEN ADD MODAL
+// ============================================================
+
+function openAddProblemModal() {
+
+    editingProblemId =
+        null;
+
+
+    const modal =
+        $("problemModal");
+
+
+    if (!modal) {
+
+        createProblemModal();
 
         return;
+    }
 
+
+    resetProblemForm();
+
+
+    modal.style.display =
+        "flex";
+
+
+    setText(
+        "problemModalTitle",
+        "เพิ่มปัญหา"
+    );
+}
+
+
+// ============================================================
+// CREATE MODAL IF NOT EXISTS
+// ============================================================
+
+function createProblemModal() {
+
+    if ($("problemModal")) {
+
+        return;
+    }
+
+
+    const modal =
+        document.createElement(
+            "div"
+        );
+
+
+    modal.id =
+        "problemModal";
+
+
+    modal.className =
+        "modal";
+
+
+    modal.innerHTML = `
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h2 id="problemModalTitle">
+
+                    เพิ่มปัญหา
+
+                </h2>
+
+
+                <button
+                    type="button"
+                    id="closeProblemModal"
+                    class="close-button"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <form id="problemForm">
+
+                <label>
+                    ชื่อปัญหา
+                </label>
+
+                <input
+                    type="text"
+                    id="problemTitle"
+                    required
+                    placeholder="เช่น ESP32 ไม่พบ COM Port"
+                >
+
+
+                <label>
+                    รายละเอียด
+                </label>
+
+                <textarea
+                    id="problemDescription"
+                    rows="4"
+                    required
+                    placeholder="รายละเอียดของปัญหา"
+                ></textarea>
+
+
+                <label>
+                    หมวดหมู่
+                </label>
+
+                <select
+                    id="problemCategory"
+                    required
+                >
+
+                    <option value="">
+                        -- เลือกหมวดหมู่ --
+                    </option>
+
+                    <option value="ESP32">
+                        ESP32
+                    </option>
+
+                    <option value="ESP8266">
+                        ESP8266
+                    </option>
+
+                    <option value="Arduino">
+                        Arduino
+                    </option>
+
+                    <option value="Servo">
+                        Servo
+                    </option>
+
+                    <option value="Sensor">
+                        Sensor
+                    </option>
+
+                    <option value="WiFi">
+                        WiFi
+                    </option>
+
+                    <option value="Hardware">
+                        Hardware
+                    </option>
+
+                </select>
+
+
+                <label>
+                    อาการ
+                </label>
+
+                <textarea
+                    id="problemSymptoms"
+                    rows="3"
+                    placeholder="อาการที่พบ"
+                ></textarea>
+
+
+                <label>
+                    สาเหตุ
+                </label>
+
+                <textarea
+                    id="problemCauses"
+                    rows="3"
+                    placeholder="สาเหตุที่เป็นไปได้"
+                ></textarea>
+
+
+                <label>
+                    สถานะ
+                </label>
+
+                <select id="problemStatus">
+
+                    <option value="pending">
+                        รอตรวจสอบ
+                    </option>
+
+                    <option value="published">
+                        เผยแพร่
+                    </option>
+
+                    <option value="rejected">
+                        ไม่เผยแพร่
+                    </option>
+
+                </select>
+
+
+                <button
+                    type="submit"
+                    class="save-button"
+                >
+
+                    💾 บันทึกข้อมูล
+
+                </button>
+
+            </form>
+
+        </div>
+
+    `;
+
+
+    document.body.appendChild(
+        modal
+    );
+
+
+    $("closeProblemModal")
+        .addEventListener(
+            "click",
+            closeProblemModal
+        );
+
+
+    $("problemForm")
+        .addEventListener(
+            "submit",
+            saveProblem
+        );
+
+
+    modal.addEventListener(
+        "click",
+        event => {
+
+            if (
+                event.target ===
+                modal
+            ) {
+
+                closeProblemModal();
+            }
+        }
+    );
+
+
+    modal.style.display =
+        "flex";
+}
+
+
+// ============================================================
+// RESET FORM
+// ============================================================
+
+function resetProblemForm() {
+
+    const form =
+        $("problemForm");
+
+
+    if (form) {
+
+        form.reset();
+    }
+
+
+    const status =
+        $("problemStatus");
+
+
+    if (status) {
+
+        status.value =
+            "pending";
+    }
+}
+
+
+// ============================================================
+// CLOSE PROBLEM MODAL
+// ============================================================
+
+function closeProblemModal() {
+
+    const modal =
+        $("problemModal");
+
+
+    if (modal) {
+
+        modal.style.display =
+            "none";
+    }
+}
+
+
+// ============================================================
+// EDIT PROBLEM
+// ============================================================
+
+async function editProblem(id) {
+
+    const problem =
+        allProblems.find(
+            item =>
+                String(item.id) ===
+                String(id)
+        );
+
+
+    if (!problem) {
+
+        showMessage(
+            "ไม่พบข้อมูลปัญหา",
+            "error"
+        );
+
+        return;
+    }
+
+
+    editingProblemId =
+        id;
+
+
+    createProblemModal();
+
+
+    setText(
+        "problemModalTitle",
+        "แก้ไขปัญหา"
+    );
+
+
+    $("problemTitle").value =
+        problem.title || "";
+
+
+    $("problemDescription").value =
+        problem.description || "";
+
+
+    $("problemCategory").value =
+        problem.category || "";
+
+
+    $("problemSymptoms").value =
+        problem.symptoms || "";
+
+
+    $("problemCauses").value =
+        problem.causes || "";
+
+
+    $("problemStatus").value =
+        problem.status || "pending";
+
+
+    $("problemModal").style.display =
+        "flex";
+}
+
+
+// ============================================================
+// SAVE PROBLEM
+// ============================================================
+
+async function saveProblem(event) {
+
+    event.preventDefault();
+
+
+    if (!isAdmin || !currentUser) {
+
+        showMessage(
+            "ไม่มีสิทธิ์ดำเนินการ",
+            "error"
+        );
+
+        return;
+    }
+
+
+    const title =
+        $("problemTitle")
+            .value
+            .trim();
+
+
+    const description =
+        $("problemDescription")
+            .value
+            .trim();
+
+
+    const category =
+        $("problemCategory")
+            .value;
+
+
+    const symptoms =
+        $("problemSymptoms")
+            .value
+            .trim();
+
+
+    const causes =
+        $("problemCauses")
+            .value
+            .trim();
+
+
+    const status =
+        $("problemStatus")
+            .value;
+
+
+    if (!title) {
+
+        showMessage(
+            "กรุณากรอกชื่อปัญหา",
+            "error"
+        );
+
+        return;
+    }
+
+
+    if (!description) {
+
+        showMessage(
+            "กรุณากรอกรายละเอียดปัญหา",
+            "error"
+        );
+
+        return;
     }
 
 
     try {
 
-        // =========================================
-        // UPDATE PROBLEM
-        // =========================================
-
-        const {
-            error:
-            problemError
-        } =
-            await supabaseClient
-                .from("problems")
-                .update({
-
-                    status:
-                        "published"
-
-                })
-                .eq(
-                    "id",
-                    problemId
-                );
+        let result;
 
 
-        if (problemError) {
+        // ==================================================
+        // EDIT
+        // ==================================================
 
-            throw problemError;
+        if (editingProblemId) {
 
-        }
+            result =
+                await supabaseClient
+                    .from("problems")
+                    .update({
 
+                        title:
+                            title,
 
-        // =========================================
-        // UPDATE SOLUTIONS
-        // =========================================
+                        description:
+                            description,
 
-        const {
-            error:
-            solutionError
-        } =
-            await supabaseClient
-                .from("solutions")
-                .update({
+                        category:
+                            category,
 
-                    status:
-                        "published"
+                        symptoms:
+                            symptoms,
 
-                })
-                .eq(
-                    "problem_id",
-                    problemId
-                );
+                        causes:
+                            causes,
 
+                        status:
+                            status
 
-        if (solutionError) {
-
-            throw solutionError;
+                    })
+                    .eq(
+                        "id",
+                        editingProblemId
+                    );
 
         }
 
+        // ==================================================
+        // INSERT
+        // ==================================================
 
-        alert(
-            "✅ อนุมัติและเผยแพร่เรียบร้อยแล้ว"
+        else {
+
+            result =
+                await supabaseClient
+                    .from("problems")
+                    .insert({
+
+                        title:
+                            title,
+
+                        description:
+                            description,
+
+                        category:
+                            category,
+
+                        symptoms:
+                            symptoms,
+
+                        causes:
+                            causes,
+
+                        status:
+                            status,
+
+                        created_by:
+                            currentUser.id
+
+                    });
+        }
+
+
+        if (result.error) {
+
+            throw result.error;
+        }
+
+
+        showMessage(
+            editingProblemId
+                ? "แก้ไขข้อมูลสำเร็จ"
+                : "เพิ่มปัญหาสำเร็จ",
+            "success"
         );
+
+
+        closeProblemModal();
+
+
+        editingProblemId =
+            null;
 
 
         await loadProblems();
 
     }
+    catch (error) {
 
-    catch(error) {
-
-        console.error(error);
-
-        alert(
-            "❌ อนุมัติไม่สำเร็จ\n\n" +
-            error.message
+        console.error(
+            "SAVE PROBLEM ERROR:",
+            error
         );
 
-    }
 
+        showMessage(
+            "บันทึกไม่สำเร็จ: " +
+            error.message,
+            "error"
+        );
+    }
 }
 
 
-// ==================================================
-// REJECT PROBLEM
-// ==================================================
+// ============================================================
+// CHANGE STATUS
+// ============================================================
 
-async function rejectProblem(
-    problemId
+async function changeProblemStatus(
+    id,
+    status
 ) {
 
-    const confirmReject =
-        confirm(
-            "ต้องการยกเลิก/ไม่อนุมัติปัญหานี้หรือไม่?"
+    if (!isAdmin) {
+
+        showMessage(
+            "ไม่มีสิทธิ์",
+            "error"
         );
-
-
-    if (!confirmReject) {
 
         return;
-
     }
 
 
-    try {
-
-        // =========================================
-        // PROBLEM
-        // =========================================
-
-        const {
-            error:
-            problemError
-        } =
-            await supabaseClient
-                .from("problems")
-                .update({
-
-                    status:
-                        "rejected"
-
-                })
-                .eq(
-                    "id",
-                    problemId
-                );
+    const message =
+        status === "published"
+            ? "ต้องการเผยแพร่ปัญหานี้หรือไม่?"
+            : "ต้องการยกเลิกการเผยแพร่หรือไม่?";
 
 
-        if (problemError) {
-
-            throw problemError;
-
-        }
-
-
-        // =========================================
-        // SOLUTIONS
-        // =========================================
-
-        const {
-            error:
-            solutionError
-        } =
-            await supabaseClient
-                .from("solutions")
-                .update({
-
-                    status:
-                        "rejected"
-
-                })
-                .eq(
-                    "problem_id",
-                    problemId
-                );
-
-
-        if (solutionError) {
-
-            throw solutionError;
-
-        }
-
-
-        alert(
-            "เปลี่ยนสถานะเป็นไม่เผยแพร่แล้ว"
-        );
-
-
-        await loadProblems();
-
-    }
-
-    catch(error) {
-
-        console.error(error);
-
-        alert(
-            "❌ ไม่สามารถเปลี่ยนสถานะได้\n\n" +
-            error.message
-        );
-
-    }
-
-}
-
-
-// ==================================================
-// DELETE PROBLEM
-// ==================================================
-
-async function deleteProblem(
-    problemId
-) {
-
-    const confirmDelete =
-        confirm(
-            "⚠️ ต้องการลบปัญหานี้จริงหรือไม่?\n\nวิธีแก้ไขทั้งหมดจะถูกลบด้วย"
-        );
-
-
-    if (!confirmDelete) {
+    if (!confirm(message)) {
 
         return;
-
     }
 
 
@@ -872,105 +1506,178 @@ async function deleteProblem(
         } =
             await supabaseClient
                 .from("problems")
-                .delete()
+                .update({
+
+                    status:
+                        status
+
+                })
                 .eq(
                     "id",
-                    problemId
+                    id
                 );
 
 
         if (error) {
 
             throw error;
-
         }
 
 
-        alert(
-            "🗑️ ลบปัญหาเรียบร้อยแล้ว"
+        showMessage(
+            status === "published"
+                ? "เผยแพร่สำเร็จ"
+                : "ยกเลิกการเผยแพร่สำเร็จ",
+            "success"
         );
 
 
         await loadProblems();
 
     }
-
-    catch(error) {
+    catch (error) {
 
         console.error(error);
 
-        alert(
-            "❌ ลบไม่สำเร็จ\n\n" +
-            error.message
+        showMessage(
+            "เปลี่ยนสถานะไม่สำเร็จ: " +
+            error.message,
+            "error"
         );
-
     }
-
 }
 
 
-// ==================================================
-// OPEN SOLUTIONS
-// ==================================================
+// ============================================================
+// DELETE PROBLEM
+// ============================================================
 
-async function openSolutions(
-    problemId
-) {
+async function deleteProblem(id) {
 
-    currentProblemId =
-        problemId;
+    if (!isAdmin) {
 
+        showMessage(
+            "ไม่มีสิทธิ์",
+            "error"
+        );
+
+        return;
+    }
+
+
+    if (
+        !confirm(
+            "ต้องการลบปัญหานี้หรือไม่?\nข้อมูลจะไม่สามารถกู้คืนได้"
+        )
+    ) {
+
+        return;
+    }
+
+
+    try {
+
+        // ------------------------------------------
+        // ลบ solutions ก่อน
+        // ------------------------------------------
+
+        const {
+            error:
+                solutionError
+        } =
+            await supabaseClient
+                .from("solutions")
+                .delete()
+                .eq(
+                    "problem_id",
+                    id
+                );
+
+
+        if (
+            solutionError &&
+            solutionError.code !==
+            "PGRST116"
+        ) {
+
+            console.warn(
+                "ลบ solutions:",
+                solutionError
+            );
+        }
+
+
+        // ------------------------------------------
+        // ลบ problem
+        // ------------------------------------------
+
+        const {
+            error
+        } =
+            await supabaseClient
+                .from("problems")
+                .delete()
+                .eq(
+                    "id",
+                    id
+                );
+
+
+        if (error) {
+
+            throw error;
+        }
+
+
+        showMessage(
+            "ลบปัญหาสำเร็จ",
+            "success"
+        );
+
+
+        await loadProblems();
+
+    }
+    catch (error) {
+
+        console.error(
+            "DELETE ERROR:",
+            error
+        );
+
+
+        showMessage(
+            "ลบข้อมูลไม่สำเร็จ: " +
+            error.message,
+            "error"
+        );
+    }
+}
+
+
+// ============================================================
+// MANAGE SOLUTIONS
+// ============================================================
+
+async function manageSolutions(id) {
 
     const problem =
         allProblems.find(
             item =>
                 String(item.id) ===
-                String(problemId)
+                String(id)
         );
 
 
     if (!problem) {
 
-        return;
-
-    }
-
-
-    document.getElementById(
-        "solutionProblemTitle"
-    ).textContent =
-        problem.title;
-
-
-    document.getElementById(
-        "solutionModal"
-    ).style.display =
-        "flex";
-
-
-    await loadSolutions(
-        problemId
-    );
-
-}
-
-
-// ==================================================
-// LOAD SOLUTIONS
-// ==================================================
-
-async function loadSolutions(
-    problemId
-) {
-
-    const list =
-        document.getElementById(
-            "solutionList"
+        showMessage(
+            "ไม่พบปัญหา",
+            "error"
         );
 
-
-    list.innerHTML =
-        "กำลังโหลด...";
+        return;
+    }
 
 
     const {
@@ -981,15 +1688,13 @@ async function loadSolutions(
             .from("solutions")
             .select(`
                 id,
+                problem_id,
                 step_number,
-                title,
-                description,
-                status,
-                created_by
+                content
             `)
             .eq(
                 "problem_id",
-                problemId
+                id
             )
             .order(
                 "step_number",
@@ -1001,180 +1706,228 @@ async function loadSolutions(
 
     if (error) {
 
-        list.innerHTML =
-            "โหลดข้อมูลไม่สำเร็จ";
-
-        console.error(error);
+        showMessage(
+            "โหลดวิธีแก้ไขไม่สำเร็จ: " +
+            error.message,
+            "error"
+        );
 
         return;
-
     }
 
 
-    list.innerHTML =
-        "";
+    createSolutionModal(
+        problem,
+        data || []
+    );
+}
 
 
-    if (!data || data.length === 0) {
+// ============================================================
+// CREATE SOLUTION MODAL
+// ============================================================
 
-        list.innerHTML = `
+function createSolutionModal(
+    problem,
+    solutions
+) {
 
-            <div class="no-result">
+    const old =
+        $("solutionModal");
 
-                ยังไม่มีวิธีแก้ไข
 
-            </div>
+    if (old) {
 
-        `;
-
-        return;
-
+        old.remove();
     }
 
 
-    data.forEach(
-        solution => {
-
-            const item =
-                document.createElement(
-                    "div"
-                );
+    const modal =
+        document.createElement(
+            "div"
+        );
 
 
-            item.className =
-                "solution-item";
+    modal.id =
+        "solutionModal";
 
 
-            let statusText =
-                "รอตรวจสอบ";
+    modal.className =
+        "modal";
 
 
-            if (
-                solution.status ===
-                "published"
-            ) {
+    modal.innerHTML = `
 
-                statusText =
-                    "เผยแพร่แล้ว";
+        <div class="modal-content">
 
-            }
-
-
-            if (
-                solution.status ===
-                "rejected"
-            ) {
-
-                statusText =
-                    "ไม่เผยแพร่";
-
-            }
-
-
-            item.innerHTML = `
+            <div class="modal-header">
 
                 <div>
 
-                    <strong>
-                        ขั้นตอนที่
-                        ${solution.step_number}
-                    </strong>
-
-
-                    <h3>
-                        ${escapeHtml(
-                            solution.title
-                        )}
-                    </h3>
-
+                    <h2>
+                        🛠 วิธีแก้ไข
+                    </h2>
 
                     <p>
                         ${escapeHtml(
-                            solution.description ||
-                            ""
+                            problem.title
                         )}
                     </p>
 
-
-                    <span
-                        class="status-badge"
-                    >
-                        ${statusText}
-                    </span>
-
                 </div>
 
 
-                <div>
+                <button
+                    type="button"
+                    class="close-button"
+                    id="closeSolutionModal"
+                >
+                    ×
+                </button>
 
-                    ${
-                        solution.status ===
-                        "pending"
+            </div>
 
-                        ?
+
+            <div id="solutionList">
+
+                ${
+                    solutions.length === 0
+
+                    ?
+
+                    `
+                    <p>
+                        ยังไม่มีวิธีแก้ไข
+                    </p>
+                    `
+
+                    :
+
+                    solutions.map(
+                        (solution, index) => `
+
+                            <div
+                                class="solution-item"
+                                data-solution-id="${solution.id}"
+                                style="
+                                    margin-bottom:15px;
+                                    padding:15px;
+                                    border:1px solid #ddd;
+                                    border-radius:10px;
+                                "
+                            >
+
+                                <strong>
+                                    ขั้นตอนที่ ${index + 1}
+                                </strong>
+
+
+                                <textarea
+                                    class="solution-content"
+                                    rows="3"
+                                    style="width:100%;margin-top:8px;"
+                                >${escapeHtml(
+                                    solution.content
+                                )}</textarea>
+
+
+                                <button
+                                    type="button"
+                                    class="delete-solution-button"
+                                    data-id="${solution.id}"
+                                    style="margin-top:8px;"
+                                >
+                                    🗑️ ลบขั้นตอน
+                                </button>
+
+                            </div>
 
                         `
+                    ).join("")
+                }
 
-                        <button
-                            class="approve-solution-button"
-                            data-id="${solution.id}"
-                        >
-                            ✅ อนุมัติ
-                        </button>
-
-                        `
-
-                        :
-
-                        ""
-                    }
+            </div>
 
 
-                    <button
-                        class="delete-solution-button"
-                        data-id="${solution.id}"
-                    >
-                        🗑️ ลบ
-                    </button>
-
-                </div>
-
-            `;
+            <hr>
 
 
-            list.appendChild(
-                item
-            );
+            <h3>
+                + เพิ่มขั้นตอน
+            </h3>
 
-        }
+
+            <textarea
+                id="newSolutionContent"
+                rows="4"
+                placeholder="พิมพ์วิธีแก้ไข..."
+                style="width:100%;"
+            ></textarea>
+
+
+            <button
+                type="button"
+                id="addSolutionButton"
+                class="add-button"
+                style="margin-top:10px;"
+            >
+                + เพิ่มขั้นตอน
+            </button>
+
+
+            <button
+                type="button"
+                id="saveSolutionsButton"
+                class="save-button"
+                style="margin-top:10px;"
+            >
+                💾 บันทึกการแก้ไข
+            </button>
+
+        </div>
+
+    `;
+
+
+    document.body.appendChild(
+        modal
     );
 
 
-    // APPROVE SOLUTION
+    modal.style.display =
+        "flex";
 
-    document
-        .querySelectorAll(
-            ".approve-solution-button"
-        )
-        .forEach(
-            button => {
 
-                button.addEventListener(
-                    "click",
-                    () => {
+    $("closeSolutionModal")
+        .addEventListener(
+            "click",
+            () => modal.remove()
+        );
 
-                        approveSolution(
-                            button.dataset.id
-                        );
 
-                    }
+    $("addSolutionButton")
+        .addEventListener(
+            "click",
+            async () => {
+
+                await addSolution(
+                    problem.id
                 );
 
             }
         );
 
 
-    // DELETE SOLUTION
+    $("saveSolutionsButton")
+        .addEventListener(
+            "click",
+            async () => {
+
+                await saveExistingSolutions();
+
+            }
+        );
+
 
     document
         .querySelectorAll(
@@ -1185,309 +1938,675 @@ async function loadSolutions(
 
                 button.addEventListener(
                     "click",
-                    () => {
+                    async () => {
 
-                        deleteSolution(
-                            button.dataset.id
+                        await deleteSolution(
+                            button.dataset.id,
+                            problem.id
+                        );
+
+                    }
+                );
+            }
+        );
+}
+
+
+// ============================================================
+// ADD SOLUTION
+// ============================================================
+
+async function addSolution(
+    problemId
+) {
+
+    const textarea =
+        $("newSolutionContent");
+
+
+    if (!textarea) {
+
+        return;
+    }
+
+
+    const content =
+        textarea.value.trim();
+
+
+    if (!content) {
+
+        showMessage(
+            "กรุณากรอกวิธีแก้ไข",
+            "error"
+        );
+
+        return;
+    }
+
+
+    try {
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+                .from("solutions")
+                .select("step_number")
+                .eq(
+                    "problem_id",
+                    problemId
+                )
+                .order(
+                    "step_number",
+                    {
+                        ascending: false
+                    }
+                )
+                .limit(1);
+
+
+        if (error) {
+
+            throw error;
+        }
+
+
+        let nextStep =
+            1;
+
+
+        if (
+            data &&
+            data.length > 0
+        ) {
+
+            nextStep =
+                Number(
+                    data[0].step_number
+                ) + 1;
+        }
+
+
+        const {
+            error:
+                insertError
+        } =
+            await supabaseClient
+                .from("solutions")
+                .insert({
+
+                    problem_id:
+                        problemId,
+
+                    step_number:
+                        nextStep,
+
+                    content:
+                        content
+
+                });
+
+
+        if (insertError) {
+
+            throw insertError;
+        }
+
+
+        showMessage(
+            "เพิ่มวิธีแก้ไขสำเร็จ",
+            "success"
+        );
+
+
+        $("newSolutionContent")
+            .value = "";
+
+
+        await manageSolutions(
+            problemId
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            "ADD SOLUTION ERROR:",
+            error
+        );
+
+
+        showMessage(
+            "เพิ่มวิธีแก้ไขไม่สำเร็จ: " +
+            error.message,
+            "error"
+        );
+    }
+}
+
+
+// ============================================================
+// SAVE EXISTING SOLUTIONS
+// ============================================================
+
+async function saveExistingSolutions() {
+
+    const items =
+        document.querySelectorAll(
+            ".solution-item"
+        );
+
+
+    try {
+
+        for (
+            const item of items
+        ) {
+
+            const id =
+                item.dataset.solutionId;
+
+
+            if (!id) {
+                continue;
+            }
+
+
+            const textarea =
+                item.querySelector(
+                    ".solution-content"
+                );
+
+
+            if (!textarea) {
+                continue;
+            }
+
+
+            const content =
+                textarea.value.trim();
+
+
+            const {
+                error
+            } =
+                await supabaseClient
+                    .from("solutions")
+                    .update({
+
+                        content:
+                            content
+
+                    })
+                    .eq(
+                        "id",
+                        id
+                    );
+
+
+            if (error) {
+
+                throw error;
+            }
+        }
+
+
+        showMessage(
+            "บันทึกวิธีแก้ไขสำเร็จ",
+            "success"
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            "SAVE SOLUTIONS ERROR:",
+            error
+        );
+
+
+        showMessage(
+            "บันทึกวิธีแก้ไขไม่สำเร็จ: " +
+            error.message,
+            "error"
+        );
+    }
+}
+
+
+// ============================================================
+// DELETE SOLUTION
+// ============================================================
+
+async function deleteSolution(
+    solutionId,
+    problemId
+) {
+
+    if (
+        !confirm(
+            "ต้องการลบขั้นตอนนี้หรือไม่?"
+        )
+    ) {
+
+        return;
+    }
+
+
+    try {
+
+        const {
+            error
+        } =
+            await supabaseClient
+                .from("solutions")
+                .delete()
+                .eq(
+                    "id",
+                    solutionId
+                );
+
+
+        if (error) {
+
+            throw error;
+        }
+
+
+        showMessage(
+            "ลบขั้นตอนสำเร็จ",
+            "success"
+        );
+
+
+        await manageSolutions(
+            problemId
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            error
+        );
+
+
+        showMessage(
+            "ลบขั้นตอนไม่สำเร็จ: " +
+            error.message,
+            "error"
+        );
+    }
+}
+
+
+// ============================================================
+// SEARCH
+// ============================================================
+
+function setupSearch() {
+
+    const input =
+        $("searchInput");
+
+
+    if (!input) {
+        return;
+    }
+
+
+    input.addEventListener(
+        "input",
+        () => {
+
+            const keyword =
+                input.value
+                    .trim()
+                    .toLowerCase();
+
+
+            const filtered =
+                allProblems.filter(
+                    problem => {
+
+                        return (
+
+                            (
+                                problem.title ||
+                                ""
+                            )
+                                .toLowerCase()
+                                .includes(
+                                    keyword
+                                )
+
+                            ||
+
+                            (
+                                problem.description ||
+                                ""
+                            )
+                                .toLowerCase()
+                                .includes(
+                                    keyword
+                                )
+
+                            ||
+
+                            (
+                                problem.category ||
+                                ""
+                            )
+                                .toLowerCase()
+                                .includes(
+                                    keyword
+                                )
+
                         );
 
                     }
                 );
 
+
+            renderFilteredProblems(
+                filtered
+            );
+        }
+    );
+}
+
+
+// ============================================================
+// RENDER FILTERED
+// ============================================================
+
+function renderFilteredProblems(
+    problems
+) {
+
+    const original =
+        allProblems;
+
+
+    allProblems =
+        problems;
+
+
+    renderProblems();
+
+
+    allProblems =
+        original;
+}
+
+
+// ============================================================
+// CATEGORY FILTER
+// ============================================================
+
+function setupCategoryFilter() {
+
+    const buttons =
+        document.querySelectorAll(
+            "[data-category]"
+        );
+
+
+    buttons.forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    const category =
+                        button.dataset.category;
+
+
+                    if (
+                        !category ||
+                        category === "all"
+                    ) {
+
+                        renderProblems();
+
+                        return;
+                    }
+
+
+                    const filtered =
+                        allProblems.filter(
+                            problem =>
+                                problem.category ===
+                                category
+                        );
+
+
+                    renderFilteredProblems(
+                        filtered
+                    );
+                }
+            );
+        }
+    );
+}
+
+
+// ============================================================
+// ADD BUTTON
+// ============================================================
+
+function setupAddButton() {
+
+    const buttons = [
+
+        $("addProblemButton"),
+
+        $("addProblem"),
+
+        $("addButton"),
+
+        document.querySelector(
+            '[data-action="add-problem"]'
+        )
+
+    ];
+
+
+    buttons.forEach(
+        button => {
+
+            if (!button) {
+                return;
             }
-        );
-
-}
 
 
-// ==================================================
-// APPROVE SOLUTION
-// ==================================================
-
-async function approveSolution(
-    solutionId
-) {
-
-    const confirmApprove =
-        confirm(
-            "ต้องการอนุมัติขั้นตอนนี้หรือไม่?"
-        );
-
-
-    if (!confirmApprove) {
-
-        return;
-
-    }
-
-
-    const {
-        error
-    } =
-        await supabaseClient
-            .from("solutions")
-            .update({
-
-                status:
-                    "published"
-
-            })
-            .eq(
-                "id",
-                solutionId
+            button.addEventListener(
+                "click",
+                openAddProblemModal
             );
-
-
-    if (error) {
-
-        alert(
-            "❌ อนุมัติไม่สำเร็จ\n\n" +
-            error.message
-        );
-
-        return;
-
-    }
-
-
-    alert(
-        "✅ อนุมัติขั้นตอนแล้ว"
+        }
     );
-
-
-    await loadSolutions(
-        currentProblemId
-    );
-
 }
 
 
-// ==================================================
-// DELETE SOLUTION
-// ==================================================
+// ============================================================
+// CREATE ADD BUTTON IF MISSING
+// ============================================================
 
-async function deleteSolution(
-    solutionId
-) {
+function createAddButtonIfMissing() {
 
-    const confirmDelete =
-        confirm(
-            "ต้องการลบขั้นตอนนี้หรือไม่?"
+    const existing =
+        $("addProblemButton") ||
+        $("addProblem") ||
+        document.querySelector(
+            '[data-action="add-problem"]'
         );
 
 
-    if (!confirmDelete) {
+    if (existing) {
 
         return;
-
     }
 
 
-    const {
-        error
-    } =
-        await supabaseClient
-            .from("solutions")
-            .delete()
-            .eq(
-                "id",
-                solutionId
-            );
+    const container =
+        document.querySelector(
+            ".section-title"
+        ) ||
+        document.querySelector(
+            "main"
+        ) ||
+        document.body;
 
 
-    if (error) {
-
-        alert(
-            "❌ ลบไม่สำเร็จ\n\n" +
-            error.message
-        );
-
-        return;
-
-    }
-
-
-    await loadSolutions(
-        currentProblemId
-    );
-
-}
-
-
-// ==================================================
-// EDIT PROBLEM
-// ==================================================
-
-function editProblem(
-    problemId
-) {
-
-    const problem =
-        allProblems.find(
-            item =>
-                String(item.id) ===
-                String(problemId)
-        );
-
-
-    if (!problem) {
-
-        return;
-
-    }
-
-
-    document.getElementById(
-        "editingProblemId"
-    ).value =
-        problem.id;
-
-
-    document.getElementById(
-        "title"
-    ).value =
-        problem.title || "";
-
-
-    document.getElementById(
-        "description"
-    ).value =
-        problem.description || "";
-
-
-    document.getElementById(
-        "category"
-    ).value =
-        problem.category || "";
-
-
-    document.getElementById(
-        "symptoms"
-    ).value =
-        problem.symptoms || "";
-
-
-    document.getElementById(
-        "causes"
-    ).value =
-        problem.causes || "";
-
-
-    document.getElementById(
-        "status"
-    ).value =
-        problem.status || "pending";
-
-
-    document.getElementById(
-        "problemModalTitle"
-    ).textContent =
-        "แก้ไขปัญหา";
-
-
-    document.getElementById(
-        "problemModal"
-    ).style.display =
-        "flex";
-
-}
-
-
-// ==================================================
-// ESCAPE HTML
-// ==================================================
-
-function escapeHtml(
-    value
-) {
-
-    const div =
+    const button =
         document.createElement(
-            "div"
+            "button"
         );
 
 
-    div.textContent =
-        value ?? "";
+    button.id =
+        "addProblemButton";
 
 
-    return div.innerHTML;
+    button.className =
+        "add-button";
 
+
+    button.type =
+        "button";
+
+
+    button.textContent =
+        "+ เพิ่มปัญหา";
+
+
+    button.addEventListener(
+        "click",
+        openAddProblemModal
+    );
+
+
+    container.prepend(
+        button
+    );
 }
 
 
-// ==================================================
-// SEARCH
-// ==================================================
+// ============================================================
+// AUTH STATE
+// ============================================================
 
-adminSearch.addEventListener(
-    "input",
-    renderProblems
-);
+function setupAuthListener() {
+
+    supabaseClient.auth.onAuthStateChange(
+        async (
+            event,
+            session
+        ) => {
+
+            console.log(
+                "AUTH EVENT:",
+                event
+            );
 
 
-// ==================================================
-// CLOSE SOLUTION MODAL
-// ==================================================
+            if (!session) {
 
-document
-    .getElementById(
-        "closeSolutionModal"
-    )
-    .addEventListener(
-        "click",
-        () => {
+                window.location.href =
+                    "login.html";
 
-            document.getElementById(
-                "solutionModal"
-            ).style.display =
-                "none";
+                return;
+            }
 
+
+            if (
+                event ===
+                "SIGNED_IN"
+            ) {
+
+                currentUser =
+                    session.user;
+
+            }
         }
     );
+}
 
 
-// ==================================================
-// LOGOUT
-// ==================================================
-
-document
-    .getElementById(
-        "logoutButton"
-    )
-    .addEventListener(
-        "click",
-        async () => {
-
-            await supabaseClient.auth.signOut();
-
-            window.location.href =
-                "login.html";
-
-        }
-    );
-
-
-// ==================================================
-// START
-// ==================================================
+// ============================================================
+// START DASHBOARD
+// ============================================================
 
 async function startDashboard() {
 
-    const isAdmin =
+    console.log(
+        "================================"
+    );
+
+    console.log(
+        "START ADMIN DASHBOARD"
+    );
+
+    console.log(
+        "================================"
+    );
+
+
+    // ------------------------------------------
+    // ตรวจ Admin
+    // ------------------------------------------
+
+    const allowed =
         await checkAdmin();
 
 
-    if (!isAdmin) {
+    if (!allowed) {
 
         return;
-
     }
 
 
+    // ------------------------------------------
+    // โหลดข้อมูล
+    // ------------------------------------------
+
     await loadProblems();
 
+
+    // ------------------------------------------
+    // ปุ่มต่าง ๆ
+    // ------------------------------------------
+
+    setupAddButton();
+
+    createAddButtonIfMissing();
+
+    setupSearch();
+
+    setupCategoryFilter();
+
+    setupAuthListener();
+
+
+    console.log(
+        "ADMIN DASHBOARD READY"
+    );
 }
 
 
-startDashboard();
+// ============================================================
+// START
+// ============================================================
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        startDashboard();
+
+    }
+);
