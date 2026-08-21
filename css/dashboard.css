@@ -1221,4 +1221,322 @@ form select:focus {
 
         border-radius: 14px;
     }
+   ```css
+/* =========================================================
+   ADMIN DASHBOARD - PROFESSIONAL BUTTON STYLE
+   ========================================================= */
+
+/* กลุ่มปุ่มจัดการปัญหา */
+.problem-actions,
+.actions,
+.button-group {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+/* ปุ่มทั้งหมดในส่วนจัดการปัญหา */
+.problem-actions button,
+.actions button,
+.button-group button {
+    border: none;
+    border-radius: 9px;
+    padding: 10px 16px;
+    min-height: 42px;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        background-color 0.15s ease;
+
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* Hover */
+.problem-actions button:hover,
+.actions button:hover,
+.button-group button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.14);
+}
+
+/* กดปุ่ม */
+.problem-actions button:active,
+.actions button:active,
+.button-group button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+
+/* =========================================================
+   ปุ่มวิธีแก้ไข
+   ========================================================= */
+
+.btn-solution,
+button.solution-btn,
+button[onclick*="solution"],
+button[onclick*="Solution"] {
+    background: #2563eb;
+    color: white;
+}
+
+.btn-solution:hover,
+button.solution-btn:hover {
+    background: #1d4ed8;
+}
+
+
+/* =========================================================
+   ปุ่มแก้ไข
+   ========================================================= */
+
+.btn-edit,
+button.edit-btn,
+button[onclick*="edit"],
+button[onclick*="Edit"] {
+    background: #f59e0b;
+    color: white;
+}
+
+.btn-edit:hover,
+button.edit-btn:hover {
+    background: #d97706;
+}
+
+
+/* =========================================================
+   ปุ่มอนุมัติ
+   ========================================================= */
+
+.btn-approve,
+button.approve-btn,
+button[onclick*="approve"],
+button[onclick*="Approve"] {
+    background: #16a34a;
+    color: white;
+}
+
+.btn-approve:hover,
+button.approve-btn:hover {
+    background: #15803d;
+}
+
+
+/* =========================================================
+   ปุ่มไม่อนุมัติ
+   ========================================================= */
+
+.btn-reject,
+button.reject-btn,
+button[onclick*="reject"],
+button[onclick*="Reject"] {
+    background: #64748b;
+    color: white;
+}
+
+.btn-reject:hover,
+button.reject-btn:hover {
+    background: #475569;
+}
+
+
+/* =========================================================
+   ปุ่มยกเลิกเผยแพร่
+   ========================================================= */
+
+.btn-unpublish,
+button.unpublish-btn {
+    background: #f97316;
+    color: white;
+}
+
+.btn-unpublish:hover,
+button.unpublish-btn:hover {
+    background: #ea580c;
+}
+
+
+/* =========================================================
+   ปุ่มลบ
+   ========================================================= */
+
+.btn-delete,
+button.delete-btn,
+button[onclick*="delete"],
+button[onclick*="Delete"] {
+    background: #dc2626;
+    color: white;
+}
+
+.btn-delete:hover,
+button.delete-btn:hover {
+    background: #b91c1c;
+}
+
+
+/* =========================================================
+   ปุ่มเพิ่มปัญหา
+   ========================================================= */
+
+#addProblemBtn,
+.add-problem-btn,
+button.primary {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: white;
+
+    border: none;
+    border-radius: 11px;
+
+    padding: 12px 22px;
+    min-height: 46px;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    box-shadow: 0 5px 14px rgba(37, 99, 235, 0.25);
+
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+#addProblemBtn:hover,
+.add-problem-btn:hover,
+button.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.32);
+}
+
+
+/* =========================================================
+   ปุ่มทั่วไปที่ยังไม่ได้กำหนด class
+   ========================================================= */
+
+.problem-actions button:not(.btn-solution):not(.btn-edit):not(.btn-approve):not(.btn-reject):not(.btn-unpublish):not(.btn-delete) {
+    border: 1px solid #d1d5db;
+    background: white;
+    color: #374151;
+}
+
+.problem-actions button:not(.btn-solution):not(.btn-edit):not(.btn-approve):not(.btn-reject):not(.btn-unpublish):not(.btn-delete):hover {
+    background: #f8fafc;
+}
+
+
+/* =========================================================
+   Responsive สำหรับมือถือ
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    .problem-actions,
+    .actions,
+    .button-group {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .problem-actions button,
+    .actions button,
+    .button-group button {
+        width: 100%;
+        min-height: 44px;
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .problem-actions,
+    .actions,
+    .button-group {
+        grid-template-columns: 1fr;
+    }
+
+    .problem-actions button,
+    .actions button,
+    .button-group button {
+        width: 100%;
+    }
+}
+
+
+/* =========================================================
+   Card ปัญหา
+   ========================================================= */
+
+.problem-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 20px;
+
+    background: #ffffff;
+
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.problem-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.09);
+}
+
+
+/* ชื่อปัญหา */
+.problem-card h3 {
+    margin: 8px 0;
+
+    color: #111827;
+
+    font-size: 20px;
+    font-weight: 700;
+}
+
+
+/* รายละเอียด */
+.problem-card p {
+    color: #4b5563;
+    line-height: 1.7;
+}
+
+
+/* Badge */
+.problem-card .badge {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 5px 11px;
+
+    border-radius: 999px;
+
+    background: #eff6ff;
+    color: #2563eb;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+```
+
 }
