@@ -1,833 +1,593 @@
 /* =========================================================
    IoT PROBLEM CENTER
-   ADMIN DASHBOARD - MODERN UI
+   ADMIN DASHBOARD - PROFESSIONAL UI
 ========================================================= */
 
-:root {
-    --primary: #2563eb;
-    --primary-dark: #1d4ed8;
-
-    --success: #16a34a;
-    --success-bg: #dcfce7;
-
-    --warning: #f59e0b;
-    --warning-bg: #fef3c7;
-
-    --danger: #dc2626;
-    --danger-bg: #fee2e2;
-
-    --text: #172033;
-    --text-light: #64748b;
-
-    --border: #e2e8f0;
-
-    --background: #f5f7fb;
-    --white: #ffffff;
-
-    --shadow:
-        0 4px 15px rgba(15, 23, 42, 0.06);
-
-    --shadow-hover:
-        0 10px 30px rgba(15, 23, 42, 0.10);
-
-    --radius: 16px;
-}
-
-
-/* =========================================================
-   RESET
-========================================================= */
+/* =========================
+   GLOBAL
+========================= */
 
 * {
     box-sizing: border-box;
 }
 
-html {
-    scroll-behavior: smooth;
+button,
+input,
+textarea,
+select {
+    font-family: inherit;
 }
 
-body {
+button {
+    -webkit-tap-highlight-color: transparent;
+}
 
-    margin: 0;
-
-    font-family:
-        "Segoe UI",
-        "Noto Sans Thai",
-        Arial,
-        sans-serif;
-
-    background: var(--background);
-
-    color: var(--text);
-
-    line-height: 1.6;
+.dashboard-container {
+    max-width: 1250px;
+    margin: 0 auto;
+    padding: 42px 24px 60px;
 }
 
 
-/* =========================================================
-   NAVBAR
-========================================================= */
-
-.navbar {
-
-    position: sticky;
-
-    top: 0;
-
-    z-index: 100;
-
-    background: rgba(255, 255, 255, 0.96);
-
-    backdrop-filter: blur(10px);
-
-    border-bottom:
-        1px solid var(--border);
-}
-
-
-.navbar-inner {
-
-    width: min(1180px, calc(100% - 40px));
-
-    margin: auto;
-
-    min-height: 68px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    gap: 20px;
-}
-
-
-/* =========================================================
-   LOGO
-========================================================= */
-
-.logo-text {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-
-    font-size: 20px;
-
-    font-weight: 700;
-
-    color: var(--text);
-
-    white-space: nowrap;
-}
-
-
-.logo-text:first-letter {
-
-    font-size: 25px;
-}
-
-
-/* =========================================================
-   USER AREA
-========================================================= */
-
-.user-area {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 14px;
-}
-
-
-.user-email {
-
-    color: var(--text-light);
-
-    font-size: 14px;
-
-    font-weight: 500;
-}
-
-
-/* =========================================================
-   LOGOUT
-========================================================= */
-
-.logout-button {
-
-    border: none;
-
-    background: #ef4444;
-
-    color: white;
-
-    padding: 10px 18px;
-
-    border-radius: 10px;
-
-    font-size: 14px;
-
-    font-weight: 600;
-
-    cursor: pointer;
-
-    transition: 0.2s;
-}
-
-
-.logout-button:hover {
-
-    background: #dc2626;
-
-    transform: translateY(-1px);
-}
-
-
-/* =========================================================
-   MAIN CONTAINER
-========================================================= */
-
-.dashboard-container,
-.container,
-.section-container {
-
-    width: min(
-        1180px,
-        calc(100% - 40px)
-    );
-
-    margin: auto;
-}
-
-
-/* =========================================================
+/* =========================
    DASHBOARD HEADER
-========================================================= */
+========================= */
 
 .dashboard-header {
-
-    margin-top: 40px;
-
-    margin-bottom: 28px;
-
     display: flex;
-
     justify-content: space-between;
-
-    align-items: flex-end;
-
-    gap: 20px;
+    align-items: center;
+    gap: 25px;
+    margin-bottom: 32px;
 }
 
-
 .dashboard-header h1 {
-
-    margin: 0 0 6px;
-
+    margin: 0;
     font-size: 36px;
-
     line-height: 1.2;
-
-    font-weight: 750;
-
+    font-weight: 800;
+    color: #111827;
     letter-spacing: -0.5px;
 }
 
-
 .dashboard-header p {
-
-    margin: 0;
-
-    color: var(--text-light);
-
+    margin: 8px 0 0;
+    color: #6b7280;
     font-size: 16px;
 }
 
 
-/* =========================================================
-   ADD BUTTON
-========================================================= */
+/* =========================
+   MAIN ADD BUTTON
+========================= */
 
 .add-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 
     border: none;
+    outline: none;
 
-    background: var(--primary);
-
-    color: white;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #ffffff;
 
     padding: 13px 22px;
+    min-height: 46px;
 
-    border-radius: 11px;
-
-    font-size: 15px;
-
-    font-weight: 650;
+    border-radius: 10px;
 
     cursor: pointer;
 
-    box-shadow:
-        0 5px 14px rgba(37, 99, 235, 0.20);
+    font-size: 15px;
+    font-weight: 700;
 
-    transition: 0.2s;
+    box-shadow: 0 5px 14px rgba(37, 99, 235, 0.22);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
 }
-
 
 .add-button:hover {
-
-    background: var(--primary-dark);
-
+    background: linear-gradient(135deg, #1d4ed8, #1e40af);
     transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.28);
+}
 
-    box-shadow:
-        0 8px 20px rgba(37, 99, 235, 0.25);
+.add-button:active {
+    transform: translateY(0);
 }
 
 
-/* =========================================================
-   STATISTICS
-========================================================= */
+/* =========================
+   STATS
+========================= */
 
 .stats-grid {
-
     display: grid;
-
-    grid-template-columns:
-        repeat(4, 1fr);
-
+    grid-template-columns: repeat(4, 1fr);
     gap: 18px;
-
-    margin-bottom: 28px;
+    margin-bottom: 34px;
 }
 
-
 .stat-card {
+    position: relative;
 
-    background: var(--white);
+    background: #ffffff;
 
-    border: 1px solid var(--border);
-
-    border-radius: var(--radius);
+    border: 1px solid #eef0f4;
+    border-radius: 16px;
 
     padding: 22px;
 
-    min-height: 130px;
-
     display: flex;
-
     align-items: center;
-
     gap: 16px;
 
-    box-shadow: var(--shadow);
+    box-shadow:
+        0 4px 15px rgba(15, 23, 42, 0.06);
 
-    transition: 0.2s;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
 }
-
 
 .stat-card:hover {
-
     transform: translateY(-3px);
 
-    box-shadow: var(--shadow-hover);
+    box-shadow:
+        0 10px 25px rgba(15, 23, 42, 0.10);
 }
 
-
 .stat-icon {
+    width: 54px;
+    height: 54px;
 
-    width: 56px;
-
-    height: 56px;
-
-    flex: 0 0 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     border-radius: 14px;
 
-    display: flex;
+    font-size: 29px;
 
-    align-items: center;
-
-    justify-content: center;
-
-    font-size: 27px;
-
-    background: #eff6ff;
+    background: #f8fafc;
 }
 
+.stat-card p {
+    margin: 0 0 5px;
 
-.stat-card h3 {
-
-    margin: 0;
-
-    color: var(--text-light);
+    color: #6b7280;
 
     font-size: 14px;
-
     font-weight: 600;
 }
 
+.stat-card h2 {
+    margin: 0;
 
-.stat-card .number {
-
-    margin-top: 2px;
+    color: #111827;
 
     font-size: 30px;
-
-    font-weight: 750;
-
-    line-height: 1.2;
-
-    color: var(--text);
+    font-weight: 800;
 }
 
 
-/* =========================================================
-   MAIN MANAGEMENT CARD
-========================================================= */
+/* =========================
+   ADMIN SECTION
+========================= */
 
-.management-card {
+.admin-section {
+    background: #ffffff;
 
-    background: var(--white);
-
-    border: 1px solid var(--border);
-
+    border: 1px solid #eef0f4;
     border-radius: 18px;
 
     padding: 28px;
 
-    box-shadow: var(--shadow);
-
-    margin-bottom: 40px;
+    box-shadow:
+        0 5px 20px rgba(15, 23, 42, 0.06);
 }
 
 
-/* =========================================================
-   MANAGEMENT HEADER
-========================================================= */
+/* =========================
+   SECTION HEADER
+========================= */
 
-.management-header {
-
+.section-header {
     display: flex;
-
-    align-items: center;
-
     justify-content: space-between;
+    align-items: flex-end;
 
-    gap: 20px;
+    gap: 25px;
 
     margin-bottom: 24px;
+
+    padding-bottom: 20px;
+
+    border-bottom: 1px solid #eef0f4;
 }
 
+.section-header h2 {
+    margin: 0 0 6px;
 
-.management-title h2 {
-
-    margin: 0;
+    color: #111827;
 
     font-size: 25px;
-
-    font-weight: 750;
+    font-weight: 800;
 }
 
+.section-header p {
+    margin: 0;
 
-.management-title p {
-
-    margin: 5px 0 0;
-
-    color: var(--text-light);
+    color: #6b7280;
 
     font-size: 14px;
 }
 
 
-/* =========================================================
+/* =========================
    SEARCH
-========================================================= */
+========================= */
 
-.search-box {
+.admin-search {
+    width: 300px;
 
-    position: relative;
+    padding: 12px 15px;
 
-    width: 280px;
-}
-
-
-.search-box input {
-
-    width: 100%;
-
-    height: 44px;
-
-    padding:
-        0 15px 0 42px;
-
-    border:
-        1px solid var(--border);
+    border: 1px solid #dfe3e8;
 
     border-radius: 10px;
 
-    background: #fff;
+    background: #ffffff;
 
-    color: var(--text);
+    color: #111827;
 
     font-size: 14px;
 
     outline: none;
 
-    transition: 0.2s;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
+.admin-search::placeholder {
+    color: #9ca3af;
+}
 
-.search-box input:focus {
-
-    border-color: var(--primary);
+.admin-search:focus {
+    border-color: #2563eb;
 
     box-shadow:
-        0 0 0 3px
-        rgba(37, 99, 235, 0.10);
+        0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
 
-/* =========================================================
-   PROBLEM LIST
-========================================================= */
+/* =========================
+   PROBLEM TABLE
+========================= */
 
-.problem-list {
-
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 14px;
+.problem-table {
+    width: 100%;
 }
 
 
-/* =========================================================
-   PROBLEM CARD
-========================================================= */
+/* =========================
+   PROBLEM ROW
+========================= */
 
-.problem-item,
-.problem-card {
+.problem-row {
+    display: grid;
 
-    background: #ffffff;
+    grid-template-columns:
+        minmax(240px, 2fr)
+        minmax(100px, 1fr)
+        minmax(110px, 1fr)
+        minmax(280px, 1.7fr);
 
-    border:
-        1px solid var(--border);
+    gap: 18px;
 
-    border-radius: 14px;
+    padding: 18px 14px;
 
-    padding: 20px;
+    border-bottom: 1px solid #f0f2f5;
 
-    transition: 0.2s;
+    align-items: center;
 
-    position: relative;
+    transition:
+        background 0.2s ease;
+}
+
+.problem-row:not(.header):hover {
+    background: #f8fafc;
+}
+
+.problem-row.header {
+    padding-top: 12px;
+    padding-bottom: 12px;
+
+    background: #f8fafc;
+
+    border: 1px solid #eef0f4;
+
+    border-radius: 10px;
+
+    color: #6b7280;
+
+    font-size: 13px;
+    font-weight: 700;
 }
 
 
-.problem-item:hover,
-.problem-card:hover {
+/* =========================
+   PROBLEM CONTENT
+========================= */
 
-    border-color: #cbd5e1;
+.problem-title {
+    font-size: 17px;
+    font-weight: 750;
 
-    box-shadow:
-        0 6px 20px
-        rgba(15, 23, 42, 0.07);
+    color: #111827;
 
-    transform: translateY(-1px);
+    line-height: 1.4;
 }
-
-
-/* =========================================================
-   PROBLEM TOP
-========================================================= */
-
-.problem-top {
-
-    display: flex;
-
-    align-items: flex-start;
-
-    justify-content: space-between;
-
-    gap: 20px;
-}
-
-
-.problem-main {
-
-    min-width: 0;
-
-    flex: 1;
-}
-
 
 .problem-category {
-
     display: inline-flex;
 
     align-items: center;
 
-    padding: 4px 10px;
+    width: fit-content;
 
-    border-radius: 999px;
+    padding: 5px 10px;
 
     background: #eff6ff;
 
     color: #2563eb;
 
+    border-radius: 999px;
+
     font-size: 12px;
-
     font-weight: 700;
-
-    margin-bottom: 8px;
 }
 
 
-.problem-title {
-
-    margin: 0;
-
-    font-size: 19px;
-
-    font-weight: 700;
-
-    color: var(--text);
-}
-
-
-.problem-description {
-
-    margin: 6px 0 0;
-
-    color: var(--text-light);
-
-    font-size: 14px;
-
-    line-height: 1.7;
-}
-
-
-/* =========================================================
+/* =========================
    STATUS
-========================================================= */
+========================= */
 
-.status-badge {
-
+.status {
     display: inline-flex;
 
     align-items: center;
+    justify-content: center;
 
-    gap: 6px;
+    width: fit-content;
 
-    padding: 5px 11px;
+    padding: 6px 11px;
 
     border-radius: 999px;
 
     font-size: 12px;
-
     font-weight: 700;
 
     white-space: nowrap;
 }
 
-
 .status-pending {
-
-    background: var(--warning-bg);
-
+    background: #fff7d6;
     color: #a16207;
-}
 
+    border: 1px solid #fde68a;
+}
 
 .status-published {
-
-    background: var(--success-bg);
-
+    background: #dcfce7;
     color: #15803d;
+
+    border: 1px solid #bbf7d0;
 }
 
-
 .status-rejected {
-
-    background: var(--danger-bg);
-
+    background: #fee2e2;
     color: #b91c1c;
+
+    border: 1px solid #fecaca;
 }
 
 
 /* =========================================================
-   PROBLEM ACTIONS
+   ACTION BUTTONS
 ========================================================= */
 
-.problem-actions {
-
+.action-buttons {
     display: flex;
-
-    align-items: center;
 
     flex-wrap: wrap;
 
+    align-items: center;
+
     gap: 8px;
-
-    margin-top: 17px;
-
-    padding-top: 15px;
-
-    border-top:
-        1px solid #f1f5f9;
 }
 
 
-/* =========================================================
-   ACTION BUTTON BASE
-========================================================= */
+/* ทุกปุ่ม Action */
 
-.problem-actions button {
-
-    border: 1px solid transparent;
-
-    border-radius: 8px;
-
-    padding: 8px 13px;
-
-    font-size: 13px;
-
-    font-weight: 600;
-
-    cursor: pointer;
-
-    transition: 0.18s;
-
+.action-buttons button,
+.solution-actions button {
     display: inline-flex;
 
     align-items: center;
+    justify-content: center;
 
-    gap: 5px;
+    gap: 6px;
+
+    min-height: 38px;
+
+    padding: 9px 13px;
+
+    border: 1px solid transparent;
+
+    border-radius: 9px;
+
+    cursor: pointer;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        background 0.18s ease,
+        border-color 0.18s ease;
+}
+
+.action-buttons button:hover,
+.solution-actions button:hover {
+    transform: translateY(-2px);
+}
+
+.action-buttons button:active,
+.solution-actions button:active {
+    transform: translateY(0);
 }
 
 
-/* =========================================================
+/* =========================
    EDIT
-========================================================= */
+========================= */
 
-.edit-button {
-
+.action-edit {
     background: #fff7ed;
-
     color: #c2410c;
 
     border-color: #fed7aa !important;
 }
 
-
-.edit-button:hover {
-
+.action-edit:hover {
     background: #ffedd5;
 
-    transform: translateY(-1px);
+    box-shadow:
+        0 5px 12px rgba(234, 88, 12, 0.15);
 }
 
 
-/* =========================================================
+/* =========================
+   SOLUTION
+========================= */
+
+.action-solution {
+    background: #eff6ff;
+    color: #1d4ed8;
+
+    border-color: #bfdbfe !important;
+}
+
+.action-solution:hover {
+    background: #dbeafe;
+
+    box-shadow:
+        0 5px 12px rgba(37, 99, 235, 0.15);
+}
+
+
+/* =========================
    APPROVE
-========================================================= */
+========================= */
 
-.approve-button {
+.action-approve {
+    background: #ecfdf5;
+    color: #047857;
 
-    background: var(--success-bg);
+    border-color: #a7f3d0 !important;
+}
 
-    color: #15803d;
+.action-approve:hover {
+    background: #d1fae5;
 
-    border-color: #bbf7d0 !important;
+    box-shadow:
+        0 5px 12px rgba(16, 185, 129, 0.16);
 }
 
 
-.approve-button:hover {
-
-    background: #bbf7d0;
-}
-
-
-/* =========================================================
+/* =========================
    REJECT
-========================================================= */
+========================= */
 
-.reject-button {
+.action-reject {
+    background: #fff1f2;
+    color: #be123c;
 
-    background: var(--danger-bg);
+    border-color: #fecdd3 !important;
+}
 
-    color: #b91c1c;
+.action-reject:hover {
+    background: #ffe4e6;
+
+    box-shadow:
+        0 5px 12px rgba(225, 29, 72, 0.15);
+}
+
+
+/* =========================
+   CANCEL PUBLISH
+========================= */
+
+.action-unpublish {
+    background: #fff7ed;
+    color: #c2410c;
+
+    border-color: #fed7aa !important;
+}
+
+.action-unpublish:hover {
+    background: #ffedd5;
+
+    box-shadow:
+        0 5px 12px rgba(234, 88, 12, 0.15);
+}
+
+
+/* =========================
+   DELETE
+========================= */
+
+.action-delete {
+    background: #fff1f2;
+    color: #dc2626;
 
     border-color: #fecaca !important;
 }
 
+.action-delete:hover {
+    background: #fee2e2;
 
-.reject-button:hover {
-
-    background: #fecaca;
+    box-shadow:
+        0 5px 12px rgba(220, 38, 38, 0.16);
 }
 
 
-/* =========================================================
-   DELETE
-========================================================= */
+/* =========================
+   GENERIC BUTTON FIX
+========================= */
 
-.delete-button {
-
-    background: #dc2626;
-
-    color: white;
-
-    border-color: #dc2626 !important;
+.action-buttons button {
+    appearance: none;
+    -webkit-appearance: none;
 }
 
-
-.delete-button:hover {
-
-    background: #b91c1c;
-
-    transform: translateY(-1px);
-}
-
-
-/* =========================================================
-   SOLUTION BUTTON
-========================================================= */
-
-.solution-button {
-
-    background: #f8fafc;
-
-    color: #334155;
-
-    border-color: #cbd5e1 !important;
-}
-
-
-.solution-button:hover {
-
-    background: #f1f5f9;
-}
-
-
-/* =========================================================
-   EMPTY STATE
-========================================================= */
-
-.no-result {
-
-    padding: 60px 20px;
-
-    text-align: center;
-
-    color: var(--text-light);
-
-    font-size: 15px;
+.action-buttons button:focus-visible,
+.solution-actions button:focus-visible,
+.add-button:focus-visible,
+.save-button:focus-visible,
+.cancel-button:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, 0.25);
+    outline-offset: 2px;
 }
 
 
@@ -836,110 +596,123 @@ body {
 ========================================================= */
 
 .modal {
+    display: none;
 
     position: fixed;
 
     inset: 0;
 
-    z-index: 999;
+    background: rgba(15, 23, 42, 0.60);
 
-    display: none;
+    backdrop-filter: blur(4px);
+
+    -webkit-backdrop-filter: blur(4px);
+
+    z-index: 1000;
 
     align-items: center;
-
     justify-content: center;
 
     padding: 20px;
-
-    background:
-        rgba(15, 23, 42, 0.55);
-
-    backdrop-filter: blur(4px);
 }
 
+.modal.show {
+    display: flex;
+}
 
 .modal-content {
+    width: 100%;
 
-    width: min(
-        700px,
-        100%
-    );
+    max-width: 650px;
 
     max-height: 90vh;
 
     overflow-y: auto;
 
-    background: white;
+    background: #ffffff;
 
     border-radius: 18px;
 
     padding: 28px;
 
     box-shadow:
-        0 25px 70px
-        rgba(15, 23, 42, 0.25);
+        0 25px 60px rgba(0, 0, 0, 0.20);
+
+    animation: modalIn 0.2s ease;
+}
+
+@keyframes modalIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 
-/* =========================================================
+/* =========================
    MODAL HEADER
-========================================================= */
+========================= */
 
 .modal-header {
-
     display: flex;
 
     justify-content: space-between;
 
-    align-items: flex-start;
+    align-items: center;
 
-    gap: 20px;
+    gap: 15px;
 
-    margin-bottom: 24px;
+    margin-bottom: 22px;
+
+    padding-bottom: 16px;
+
+    border-bottom: 1px solid #eef0f4;
 }
-
 
 .modal-header h2 {
-
     margin: 0;
 
+    color: #111827;
+
     font-size: 23px;
+    font-weight: 800;
 }
-
-
-.modal-subtitle {
-
-    margin: 5px 0 0;
-
-    color: var(--text-light);
-
-    font-size: 14px;
-}
-
 
 .close-button {
-
     width: 38px;
-
     height: 38px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
 
     border: none;
 
     border-radius: 9px;
 
-    background: #f1f5f9;
+    background: #f3f4f6;
 
-    color: #475569;
+    color: #4b5563;
 
-    font-size: 23px;
+    font-size: 24px;
 
     cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
 }
 
-
 .close-button:hover {
+    background: #fee2e2;
 
-    background: #e2e8f0;
+    color: #dc2626;
 }
 
 
@@ -947,596 +720,572 @@ body {
    FORM
 ========================================================= */
 
-form label {
-
+#problemForm label {
     display: block;
 
-    margin:
-        16px 0 7px;
+    margin-top: 16px;
+    margin-bottom: 7px;
 
-    font-size: 14px;
-
-    font-weight: 650;
-
-    color: #334155;
-}
-
-
-form input,
-form textarea,
-form select {
-
-    width: 100%;
-
-    border:
-        1px solid var(--border);
-
-    border-radius: 10px;
-
-    padding: 11px 13px;
-
-    font-family: inherit;
-
-    font-size: 14px;
-
-    color: var(--text);
-
-    background: white;
-
-    outline: none;
-
-    transition: 0.2s;
-}
-
-
-form textarea {
-
-    resize: vertical;
-
-    min-height: 100px;
-}
-
-
-form input:focus,
-form textarea:focus,
-form select:focus {
-
-    border-color: var(--primary);
-
-    box-shadow:
-        0 0 0 3px
-        rgba(37, 99, 235, 0.10);
-}
-
-
-/* =========================================================
-   SAVE BUTTON
-========================================================= */
-
-.save-button {
-
-    width: 100%;
-
-    margin-top: 24px;
-
-    padding: 13px;
-
-    border: none;
-
-    border-radius: 10px;
-
-    background: var(--primary);
-
-    color: white;
-
-    font-size: 15px;
-
-    font-weight: 700;
-
-    cursor: pointer;
-
-    transition: 0.2s;
-}
-
-
-.save-button:hover {
-
-    background: var(--primary-dark);
-
-    transform: translateY(-1px);
-}
-
-
-/* =========================================================
-   FOOTER
-========================================================= */
-
-.footer {
-
-    padding: 30px 20px;
-
-    text-align: center;
-
-    color: var(--text-light);
-
-    font-size: 13px;
-}
-
-
-/* =========================================================
-   RESPONSIVE - TABLET
-========================================================= */
-
-@media (max-width: 900px) {
-
-    .stats-grid {
-
-        grid-template-columns:
-            repeat(2, 1fr);
-    }
-
-    .dashboard-header {
-
-        align-items: flex-start;
-
-        flex-direction: column;
-    }
-
-    .management-header {
-
-        flex-direction: column;
-
-        align-items: stretch;
-    }
-
-    .search-box {
-
-        width: 100%;
-    }
-
-}
-
-
-/* =========================================================
-   RESPONSIVE - MOBILE
-========================================================= */
-
-@media (max-width: 600px) {
-
-    .navbar-inner {
-
-        width:
-            calc(100% - 24px);
-
-        min-height: 60px;
-    }
-
-    .logo-text {
-
-        font-size: 16px;
-    }
-
-    .user-email {
-
-        display: none;
-    }
-
-    .logout-button {
-
-        padding:
-            8px 12px;
-
-        font-size: 12px;
-    }
-
-    .dashboard-container,
-    .container,
-    .section-container {
-
-        width:
-            calc(100% - 24px);
-    }
-
-    .dashboard-header {
-
-        margin-top: 25px;
-    }
-
-    .dashboard-header h1 {
-
-        font-size: 28px;
-    }
-
-    .add-button {
-
-        width: 100%;
-    }
-
-    .stats-grid {
-
-        grid-template-columns: 1fr;
-
-        gap: 12px;
-    }
-
-    .stat-card {
-
-        min-height: 100px;
-
-        padding: 17px;
-    }
-
-    .management-card {
-
-        padding: 17px;
-
-        border-radius: 14px;
-    }
-
-    .management-title h2 {
-
-        font-size: 21px;
-    }
-
-    .problem-item,
-    .problem-card {
-
-        padding: 16px;
-    }
-
-    .problem-top {
-
-        flex-direction: column;
-
-        gap: 8px;
-    }
-
-    .problem-title {
-
-        font-size: 17px;
-    }
-
-    .problem-actions {
-
-        gap: 6px;
-    }
-
-    .problem-actions button {
-
-        flex: 1;
-
-        justify-content: center;
-
-        min-width: 100px;
-    }
-
-    .modal {
-
-        padding: 10px;
-    }
-
-    .modal-content {
-
-        padding: 20px;
-
-        border-radius: 14px;
-    }
-   ```css
-/* =========================================================
-   ADMIN DASHBOARD - PROFESSIONAL BUTTON STYLE
-   ========================================================= */
-
-/* กลุ่มปุ่มจัดการปัญหา */
-.problem-actions,
-.actions,
-.button-group {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 12px;
-}
-
-/* ปุ่มทั้งหมดในส่วนจัดการปัญหา */
-.problem-actions button,
-.actions button,
-.button-group button {
-    border: none;
-    border-radius: 9px;
-    padding: 10px 16px;
-    min-height: 42px;
-
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 600;
-
-    cursor: pointer;
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-
-    transition:
-        transform 0.15s ease,
-        box-shadow 0.15s ease,
-        background-color 0.15s ease;
-
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-}
-
-/* Hover */
-.problem-actions button:hover,
-.actions button:hover,
-.button-group button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.14);
-}
-
-/* กดปุ่ม */
-.problem-actions button:active,
-.actions button:active,
-.button-group button:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-
-/* =========================================================
-   ปุ่มวิธีแก้ไข
-   ========================================================= */
-
-.btn-solution,
-button.solution-btn,
-button[onclick*="solution"],
-button[onclick*="Solution"] {
-    background: #2563eb;
-    color: white;
-}
-
-.btn-solution:hover,
-button.solution-btn:hover {
-    background: #1d4ed8;
-}
-
-
-/* =========================================================
-   ปุ่มแก้ไข
-   ========================================================= */
-
-.btn-edit,
-button.edit-btn,
-button[onclick*="edit"],
-button[onclick*="Edit"] {
-    background: #f59e0b;
-    color: white;
-}
-
-.btn-edit:hover,
-button.edit-btn:hover {
-    background: #d97706;
-}
-
-
-/* =========================================================
-   ปุ่มอนุมัติ
-   ========================================================= */
-
-.btn-approve,
-button.approve-btn,
-button[onclick*="approve"],
-button[onclick*="Approve"] {
-    background: #16a34a;
-    color: white;
-}
-
-.btn-approve:hover,
-button.approve-btn:hover {
-    background: #15803d;
-}
-
-
-/* =========================================================
-   ปุ่มไม่อนุมัติ
-   ========================================================= */
-
-.btn-reject,
-button.reject-btn,
-button[onclick*="reject"],
-button[onclick*="Reject"] {
-    background: #64748b;
-    color: white;
-}
-
-.btn-reject:hover,
-button.reject-btn:hover {
-    background: #475569;
-}
-
-
-/* =========================================================
-   ปุ่มยกเลิกเผยแพร่
-   ========================================================= */
-
-.btn-unpublish,
-button.unpublish-btn {
-    background: #f97316;
-    color: white;
-}
-
-.btn-unpublish:hover,
-button.unpublish-btn:hover {
-    background: #ea580c;
-}
-
-
-/* =========================================================
-   ปุ่มลบ
-   ========================================================= */
-
-.btn-delete,
-button.delete-btn,
-button[onclick*="delete"],
-button[onclick*="Delete"] {
-    background: #dc2626;
-    color: white;
-}
-
-.btn-delete:hover,
-button.delete-btn:hover {
-    background: #b91c1c;
-}
-
-
-/* =========================================================
-   ปุ่มเพิ่มปัญหา
-   ========================================================= */
-
-#addProblemBtn,
-.add-problem-btn,
-button.primary {
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
-    color: white;
-
-    border: none;
-    border-radius: 11px;
-
-    padding: 12px 22px;
-    min-height: 46px;
-
-    font-size: 15px;
-    font-weight: 700;
-
-    cursor: pointer;
-
-    box-shadow: 0 5px 14px rgba(37, 99, 235, 0.25);
-
-    transition:
-        transform 0.15s ease,
-        box-shadow 0.15s ease;
-}
-
-#addProblemBtn:hover,
-.add-problem-btn:hover,
-button.primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.32);
-}
-
-
-/* =========================================================
-   ปุ่มทั่วไปที่ยังไม่ได้กำหนด class
-   ========================================================= */
-
-.problem-actions button:not(.btn-solution):not(.btn-edit):not(.btn-approve):not(.btn-reject):not(.btn-unpublish):not(.btn-delete) {
-    border: 1px solid #d1d5db;
-    background: white;
     color: #374151;
+
+    font-size: 14px;
+
+    font-weight: 700;
 }
 
-.problem-actions button:not(.btn-solution):not(.btn-edit):not(.btn-approve):not(.btn-reject):not(.btn-unpublish):not(.btn-delete):hover {
-    background: #f8fafc;
-}
+#problemForm input,
+#problemForm textarea,
+#problemForm select {
+    width: 100%;
 
+    box-sizing: border-box;
 
-/* =========================================================
-   Responsive สำหรับมือถือ
-   ========================================================= */
+    padding: 12px 13px;
 
-@media (max-width: 768px) {
+    border: 1px solid #d9dee7;
 
-    .problem-actions,
-    .actions,
-    .button-group {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 8px;
-    }
-
-    .problem-actions button,
-    .actions button,
-    .button-group button {
-        width: 100%;
-        min-height: 44px;
-        padding: 10px 12px;
-        font-size: 13px;
-    }
-}
-
-
-@media (max-width: 480px) {
-
-    .problem-actions,
-    .actions,
-    .button-group {
-        grid-template-columns: 1fr;
-    }
-
-    .problem-actions button,
-    .actions button,
-    .button-group button {
-        width: 100%;
-    }
-}
-
-
-/* =========================================================
-   Card ปัญหา
-   ========================================================= */
-
-.problem-card {
-    border: 1px solid #e5e7eb;
-    border-radius: 16px;
-    padding: 20px;
+    border-radius: 9px;
 
     background: #ffffff;
 
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+    color: #111827;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+#problemForm input:focus,
+#problemForm textarea:focus,
+#problemForm select:focus {
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.10);
+}
+
+#problemForm textarea {
+    min-height: 110px;
+
+    resize: vertical;
+}
+
+
+/* =========================
+   SAVE BUTTON
+========================= */
+
+.save-button {
+    width: 100%;
+
+    margin-top: 22px;
+
+    padding: 13px 18px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: linear-gradient(135deg, #16a34a, #15803d);
+
+    color: #ffffff;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 5px 14px rgba(22, 163, 74, 0.18);
 
     transition:
         transform 0.2s ease,
         box-shadow 0.2s ease;
 }
 
-.problem-card:hover {
+.save-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.09);
+
+    box-shadow:
+        0 8px 20px rgba(22, 163, 74, 0.24);
+}
+
+.save-button:disabled {
+    opacity: 0.55;
+
+    cursor: not-allowed;
+
+    transform: none;
+}
+
+.form-message {
+    margin-top: 15px;
+
+    font-size: 14px;
 }
 
 
-/* ชื่อปัญหา */
-.problem-card h3 {
-    margin: 8px 0;
+/* =========================================================
+   SOLUTION MODAL
+========================================================= */
+
+.solution-modal {
+    max-width: 850px;
+}
+
+.modal-subtitle {
+    margin: 5px 0 0;
+
+    color: #6b7280;
+
+    font-size: 14px;
+}
+
+.solution-add-button {
+    margin-bottom: 20px;
+}
+
+
+/* =========================================================
+   SOLUTION LIST
+========================================================= */
+
+.solution-list {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 14px;
+}
+
+.solution-card {
+    display: grid;
+
+    grid-template-columns: 90px 1fr auto;
+
+    gap: 18px;
+
+    padding: 18px;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 13px;
+
+    background: #f8fafc;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.solution-card:hover {
+    border-color: #cbd5e1;
+
+    box-shadow:
+        0 5px 15px rgba(15, 23, 42, 0.06);
+}
+
+.solution-step {
+    display: flex;
+
+    align-items: flex-start;
+
+    color: #2563eb;
+
+    font-weight: 800;
+}
+
+.solution-content h3 {
+    margin: 0 0 8px;
 
     color: #111827;
 
-    font-size: 20px;
-    font-weight: 700;
+    font-size: 16px;
 }
 
+.solution-content p {
+    margin: 0 0 10px;
 
-/* รายละเอียด */
-.problem-card p {
     color: #4b5563;
+
     line-height: 1.7;
 }
 
+.solution-actions {
+    display: flex;
 
-/* Badge */
-.problem-card .badge {
-    display: inline-flex;
-    align-items: center;
+    gap: 7px;
 
-    padding: 5px 11px;
+    align-items: flex-start;
+}
 
-    border-radius: 999px;
 
-    background: #eff6ff;
-    color: #2563eb;
+/* =========================================================
+   EMPTY SOLUTIONS
+========================================================= */
 
-    font-size: 12px;
+.empty-solutions {
+    text-align: center;
+
+    padding: 45px 20px;
+
+    border: 2px dashed #dbe1e8;
+
+    border-radius: 13px;
+
+    color: #6b7280;
+
+    background: #fafafa;
+}
+
+.empty-solutions small {
+    display: block;
+
+    margin-top: 8px;
+
+    color: #9ca3af;
+}
+
+
+/* =========================================================
+   SOLUTION FORM
+========================================================= */
+
+.solution-form-box {
+    margin-top: 25px;
+
+    padding: 22px;
+
+    border-radius: 13px;
+
+    background: #f8fafc;
+
+    border: 1px solid #e2e8f0;
+}
+
+.solution-form-box h3 {
+    margin: 0 0 20px;
+
+    color: #111827;
+
+    font-size: 18px;
+}
+
+.solution-form-box label {
+    display: block;
+
+    margin-top: 15px;
+
+    margin-bottom: 6px;
+
+    color: #374151;
+
+    font-size: 14px;
+
     font-weight: 700;
 }
-```
 
+.solution-form-box input,
+.solution-form-box textarea,
+.solution-form-box select {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 12px;
+
+    border: 1px solid #d9dee7;
+
+    border-radius: 9px;
+
+    background: #ffffff;
+
+    font-family: inherit;
+
+    outline: none;
+}
+
+.solution-form-box input:focus,
+.solution-form-box textarea:focus,
+.solution-form-box select:focus {
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.10);
+}
+
+.solution-form-box textarea {
+    resize: vertical;
+}
+
+.solution-form-buttons {
+    display: flex;
+
+    gap: 10px;
+
+    margin-top: 10px;
+}
+
+.solution-form-buttons .save-button {
+    flex: 1;
+}
+
+.cancel-button {
+    margin-top: 20px;
+
+    padding: 13px 20px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    color: #374151;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.cancel-button:hover {
+    background: #f3f4f6;
+
+    border-color: #9ca3af;
+}
+
+
+/* =========================================================
+   SOLUTION IMAGES
+========================================================= */
+
+.solution-image-preview {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 12px;
+
+    margin-top: 12px;
+}
+
+.solution-preview-image {
+    width: 120px;
+    height: 90px;
+
+    object-fit: cover;
+
+    border-radius: 9px;
+
+    border: 1px solid #dfe3e8;
+}
+
+.solution-images {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 14px;
+
+    margin-top: 15px;
+}
+
+.solution-image-item {
+    width: 180px;
+}
+
+.solution-image {
+    width: 100%;
+    height: 130px;
+
+    object-fit: cover;
+
+    border-radius: 10px;
+
+    border: 1px solid #dfe3e8;
+
+    display: block;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.solution-image:hover {
+    transform: scale(1.03);
+
+    cursor: pointer;
+
+    box-shadow:
+        0 8px 20px rgba(15, 23, 42, 0.12);
+}
+
+
+/* =========================================================
+   MOBILE - 900px
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .dashboard-header {
+        align-items: flex-start;
+    }
+
+    .problem-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .problem-row.header {
+        display: none;
+    }
+
+    .action-buttons {
+        padding-top: 5px;
+    }
+
+    .admin-search {
+        width: 100%;
+    }
+
+    .section-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}
+
+
+/* =========================================================
+   MOBILE - 700px
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .dashboard-container {
+        padding: 25px 15px 45px;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 18px;
+    }
+
+    .dashboard-header h1 {
+        font-size: 29px;
+    }
+
+    .add-button {
+        width: 100%;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .admin-section {
+        padding: 18px;
+        border-radius: 14px;
+    }
+
+    .section-header h2 {
+        font-size: 22px;
+    }
+
+    .problem-row {
+        padding: 18px 5px;
+
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .action-buttons {
+        display: grid;
+
+        grid-template-columns: repeat(2, 1fr);
+
+        gap: 8px;
+    }
+
+    .action-buttons button {
+        width: 100%;
+        min-height: 42px;
+    }
+
+    .solution-card {
+        grid-template-columns: 1fr;
+
+        gap: 10px;
+    }
+
+    .solution-actions {
+        width: 100%;
+    }
+
+    .solution-actions button {
+        flex: 1;
+    }
+
+    .solution-form-buttons {
+        flex-direction: column;
+    }
+
+    .modal {
+        padding: 10px;
+    }
+
+    .modal-content {
+        padding: 20px;
+
+        max-height: 94vh;
+
+        border-radius: 14px;
+    }
+}
+
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media (max-width: 420px) {
+
+    .dashboard-header h1 {
+        font-size: 25px;
+    }
+
+    .stat-card {
+        padding: 18px;
+    }
+
+    .stat-card h2 {
+        font-size: 25px;
+    }
+
+    .action-buttons {
+        grid-template-columns: 1fr;
+    }
+
+    .solution-actions {
+        flex-direction: column;
+    }
+
+    .solution-actions button {
+        width: 100%;
+    }
 }
