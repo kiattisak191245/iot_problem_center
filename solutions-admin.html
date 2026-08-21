@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        จัดการวิธีแก้ไข | IoT Problem Center
+    </title>
+
+    <link rel="stylesheet"
+          href="css/style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <div class="navbar-inner">
+
+        <div class="logo-text">
+
+            🤖
+            <span>
+                IoT Problem Center
+            </span>
+
+        </div>
+
+        <div id="userArea"
+             class="user-area">
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<main class="admin-container">
+
+    <h1>
+        🛠️ จัดการวิธีแก้ไขปัญหา
+    </h1>
+
+    <p class="admin-description">
+        เพิ่ม แก้ไข และลบขั้นตอนการแก้ไขปัญหา
+    </p>
+
+
+    <!-- =========================
+         เลือกปัญหา
+    ========================= -->
+
+    <section class="admin-card">
+
+        <h2>
+            1. เลือกปัญหา
+        </h2>
+
+        <select id="problemSelect">
+
+            <option value="">
+                -- เลือกปัญหา --
+            </option>
+
+        </select>
+
+    </section>
+
+
+    <!-- =========================
+         เพิ่ม Solution
+    ========================= -->
+
+    <section
+        id="solutionSection"
+        class="admin-card"
+        style="display:none;"
+    >
+
+        <h2>
+            2. เพิ่มขั้นตอนการแก้ไข
+        </h2>
+
+
+        <form id="solutionForm">
+
+
+            <label>
+                ขั้นตอนที่
+            </label>
+
+            <input
+                type="number"
+                id="stepNumber"
+                min="1"
+                value="1"
+                required
+            >
+
+
+            <label>
+                ชื่อขั้นตอน
+            </label>
+
+            <input
+                type="text"
+                id="solutionTitle"
+                placeholder="เช่น ตรวจสอบสาย USB"
+                required
+            >
+
+
+            <label>
+                รายละเอียด
+            </label>
+
+            <textarea
+                id="solutionDescription"
+                rows="5"
+                placeholder="อธิบายวิธีแก้ไข..."
+            ></textarea>
+
+
+            <label>
+                รูปภาพประกอบ
+            </label>
+
+            <input
+                type="file"
+                id="solutionImage"
+                accept="image/jpeg,image/png,image/webp"
+            >
+
+
+            <button
+                type="submit"
+                id="saveSolutionButton"
+                class="primary-button"
+            >
+
+                ➕ เพิ่มขั้นตอน
+
+            </button>
+
+
+            <button
+                type="button"
+                id="cancelButton"
+                class="secondary-button"
+                style="display:none;"
+            >
+
+                ยกเลิกการแก้ไข
+
+            </button>
+
+
+        </form>
+
+    </section>
+
+
+    <!-- =========================
+         รายการ Solutions
+    ========================= -->
+
+    <section
+        id="solutionListSection"
+        class="admin-card"
+        style="display:none;"
+    >
+
+        <h2>
+            3. ขั้นตอนการแก้ไข
+        </h2>
+
+
+        <div id="solutionList">
+
+        </div>
+
+
+    </section>
+
+
+</main>
+
+
+<script src="js/supabase.js"></script>
+
+<script src="js/solutions-admin.js"></script>
+
+
+</body>
+
+</html>
