@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Admin Dashboard - IoT Problem Center
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/dashboard.css"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+</head>
+
+
+<body>
+
+
+<!-- ==================================================
+     NAVBAR
+================================================== -->
+
+<header class="navbar">
+
+    <div class="navbar-inner">
+
+        <div class="logo-text">
+
+            🤖
+
+            <span>
+                IoT Problem Center
+            </span>
+
+        </div>
+
+
+        <div class="user-area">
+
+            <span id="adminEmail">
+                กำลังโหลด...
+            </span>
+
+            <button
+                id="logoutButton"
+                class="logout-button"
+            >
+                ออกจากระบบ
+            </button>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+
+<!-- ==================================================
+     DASHBOARD
+================================================== -->
+
+<main class="dashboard-container">
+
+
+    <!-- HEADER -->
+
+    <div class="dashboard-header">
+
+        <div>
+
+            <h1>
+                Admin Dashboard
+            </h1>
+
+            <p>
+                จัดการปัญหาและวิธีแก้ไขระบบ IoT
+            </p>
+
+        </div>
+
+
+        <button
+            id="addProblemButton"
+            class="add-button"
+        >
+            + เพิ่มปัญหา
+        </button>
+
+    </div>
+
+
+
+    <!-- ==================================================
+         STATISTICS
+    ================================================== -->
+
+    <div class="stats-grid">
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                📚
+            </div>
+
+            <div>
+
+                <p>
+                    ปัญหาทั้งหมด
+                </p>
+
+                <h2 id="totalProblems">
+                    0
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                🟡
+            </div>
+
+            <div>
+
+                <p>
+                    รอตรวจสอบ
+                </p>
+
+                <h2 id="pendingProblems">
+                    0
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                🟢
+            </div>
+
+            <div>
+
+                <p>
+                    เผยแพร่แล้ว
+                </p>
+
+                <h2 id="publishedProblems">
+                    0
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                🔴
+            </div>
+
+            <div>
+
+                <p>
+                    ไม่เผยแพร่
+                </p>
+
+                <h2 id="rejectedProblems">
+                    0
+                </h2>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- ==================================================
+         PROBLEMS
+    ================================================== -->
+
+    <section class="admin-section">
+
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    จัดการปัญหา
+                </h2>
+
+                <p>
+                    เพิ่ม แก้ไข ลบ และจัดการวิธีแก้ไข
+                </p>
+
+            </div>
+
+
+            <input
+                type="text"
+                id="adminSearch"
+                placeholder="🔍 ค้นหาปัญหา..."
+                class="admin-search"
+            >
+
+        </div>
+
+
+        <div
+            id="loading"
+            class="loading"
+        >
+            กำลังโหลดข้อมูล...
+        </div>
+
+
+        <div
+            id="problemTable"
+            class="problem-table"
+        >
+        </div>
+
+
+    </section>
+
+
+</main>
+
+
+
+<!-- ==================================================
+     MODAL : ADD / EDIT PROBLEM
+================================================== -->
+
+<div
+    id="problemModal"
+    class="modal"
+>
+
+    <div class="modal-content">
+
+
+        <div class="modal-header">
+
+            <h2 id="problemModalTitle">
+                เพิ่มปัญหาใหม่
+            </h2>
+
+            <button
+                id="closeProblemModal"
+                class="close-button"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <form id="problemForm">
+
+
+            <input
+                type="hidden"
+                id="editingProblemId"
+            >
+
+
+            <!-- TITLE -->
+
+            <label>
+                ชื่อปัญหา
+            </label>
+
+            <input
+                type="text"
+                id="title"
+                placeholder="เช่น ESP32 ไม่พบ COM Port"
+                required
+            >
+
+
+            <!-- DESCRIPTION -->
+
+            <label>
+                รายละเอียดปัญหา
+            </label>
+
+            <textarea
+                id="description"
+                rows="4"
+                placeholder="อธิบายรายละเอียดของปัญหา"
+                required
+            ></textarea>
+
+
+            <!-- CATEGORY -->
+
+            <label>
+                หมวดหมู่
+            </label>
+
+            <select
+                id="category"
+                required
+            >
+
+                <option value="">
+                    -- เลือกหมวดหมู่ --
+                </option>
+
+                <option value="ESP32">
+                    ESP32
+                </option>
+
+                <option value="ESP8266">
+                    ESP8266
+                </option>
+
+                <option value="Arduino">
+                    Arduino
+                </option>
+
+                <option value="Servo">
+                    Servo
+                </option>
+
+                <option value="Sensor">
+                    Sensor
+                </option>
+
+                <option value="WiFi">
+                    WiFi
+                </option>
+
+                <option value="Hardware">
+                    Hardware
+                </option>
+
+            </select>
+
+
+            <!-- SYMPTOMS -->
+
+            <label>
+                อาการ
+            </label>
+
+            <textarea
+                id="symptoms"
+                rows="3"
+                placeholder="อาการที่พบ"
+            ></textarea>
+
+
+            <!-- CAUSES -->
+
+            <label>
+                สาเหตุ
+            </label>
+
+            <textarea
+                id="causes"
+                rows="3"
+                placeholder="สาเหตุที่เป็นไปได้"
+            ></textarea>
+
+
+            <!-- STATUS -->
+
+            <label>
+                สถานะ
+            </label>
+
+            <select id="status">
+
+                <option value="pending">
+                    รอตรวจสอบ
+                </option>
+
+                <option value="published">
+                    เผยแพร่
+                </option>
+
+                <option value="rejected">
+                    ไม่เผยแพร่
+                </option>
+
+            </select>
+
+
+
+            <!-- ==================================================
+                 PROBLEM IMAGE
+            ================================================== -->
+
+            <label>
+                รูปภาพปัญหา
+            </label>
+
+            <input
+                type="file"
+                id="problemImage"
+                accept="image/jpeg,image/png,image/webp"
+            >
+
+            <small>
+                รองรับ JPG, PNG, WEBP ขนาดไม่เกิน 5 MB
+            </small>
+
+
+            <div
+                id="problemImagePreview"
+                class="image-preview"
+            >
+            </div>
+
+
+            <div
+                id="formMessage"
+                class="form-message"
+            ></div>
+
+
+            <button
+                type="submit"
+                class="save-button"
+                id="saveProblemButton"
+            >
+                บันทึกปัญหา
+            </button>
+
+
+        </form>
+
+    </div>
+
+</div>
+
+
+
+<!-- ==================================================
+     MODAL : SOLUTIONS
+================================================== -->
+
+<div
+    id="solutionModal"
+    class="modal"
+>
+
+    <div class="modal-content solution-modal">
+
+
+        <div class="modal-header">
+
+            <div>
+
+                <h2>
+                    วิธีแก้ไข
+                </h2>
+
+                <p
+                    id="solutionProblemTitle"
+                    class="modal-subtitle"
+                >
+                </p>
+
+            </div>
+
+
+            <button
+                id="closeSolutionModal"
+                class="close-button"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+
+        <!-- ADD STEP -->
+
+        <button
+            id="addSolutionButton"
+            class="add-button solution-add-button"
+        >
+            + เพิ่มขั้นตอน
+        </button>
+
+
+
+        <!-- SOLUTION LIST -->
+
+        <div
+            id="solutionList"
+            class="solution-list"
+        >
+        </div>
+
+
+
+        <!-- ==================================================
+             SOLUTION FORM
+        ================================================== -->
+
+        <div
+            id="solutionFormBox"
+            class="solution-form-box"
+            style="display:none;"
+        >
+
+
+            <h3 id="solutionFormTitle">
+                เพิ่มขั้นตอน
+            </h3>
+
+
+            <form id="solutionForm">
+
+
+                <input
+                    type="hidden"
+                    id="editingSolutionId"
+                >
+
+
+                <!-- STEP -->
+
+                <label>
+                    ขั้นตอนที่
+                </label>
+
+                <input
+                    type="number"
+                    id="stepNumber"
+                    min="1"
+                    required
+                >
+
+
+                <!-- TITLE -->
+
+                <label>
+                    หัวข้อขั้นตอน
+                </label>
+
+                <input
+                    type="text"
+                    id="solutionTitle"
+                    placeholder="เช่น ตรวจสอบสาย USB"
+                    required
+                >
+
+
+                <!-- DESCRIPTION -->
+
+                <label>
+                    รายละเอียด
+                </label>
+
+                <textarea
+                    id="solutionDescription"
+                    rows="5"
+                    placeholder="อธิบายวิธีแก้ไขอย่างละเอียด"
+                ></textarea>
+
+
+                <!-- STATUS -->
+
+                <label>
+                    สถานะ
+                </label>
+
+                <select id="solutionStatus">
+
+                    <option value="pending">
+                        รอตรวจสอบ
+                    </option>
+
+                    <option value="published">
+                        เผยแพร่
+                    </option>
+
+                    <option value="rejected">
+                        ไม่เผยแพร่
+                    </option>
+
+                </select>
+
+
+
+                <!-- ==================================================
+                     SOLUTION IMAGE
+                ================================================== -->
+
+                <label>
+                    รูปภาพของขั้นตอนนี้
+                </label>
+
+                <input
+                    type="file"
+                    id="solutionImage"
+                    accept="image/jpeg,image/png,image/webp"
+                >
+
+                <small>
+                    รองรับ JPG, PNG, WEBP ขนาดไม่เกิน 5 MB
+                </small>
+
+
+                <div
+                    id="solutionImagePreview"
+                    class="image-preview"
+                >
+                </div>
+
+
+
+                <div
+                    id="solutionFormMessage"
+                    class="form-message"
+                ></div>
+
+
+
+                <div class="solution-form-buttons">
+
+
+                    <button
+                        type="submit"
+                        class="save-button"
+                        id="saveSolutionButton"
+                    >
+                        บันทึกขั้นตอน
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="cancelSolutionButton"
+                        class="cancel-button"
+                    >
+                        ยกเลิก
+                    </button>
+
+
+                </div>
+
+
+            </form>
+
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+
+<!-- ==================================================
+     JAVASCRIPT
+================================================== -->
+
+<script src="js/supabase.js"></script>
+
+<script src="js/dashboard.js"></script>
+
+
+</body>
+
+</html>
