@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>รายละเอียดปัญหา | IoT Problem Center</title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+</head>
+
+
+<body>
+
+<header class="navbar">
+
+    <div class="navbar-inner">
+
+        <div class="logo-text">
+
+            🤖
+
+            <span>
+                IoT Problem Center
+            </span>
+
+        </div>
+
+
+        <div
+            id="userArea"
+            class="user-area"
+        >
+
+            <a
+                href="login.html"
+                class="login-link"
+            >
+                เข้าสู่ระบบ
+            </a>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+
+<main class="section">
+
+    <div class="section-container">
+
+
+        <!-- BACK -->
+
+        <a
+            href="index.html"
+            class="problem-back"
+        >
+            ← กลับหน้าปัญหา
+        </a>
+
+
+        <!-- LOADING -->
+
+        <div
+            id="loading"
+            class="loading"
+        >
+            กำลังโหลดข้อมูล...
+        </div>
+
+
+        <!-- ERROR -->
+
+        <div
+            id="errorMessage"
+            class="no-result"
+            style="display:none;"
+        >
+        </div>
+
+
+        <!-- PROBLEM -->
+
+        <article
+            id="problemDetail"
+            style="display:none;"
+        >
+
+            <span
+                id="problemCategory"
+                class="problem-category"
+            >
+            </span>
+
+
+            <h1 id="problemTitle"></h1>
+
+
+            <div class="problem-info">
+
+                <h2>
+                    📋 รายละเอียดปัญหา
+                </h2>
+
+                <p id="problemDescription"></p>
+
+            </div>
+
+
+            <div class="problem-info">
+
+                <h2>
+                    ⚠️ อาการ
+                </h2>
+
+                <p id="problemSymptoms"></p>
+
+            </div>
+
+
+            <div class="problem-info">
+
+                <h2>
+                    🔍 สาเหตุ
+                </h2>
+
+                <p id="problemCauses"></p>
+
+            </div>
+
+
+            <!-- SOLUTIONS -->
+
+            <div class="solution-section">
+
+                <h2>
+                    🔧 วิธีแก้ไข
+                </h2>
+
+
+                <div id="solutionList">
+                </div>
+
+            </div>
+
+        </article>
+
+    </div>
+
+</main>
+
+
+
+<footer class="footer">
+
+    <p>
+        © 2026 IoT Problem Center
+    </p>
+
+</footer>
+
+
+
+<script src="js/supabase.js"></script>
+
+<script src="js/problem.js"></script>
+
+</body>
+
+</html>
