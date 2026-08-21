@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="th">
 
@@ -10,9 +11,40 @@
         content="width=device-width, initial-scale=1.0"
     >
 
+    <meta
+        name="description"
+        content="Admin Dashboard สำหรับจัดการปัญหาและวิธีแก้ไขระบบ IoT"
+    >
+
     <title>
         Admin Dashboard - IoT Problem Center
     </title>
+
+
+    <!-- ==================================================
+         GOOGLE FONT
+    ================================================== -->
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- ==================================================
+         MAIN CSS
+    ================================================== -->
 
     <link
         rel="stylesheet"
@@ -24,7 +56,13 @@
         href="css/dashboard.css"
     >
 
+
+    <!-- ==================================================
+         SUPABASE
+    ================================================== -->
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 
 </head>
 
@@ -33,38 +71,100 @@
 
 
 <!-- ==================================================
+     PAGE LOADING
+================================================== -->
+
+<div
+    id="pageLoading"
+    class="page-loading"
+>
+
+    <div class="loading-spinner"></div>
+
+    <p>
+        กำลังโหลด Admin Dashboard...
+    </p>
+
+</div>
+
+
+
+<!-- ==================================================
      NAVBAR
 ================================================== -->
 
-<header class="navbar">
+<header class="navbar admin-navbar">
 
     <div class="navbar-inner">
 
-        <div class="logo-text">
 
-            🤖
+        <!-- LOGO -->
+
+        <a
+            href="index.html"
+            class="logo-text"
+            style="text-decoration:none;"
+        >
+
+            <span class="logo-icon">
+                🤖
+            </span>
 
             <span>
                 IoT Problem Center
             </span>
 
-        </div>
+        </a>
 
 
-        <div class="user-area">
 
-            <span id="adminEmail">
-                กำลังโหลด...
-            </span>
+        <!-- ADMIN AREA -->
+
+        <div class="user-area admin-user-area">
+
+
+            <div class="admin-profile">
+
+                <div class="admin-avatar">
+                    👨‍💻
+                </div>
+
+                <div class="admin-info">
+
+                    <span class="admin-label">
+                        ADMIN
+                    </span>
+
+                    <span
+                        id="adminEmail"
+                        class="admin-email"
+                    >
+                        กำลังโหลด...
+                    </span>
+
+                </div>
+
+            </div>
+
+
 
             <button
                 id="logoutButton"
                 class="logout-button"
+                type="button"
             >
+
+                <span>
+                    ↪
+                </span>
+
                 ออกจากระบบ
+
             </button>
 
+
         </div>
+
 
     </div>
 
@@ -73,37 +173,64 @@
 
 
 <!-- ==================================================
-     DASHBOARD
+     MAIN
 ================================================== -->
 
 <main class="dashboard-container">
 
 
-    <!-- HEADER -->
+    <!-- ==================================================
+         DASHBOARD HERO
+    ================================================== -->
 
-    <div class="dashboard-header">
+    <section class="dashboard-hero">
 
-        <div>
+
+        <div class="dashboard-hero-content">
+
+
+            <div class="dashboard-badge">
+
+                <span>
+                    ⚡
+                </span>
+
+                ADMIN CONTROL CENTER
+
+            </div>
+
 
             <h1>
                 Admin Dashboard
             </h1>
 
+
             <p>
-                จัดการปัญหาและวิธีแก้ไขระบบ IoT
+                จัดการปัญหา วิธีแก้ไข และเนื้อหาความรู้
+                สำหรับระบบ IoT และ Robotics
             </p>
+
 
         </div>
 
 
+
         <button
             id="addProblemButton"
-            class="add-button"
+            class="add-button hero-add-button"
+            type="button"
         >
-            + เพิ่มปัญหา
+
+            <span class="button-icon">
+                ＋
+            </span>
+
+            เพิ่มปัญหา
+
         </button>
 
-    </div>
+
+    </section>
 
 
 
@@ -111,136 +238,232 @@
          STATISTICS
     ================================================== -->
 
-    <div class="stats-grid">
+    <section class="stats-grid">
 
 
-        <div class="stat-card">
+        <!-- TOTAL -->
+
+        <article class="stat-card total-card">
 
             <div class="stat-icon">
+
                 📚
+
             </div>
 
-            <div>
 
-                <p>
+            <div class="stat-content">
+
+                <span class="stat-label">
                     ปัญหาทั้งหมด
-                </p>
+                </span>
 
-                <h2 id="totalProblems">
+                <strong
+                    id="totalProblems"
+                    class="stat-number"
+                >
                     0
-                </h2>
+                </strong>
+
+                <span class="stat-description">
+                    รายการในระบบ
+                </span>
 
             </div>
 
-        </div>
+        </article>
 
 
-        <div class="stat-card">
+
+        <!-- PENDING -->
+
+        <article class="stat-card pending-card">
 
             <div class="stat-icon">
+
                 🟡
+
             </div>
 
-            <div>
 
-                <p>
+            <div class="stat-content">
+
+                <span class="stat-label">
                     รอตรวจสอบ
-                </p>
+                </span>
 
-                <h2 id="pendingProblems">
+                <strong
+                    id="pendingProblems"
+                    class="stat-number"
+                >
                     0
-                </h2>
+                </strong>
+
+                <span class="stat-description">
+                    รอ Admin ตรวจสอบ
+                </span>
 
             </div>
 
-        </div>
+        </article>
 
 
-        <div class="stat-card">
+
+        <!-- PUBLISHED -->
+
+        <article class="stat-card published-card">
 
             <div class="stat-icon">
+
                 🟢
+
             </div>
 
-            <div>
 
-                <p>
+            <div class="stat-content">
+
+                <span class="stat-label">
                     เผยแพร่แล้ว
-                </p>
+                </span>
 
-                <h2 id="publishedProblems">
+                <strong
+                    id="publishedProblems"
+                    class="stat-number"
+                >
                     0
-                </h2>
+                </strong>
+
+                <span class="stat-description">
+                    ผู้ใช้สามารถดูได้
+                </span>
 
             </div>
 
-        </div>
+        </article>
 
 
-        <div class="stat-card">
+
+        <!-- REJECTED -->
+
+        <article class="stat-card rejected-card">
 
             <div class="stat-icon">
+
                 🔴
+
             </div>
 
-            <div>
 
-                <p>
+            <div class="stat-content">
+
+                <span class="stat-label">
                     ไม่เผยแพร่
-                </p>
+                </span>
 
-                <h2 id="rejectedProblems">
+                <strong
+                    id="rejectedProblems"
+                    class="stat-number"
+                >
                     0
-                </h2>
+                </strong>
+
+                <span class="stat-description">
+                    ซ่อนจากผู้ใช้งาน
+                </span>
 
             </div>
 
-        </div>
+        </article>
 
 
-    </div>
+    </section>
 
 
 
     <!-- ==================================================
-         PROBLEMS
+         PROBLEM MANAGEMENT
     ================================================== -->
 
     <section class="admin-section">
 
 
+        <!-- SECTION HEADER -->
+
         <div class="section-header">
 
-            <div>
 
-                <h2>
-                    จัดการปัญหา
-                </h2>
+            <div class="section-heading">
 
-                <p>
-                    เพิ่ม แก้ไข ลบ และจัดการวิธีแก้ไข
-                </p>
+
+                <div class="section-icon">
+                    🛠️
+                </div>
+
+
+                <div>
+
+                    <h2>
+                        จัดการปัญหา
+                    </h2>
+
+                    <p>
+                        เพิ่ม แก้ไข ลบ และจัดการวิธีแก้ไขปัญหา
+                    </p>
+
+                </div>
+
 
             </div>
 
 
-            <input
-                type="text"
-                id="adminSearch"
-                placeholder="🔍 ค้นหาปัญหา..."
-                class="admin-search"
-            >
+
+            <!-- SEARCH -->
+
+            <div class="search-wrapper">
+
+                <span class="search-icon">
+                    🔍
+                </span>
+
+                <input
+                    type="text"
+                    id="adminSearch"
+                    placeholder="ค้นหาปัญหา..."
+                    class="admin-search"
+                    autocomplete="off"
+                >
+
+            </div>
+
 
         </div>
 
+
+
+        <!-- DIVIDER -->
+
+        <div class="section-divider"></div>
+
+
+
+        <!-- LOADING -->
 
         <div
             id="loading"
             class="loading"
         >
-            กำลังโหลดข้อมูล...
+
+            <div class="loading-spinner small"></div>
+
+            <span>
+                กำลังโหลดข้อมูล...
+            </span>
+
         </div>
 
+
+
+        <!-- PROBLEM LIST -->
 
         <div
             id="problemTable"
@@ -265,27 +488,59 @@
     class="modal"
 >
 
+
     <div class="modal-content">
 
 
+        <!-- MODAL HEADER -->
+
         <div class="modal-header">
 
-            <h2 id="problemModalTitle">
-                เพิ่มปัญหาใหม่
-            </h2>
+
+            <div class="modal-title-area">
+
+                <div class="modal-icon">
+                    🐞
+                </div>
+
+                <div>
+
+                    <h2 id="problemModalTitle">
+                        เพิ่มปัญหาใหม่
+                    </h2>
+
+                    <p>
+                        กรอกข้อมูลปัญหาให้ครบถ้วน
+                    </p>
+
+                </div>
+
+            </div>
+
+
 
             <button
                 id="closeProblemModal"
                 class="close-button"
+                type="button"
+                aria-label="ปิด"
             >
+
                 ×
+
             </button>
+
 
         </div>
 
 
+
+        <!-- FORM -->
+
         <form id="problemForm">
 
+
+            <!-- Hidden ID -->
 
             <input
                 type="hidden"
@@ -293,155 +548,254 @@
             >
 
 
-            <!-- TITLE -->
 
-            <label>
-                ชื่อปัญหา
-            </label>
+            <!-- ==================================================
+                 BASIC INFORMATION
+            ================================================== -->
 
-            <input
-                type="text"
-                id="title"
-                placeholder="เช่น ESP32 ไม่พบ COM Port"
-                required
-            >
+            <div class="form-section">
 
 
-            <!-- DESCRIPTION -->
+                <div class="form-section-title">
 
-            <label>
-                รายละเอียดปัญหา
-            </label>
+                    <span>
+                        📋
+                    </span>
 
-            <textarea
-                id="description"
-                rows="4"
-                placeholder="อธิบายรายละเอียดของปัญหา"
-                required
-            ></textarea>
+                    ข้อมูลปัญหา
+
+                </div>
 
 
-            <!-- CATEGORY -->
 
-            <label>
-                หมวดหมู่
-            </label>
+                <!-- TITLE -->
 
-            <select
-                id="category"
-                required
-            >
+                <div class="form-group">
 
-                <option value="">
-                    -- เลือกหมวดหมู่ --
-                </option>
+                    <label for="title">
+                        ชื่อปัญหา
+                    </label>
 
-                <option value="ESP32">
-                    ESP32
-                </option>
+                    <input
+                        type="text"
+                        id="title"
+                        placeholder="เช่น ESP32 ไม่พบ COM Port"
+                        required
+                    >
 
-                <option value="ESP8266">
-                    ESP8266
-                </option>
-
-                <option value="Arduino">
-                    Arduino
-                </option>
-
-                <option value="Servo">
-                    Servo
-                </option>
-
-                <option value="Sensor">
-                    Sensor
-                </option>
-
-                <option value="WiFi">
-                    WiFi
-                </option>
-
-                <option value="Hardware">
-                    Hardware
-                </option>
-
-            </select>
+                </div>
 
 
-            <!-- SYMPTOMS -->
 
-            <label>
-                อาการ
-            </label>
+                <!-- DESCRIPTION -->
 
-            <textarea
-                id="symptoms"
-                rows="3"
-                placeholder="อาการที่พบ"
-            ></textarea>
+                <div class="form-group">
 
+                    <label for="description">
+                        รายละเอียดปัญหา
+                    </label>
 
-            <!-- CAUSES -->
+                    <textarea
+                        id="description"
+                        rows="4"
+                        placeholder="อธิบายรายละเอียดของปัญหาที่พบ..."
+                        required
+                    ></textarea>
 
-            <label>
-                สาเหตุ
-            </label>
-
-            <textarea
-                id="causes"
-                rows="3"
-                placeholder="สาเหตุที่เป็นไปได้"
-            ></textarea>
+                </div>
 
 
-            <!-- STATUS -->
 
-            <label>
-                สถานะ
-            </label>
+                <!-- CATEGORY -->
 
-            <select id="status">
+                <div class="form-group">
 
-                <option value="pending">
-                    รอตรวจสอบ
-                </option>
+                    <label for="category">
+                        หมวดหมู่
+                    </label>
 
-                <option value="published">
-                    เผยแพร่
-                </option>
+                    <select
+                        id="category"
+                        required
+                    >
 
-                <option value="rejected">
-                    ไม่เผยแพร่
-                </option>
+                        <option value="">
+                            -- เลือกหมวดหมู่ --
+                        </option>
 
-            </select>
+                        <option value="ESP32">
+                            ESP32
+                        </option>
+
+                        <option value="ESP8266">
+                            ESP8266
+                        </option>
+
+                        <option value="Arduino">
+                            Arduino
+                        </option>
+
+                        <option value="Servo">
+                            Servo
+                        </option>
+
+                        <option value="Sensor">
+                            Sensor
+                        </option>
+
+                        <option value="WiFi">
+                            WiFi
+                        </option>
+
+                        <option value="Hardware">
+                            Hardware
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+            </div>
 
 
 
             <!-- ==================================================
-                 PROBLEM IMAGE
+                 PROBLEM DETAILS
             ================================================== -->
 
-            <label>
-                รูปภาพปัญหา
-            </label>
-
-            <input
-                type="file"
-                id="problemImage"
-                accept="image/jpeg,image/png,image/webp"
-            >
-
-            <small>
-                รองรับ JPG, PNG, WEBP ขนาดไม่เกิน 5 MB
-            </small>
+            <div class="form-section">
 
 
-            <div
-                id="problemImagePreview"
-                class="image-preview"
-            >
+                <div class="form-section-title">
+
+                    <span>
+                        🔎
+                    </span>
+
+                    รายละเอียดเพิ่มเติม
+
+                </div>
+
+
+
+                <!-- SYMPTOMS -->
+
+                <div class="form-group">
+
+                    <label for="symptoms">
+                        อาการที่พบ
+                    </label>
+
+                    <textarea
+                        id="symptoms"
+                        rows="3"
+                        placeholder="อธิบายอาการที่เกิดขึ้น..."
+                    ></textarea>
+
+                </div>
+
+
+
+                <!-- CAUSES -->
+
+                <div class="form-group">
+
+                    <label for="causes">
+                        สาเหตุที่คาดว่าเกิดจาก
+                    </label>
+
+                    <textarea
+                        id="causes"
+                        rows="3"
+                        placeholder="อธิบายสาเหตุที่เป็นไปได้..."
+                    ></textarea>
+
+                </div>
+
+
+
+                <!-- STATUS -->
+
+                <div class="form-group">
+
+                    <label for="status">
+                        สถานะการเผยแพร่
+                    </label>
+
+                    <select id="status">
+
+                        <option value="pending">
+                            🟡 รอตรวจสอบ
+                        </option>
+
+                        <option value="published">
+                            🟢 เผยแพร่
+                        </option>
+
+                        <option value="rejected">
+                            🔴 ไม่เผยแพร่
+                        </option>
+
+                    </select>
+
+                </div>
+
+
             </div>
 
+
+
+            <!-- ==================================================
+                 IMAGE
+            ================================================== -->
+
+            <div class="form-section">
+
+
+                <div class="form-section-title">
+
+                    <span>
+                        🖼️
+                    </span>
+
+                    รูปภาพปัญหา
+
+                </div>
+
+
+
+                <div class="form-group">
+
+                    <label for="problemImage">
+                        อัปโหลดรูปภาพ
+                    </label>
+
+                    <input
+                        type="file"
+                        id="problemImage"
+                        accept="image/jpeg,image/png,image/webp"
+                    >
+
+                    <small>
+                        รองรับ JPG, PNG, WEBP ขนาดไม่เกิน 5 MB
+                    </small>
+
+
+                    <div
+                        id="problemImagePreview"
+                        class="image-preview"
+                    >
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- MESSAGE -->
 
             <div
                 id="formMessage"
@@ -449,16 +803,29 @@
             ></div>
 
 
-            <button
-                type="submit"
-                class="save-button"
-                id="saveProblemButton"
-            >
-                บันทึกปัญหา
-            </button>
+
+            <!-- SAVE -->
+
+            <div class="modal-actions">
+
+
+                <button
+                    type="submit"
+                    class="save-button"
+                    id="saveProblemButton"
+                >
+
+                    💾
+                    บันทึกปัญหา
+
+                </button>
+
+
+            </div>
 
 
         </form>
+
 
     </div>
 
@@ -475,32 +842,50 @@
     class="modal"
 >
 
+
     <div class="modal-content solution-modal">
 
 
+        <!-- HEADER -->
+
         <div class="modal-header">
 
-            <div>
 
-                <h2>
-                    วิธีแก้ไข
-                </h2>
+            <div class="modal-title-area">
 
-                <p
-                    id="solutionProblemTitle"
-                    class="modal-subtitle"
-                >
-                </p>
+                <div class="modal-icon">
+                    🛠️
+                </div>
+
+                <div>
+
+                    <h2>
+                        วิธีแก้ไข
+                    </h2>
+
+                    <p
+                        id="solutionProblemTitle"
+                        class="modal-subtitle"
+                    >
+                    </p>
+
+                </div>
 
             </div>
+
 
 
             <button
                 id="closeSolutionModal"
                 class="close-button"
+                type="button"
+                aria-label="ปิด"
             >
+
                 ×
+
             </button>
+
 
         </div>
 
@@ -508,12 +893,35 @@
 
         <!-- ADD STEP -->
 
-        <button
-            id="addSolutionButton"
-            class="add-button solution-add-button"
-        >
-            + เพิ่มขั้นตอน
-        </button>
+        <div class="solution-toolbar">
+
+
+            <div>
+
+                <h3>
+                    ขั้นตอนการแก้ไข
+                </h3>
+
+                <p>
+                    เพิ่มหรือแก้ไขขั้นตอนของวิธีแก้ไข
+                </p>
+
+            </div>
+
+
+
+            <button
+                id="addSolutionButton"
+                class="add-button solution-add-button"
+                type="button"
+            >
+
+                ＋ เพิ่มขั้นตอน
+
+            </button>
+
+
+        </div>
 
 
 
@@ -538,9 +946,22 @@
         >
 
 
-            <h3 id="solutionFormTitle">
-                เพิ่มขั้นตอน
-            </h3>
+            <div class="solution-form-header">
+
+                <div>
+
+                    <h3 id="solutionFormTitle">
+                        เพิ่มขั้นตอน
+                    </h3>
+
+                    <p>
+                        กรอกข้อมูลขั้นตอนการแก้ไข
+                    </p>
+
+                </div>
+
+            </div>
+
 
 
             <form id="solutionForm">
@@ -552,97 +973,122 @@
                 >
 
 
-                <!-- STEP -->
 
-                <label>
-                    ขั้นตอนที่
-                </label>
+                <!-- STEP NUMBER -->
 
-                <input
-                    type="number"
-                    id="stepNumber"
-                    min="1"
-                    required
-                >
+                <div class="form-group">
+
+                    <label for="stepNumber">
+                        ขั้นตอนที่
+                    </label>
+
+                    <input
+                        type="number"
+                        id="stepNumber"
+                        min="1"
+                        placeholder="1"
+                        required
+                    >
+
+                </div>
+
 
 
                 <!-- TITLE -->
 
-                <label>
-                    หัวข้อขั้นตอน
-                </label>
+                <div class="form-group">
 
-                <input
-                    type="text"
-                    id="solutionTitle"
-                    placeholder="เช่น ตรวจสอบสาย USB"
-                    required
-                >
+                    <label for="solutionTitle">
+                        หัวข้อขั้นตอน
+                    </label>
+
+                    <input
+                        type="text"
+                        id="solutionTitle"
+                        placeholder="เช่น ตรวจสอบสาย USB"
+                        required
+                    >
+
+                </div>
+
 
 
                 <!-- DESCRIPTION -->
 
-                <label>
-                    รายละเอียด
-                </label>
+                <div class="form-group">
 
-                <textarea
-                    id="solutionDescription"
-                    rows="5"
-                    placeholder="อธิบายวิธีแก้ไขอย่างละเอียด"
-                ></textarea>
+                    <label for="solutionDescription">
+                        รายละเอียด
+                    </label>
+
+                    <textarea
+                        id="solutionDescription"
+                        rows="5"
+                        placeholder="อธิบายวิธีแก้ไขอย่างละเอียด..."
+                    ></textarea>
+
+                </div>
+
 
 
                 <!-- STATUS -->
 
-                <label>
-                    สถานะ
-                </label>
+                <div class="form-group">
 
-                <select id="solutionStatus">
+                    <label for="solutionStatus">
+                        สถานะ
+                    </label>
 
-                    <option value="pending">
-                        รอตรวจสอบ
-                    </option>
+                    <select id="solutionStatus">
 
-                    <option value="published">
-                        เผยแพร่
-                    </option>
+                        <option value="pending">
+                            🟡 รอตรวจสอบ
+                        </option>
 
-                    <option value="rejected">
-                        ไม่เผยแพร่
-                    </option>
+                        <option value="published">
+                            🟢 เผยแพร่
+                        </option>
 
-                </select>
+                        <option value="rejected">
+                            🔴 ไม่เผยแพร่
+                        </option>
 
+                    </select>
 
-
-                <!-- ==================================================
-                     SOLUTION IMAGE
-                ================================================== -->
-
-                <label>
-                    รูปภาพของขั้นตอนนี้
-                </label>
-
-                <input
-                    type="file"
-                    id="solutionImage"
-                    accept="image/jpeg,image/png,image/webp"
-                >
-
-                <small>
-                    รองรับ JPG, PNG, WEBP ขนาดไม่เกิน 5 MB
-                </small>
-
-
-                <div
-                    id="solutionImagePreview"
-                    class="image-preview"
-                >
                 </div>
 
 
+
+                <!-- IMAGE -->
+
+                <div class="form-group">
+
+                    <label for="solutionImage">
+                        รูปภาพของขั้นตอนนี้
+                    </label>
+
+                    <input
+                        type="file"
+                        id="solutionImage"
+                        accept="image/jpeg,image/png,image/webp"
+                    >
+
+                    <small>
+                        รองรับ JPG, PNG, WEBP ขนาดไม่เกิน 5 MB
+                    </small>
+
+
+                    <div
+                        id="solutionImagePreview"
+                        class="image-preview"
+                    >
+                    </div>
+
+                </div>
+
+
+
+                <!-- MESSAGE -->
 
                 <div
                     id="solutionFormMessage"
@@ -650,6 +1096,8 @@
                 ></div>
 
 
+
+                <!-- BUTTONS -->
 
                 <div class="solution-form-buttons">
 
@@ -659,8 +1107,12 @@
                         class="save-button"
                         id="saveSolutionButton"
                     >
+
+                        💾
                         บันทึกขั้นตอน
+
                     </button>
+
 
 
                     <button
@@ -668,7 +1120,9 @@
                         id="cancelSolutionButton"
                         class="cancel-button"
                     >
+
                         ยกเลิก
+
                     </button>
 
 
@@ -696,6 +1150,49 @@
 <script src="js/dashboard.js"></script>
 
 
+
+<!-- ==================================================
+     PAGE LOADING SCRIPT
+================================================== -->
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        setTimeout(
+            function () {
+
+                const loading =
+                    document.getElementById("pageLoading");
+
+                if (loading) {
+
+                    loading.classList.add("hidden");
+
+                    setTimeout(
+                        function () {
+
+                            loading.remove();
+
+                        },
+                        400
+                    );
+
+                }
+
+            },
+            500
+        );
+
+    }
+);
+
+</script>
+
+
 </body>
 
 </html>
+
