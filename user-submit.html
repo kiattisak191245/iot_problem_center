@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ส่งปัญหา - IoT Problem Center</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+<header class="navbar">
+    <div class="navbar-inner">
+
+        <div class="logo-text">
+            🤖
+            <span>IoT Problem Center</span>
+        </div>
+
+        <div class="user-area">
+            <span id="userEmail">กำลังโหลด...</span>
+
+            <button id="logoutButton" class="logout-button">
+                ออกจากระบบ
+            </button>
+        </div>
+
+    </div>
+</header>
+
+
+<main class="dashboard-container">
+
+    <div class="dashboard-header">
+
+        <div>
+            <h1>ส่งปัญหาและวิธีแก้ไข</h1>
+
+            <p>
+                สามารถส่งปัญหาและวิธีแก้ไขให้ Admin ตรวจสอบก่อนเผยแพร่
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         PROBLEM
+    ========================= -->
+
+    <section class="admin-section">
+
+        <h2>1. ข้อมูลปัญหา</h2>
+
+        <form id="problemForm">
+
+            <label>ชื่อปัญหา</label>
+
+            <input
+                type="text"
+                id="title"
+                placeholder="เช่น ESP32 ไม่พบ COM Port"
+                required
+            >
+
+
+            <label>รายละเอียดปัญหา</label>
+
+            <textarea
+                id="description"
+                rows="5"
+                required
+            ></textarea>
+
+
+            <label>หมวดหมู่</label>
+
+            <select id="category" required>
+
+                <option value="">
+                    -- เลือกหมวดหมู่ --
+                </option>
+
+                <option value="ESP32">ESP32</option>
+                <option value="ESP8266">ESP8266</option>
+                <option value="Arduino">Arduino</option>
+                <option value="Servo">Servo</option>
+                <option value="Sensor">Sensor</option>
+                <option value="WiFi">WiFi</option>
+                <option value="Hardware">Hardware</option>
+
+            </select>
+
+
+            <label>อาการ</label>
+
+            <textarea
+                id="symptoms"
+                rows="4"
+            ></textarea>
+
+
+            <label>สาเหตุ</label>
+
+            <textarea
+                id="causes"
+                rows="4"
+            ></textarea>
+
+
+            <button
+                type="submit"
+                class="save-button"
+                id="saveProblemButton"
+            >
+                บันทึกปัญหา
+            </button>
+
+        </form>
+
+    </section>
+
+
+    <!-- =========================
+         SOLUTIONS
+    ========================= -->
+
+    <section
+        id="solutionSection"
+        class="admin-section"
+        style="display:none;"
+    >
+
+        <h2>2. วิธีแก้ไข</h2>
+
+        <p>
+            เพิ่มวิธีแก้ไขได้หลายขั้นตอน
+        </p>
+
+
+        <div id="solutionList"></div>
+
+
+        <button
+            type="button"
+            id="addSolutionButton"
+            class="add-button"
+        >
+            + เพิ่มขั้นตอน
+        </button>
+
+
+        <br><br>
+
+
+        <button
+            id="submitAllButton"
+            class="save-button"
+        >
+            📤 ส่งให้ Admin ตรวจสอบ
+        </button>
+
+    </section>
+
+
+    <div
+        id="message"
+        class="form-message"
+    ></div>
+
+</main>
+
+
+<script src="js/supabase.js"></script>
+
+<script src="js/user-submit.js"></script>
+
+</body>
+</html>
