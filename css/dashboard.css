@@ -1,0 +1,570 @@
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.dashboard-header h1 {
+    margin: 0 0 8px;
+}
+
+.dashboard-header p {
+    margin: 0;
+    color: #666;
+}
+
+
+/* =========================
+   BUTTON
+========================= */
+
+.add-button {
+    border: none;
+    background: #2563eb;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.add-button:hover {
+    opacity: 0.9;
+}
+
+
+/* =========================
+   STATS
+========================= */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 35px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.stat-icon {
+    font-size: 30px;
+}
+
+.stat-card p {
+    margin: 0 0 5px;
+    color: #666;
+}
+
+.stat-card h2 {
+    margin: 0;
+}
+
+
+/* =========================
+   SECTION
+========================= */
+
+.admin-section {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.section-header h2 {
+    margin: 0 0 5px;
+}
+
+.section-header p {
+    margin: 0;
+    color: #777;
+}
+
+.admin-search {
+    width: 280px;
+    padding: 10px 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+
+/* =========================
+   TABLE
+========================= */
+
+.problem-table {
+    width: 100%;
+}
+
+.problem-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1.5fr;
+    gap: 15px;
+    padding: 15px 10px;
+    border-bottom: 1px solid #eee;
+    align-items: center;
+}
+
+.problem-row.header {
+    font-weight: bold;
+    background: #f5f5f5;
+}
+
+.problem-title {
+    font-weight: bold;
+}
+
+.problem-category {
+    color: #2563eb;
+}
+
+.status {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 13px;
+    display: inline-block;
+}
+
+.status-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-published {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-rejected {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+
+/* =========================
+   MODAL
+========================= */
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    width: 100%;
+    max-width: 650px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-header h2 {
+    margin: 0;
+}
+
+.close-button {
+    border: none;
+    background: none;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+
+/* =========================
+   FORM
+========================= */
+
+#problemForm label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+#problemForm input,
+#problemForm textarea,
+#problemForm select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 11px;
+    border: 1px solid #ddd;
+    border-radius: 7px;
+    font-family: inherit;
+}
+
+#problemForm textarea {
+    resize: vertical;
+}
+
+.save-button {
+    width: 100%;
+    margin-top: 20px;
+    padding: 13px;
+    border: none;
+    border-radius: 8px;
+    background: #16a34a;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.save-button:disabled {
+    opacity: 0.6;
+}
+
+.form-message {
+    margin-top: 15px;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 800px) {
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .admin-search {
+        width: 100%;
+    }
+
+    .problem-row {
+        grid-template-columns: 1fr;
+    }
+
+}
+/* ==================================================
+   ACTION BUTTONS
+================================================== */
+
+.action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.action-buttons button,
+.solution-actions button {
+    border: none;
+    padding: 7px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.action-edit {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.action-solution {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.action-delete {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.action-buttons button:hover,
+.solution-actions button:hover {
+    opacity: 0.8;
+}
+
+
+/* ==================================================
+   SOLUTION MODAL
+================================================== */
+
+.solution-modal {
+    max-width: 800px;
+}
+
+.modal-subtitle {
+    margin: 5px 0 0;
+    color: #666;
+}
+
+.solution-add-button {
+    margin-bottom: 20px;
+}
+
+
+/* ==================================================
+   SOLUTION LIST
+================================================== */
+
+.solution-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.solution-card {
+    display: grid;
+    grid-template-columns: 100px 1fr auto;
+    gap: 15px;
+    padding: 18px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #fafafa;
+}
+
+.solution-step {
+    font-weight: bold;
+    color: #2563eb;
+}
+
+.solution-content h3 {
+    margin: 0 0 8px;
+}
+
+.solution-content p {
+    margin: 0 0 10px;
+    color: #555;
+    line-height: 1.6;
+}
+
+.solution-actions {
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+}
+
+
+/* ==================================================
+   EMPTY SOLUTIONS
+================================================== */
+
+.empty-solutions {
+    text-align: center;
+    padding: 40px 20px;
+    border: 2px dashed #ddd;
+    border-radius: 10px;
+    color: #777;
+}
+
+.empty-solutions small {
+    display: block;
+    margin-top: 8px;
+}
+
+
+/* ==================================================
+   SOLUTION FORM
+================================================== */
+
+.solution-form-box {
+    margin-top: 25px;
+    padding: 20px;
+    border-radius: 10px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+}
+
+.solution-form-box h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.solution-form-box label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+.solution-form-box input,
+.solution-form-box textarea,
+.solution-form-box select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 11px;
+    border: 1px solid #ddd;
+    border-radius: 7px;
+    font-family: inherit;
+}
+
+.solution-form-box textarea {
+    resize: vertical;
+}
+
+.solution-form-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.solution-form-buttons .save-button {
+    flex: 1;
+}
+
+.cancel-button {
+    margin-top: 20px;
+    padding: 13px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #e5e7eb;
+    color: #333;
+    cursor: pointer;
+}
+
+
+/* ==================================================
+   MOBILE
+================================================== */
+
+@media (max-width: 700px) {
+
+    .solution-card {
+        grid-template-columns: 1fr;
+    }
+
+    .solution-actions {
+        justify-content: flex-start;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .action-buttons button {
+        width: 100%;
+    }
+
+}
+/* ==========================================
+   SOLUTION IMAGES
+========================================== */
+
+.solution-image-preview {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 12px;
+
+    margin-top: 12px;
+
+}
+
+
+.solution-preview-image {
+
+    width: 120px;
+
+    height: 90px;
+
+    object-fit: cover;
+
+    border-radius: 8px;
+
+    border: 1px solid #ddd;
+
+}
+
+
+.solution-images {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 12px;
+
+    margin-top: 15px;
+
+}
+
+
+.solution-image-item {
+
+    width: 180px;
+
+}
+
+
+.solution-image {
+
+    width: 100%;
+
+    height: 130px;
+
+    object-fit: cover;
+
+    border-radius: 10px;
+
+    border: 1px solid #ddd;
+
+    display: block;
+
+}
+
+
+.solution-image:hover {
+
+    transform: scale(1.03);
+
+    transition: 0.2s;
+
+    cursor: pointer;
+
+}
