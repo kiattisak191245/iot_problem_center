@@ -2,24 +2,30 @@
 // IoT PROBLEM CENTER - DASHBOARD.JS (FULL FIXED VERSION)
 // ============================================================
 
+// ============================================================
+// GLOBAL VARIABLES
+// ============================================================
+
 let currentUser = null;
 let isAdmin = false;
 let allProblems = [];
 let editingProblemId = null;
+let currentProblemForSolution = null;
 
-// Helper: ดึง Element ตาม ID
+// ============================================================
+// DOM HELPERS
+// ============================================================
+
 function $(id) {
     return document.getElementById(id);
 }
 
-// Helper: แปลงอักขระป้องกัน XSS
 function escapeHtml(value) {
     const div = document.createElement("div");
     div.textContent = value ?? "";
     return div.innerHTML;
 }
 
-// Helper: กำหนดข้อความให้ Element
 function setText(id, value) {
     const element = $(id);
     if (element) {
@@ -27,12 +33,10 @@ function setText(id, value) {
     }
 }
 
-// Helper: ดึง Field โดยรองรับทั้ง ID หลักและ ID สำรอง
-function getField(primaryId, fallbackId) {
-    return $(primaryId) || $(fallbackId);
-}
+// ============================================================
+// TOAST NOTIFICATION
+// ============================================================
 
-// แสดงข้อความ แจ้งเตือน (Toast Notification)
 function showMessage(message, type = "info") {
     let box = $("dashboardMessage");
 
@@ -73,17 +77,13 @@ function showMessage(message, type = "info") {
 }
 
 // ============================================================
-// GET CURRENT USER & AUTH
+// AUTH & ADMIN CHECK
 // ============================================================
 
 async function getCurrentUser() {
     try {
         const { data, error } = await supabaseClient.auth.getSession();
-        if (error) {
-            console.error("GET SESSION ERROR:", error);
-            return null;
-        }
-        if (!data.session) {
+        if (error || !data.session) {
             return null;
         }
         return data.session.user;
@@ -92,10 +92,6 @@ async function getCurrentUser() {
         return null;
     }
 }
-
-// ============================================================
-// CHECK ADMIN PERMISSIONS
-// ============================================================
 
 async function checkAdmin() {
     try {
@@ -111,22 +107,39 @@ async function checkAdmin() {
 
         let adminResult = false;
 
-        // วิธีที่ 1: ตรวจสอบจากตาราง admins
+        // 1. ตรวจสอบสิทธิ์จากตาราง profiles (ที่ใช้งานในระบบจริง)
         try {
             const { data, error } = await supabaseClient
-                .from("admins")
-                .select("user_id")
-                .eq("user_id", currentUser.id)
+                .from("profiles")
+                .select("role")
+                .eq("id", currentUser.id)
                 .maybeSingle();
 
-            if (!error && data) {
+            if (!error && data && data.role === "admin") {
                 adminResult = true;
             }
         } catch (err) {
-            console.log("ไม่พบ/ไม่สามารถอ่าน admins table:", err);
+            console.log("ไม่สามารถอ่านตาราง profiles ได้:", err);
         }
 
-        // วิธีที่ 2: ตรวจสอบจาก user_metadata
+        // 2. สำรอง: ตรวจสอบจากตาราง admins
+        if (!adminResult) {
+            try {
+                const { data, error } = await supabaseClient
+                    .from("admins")
+                    .select("user_id")
+                    .eq("user_id", currentUser.id)
+                    .maybeSingle();
+
+                if (!error && data) {
+                    adminResult = true;
+                }
+            } catch (err) {
+                console.log("ไม่พบตาราง admins:", err);
+            }
+        }
+
+        // 3. สำรอง: ตรวจสอบจาก user_metadata
         if (!adminResult) {
             const metadata = currentUser.user_metadata || {};
             if (metadata.role === "admin" || metadata.is_admin === true) {
@@ -153,23 +166,17 @@ async function checkAdmin() {
     }
 }
 
-// ============================================================
-// USER AREA & LOGOUT
-// ============================================================
-
 function updateUserArea() {
     if (!currentUser) return;
 
-    // แสดง Email ใน Navbar
     const adminEmail = $("adminEmail");
     if (adminEmail) {
         adminEmail.textContent = currentUser.email || "Admin";
     }
 
-    // ผูก Event ให้ปุ่ม Logout
     const logoutBtn = $("logoutButton");
     if (logoutBtn) {
-        logoutBtn.replaceWith(logoutBtn.cloneNode(true));
+        logoutBtn.replaceWith(logoutBtn.cloneNode(true)); // ลบ listener เก่า
         const newLogoutBtn = $("logoutButton");
         if (newLogoutBtn) {
             newLogoutBtn.addEventListener("click", logout);
@@ -194,9 +201,7 @@ async function logout() {
 
 async function loadProblems() {
     const loading = $("loading");
-    if (loading) {
-        loading.style.display = "block";
-    }
+    if (loading) loading.style.display = "block";
 
     try {
         const { data, error } = await supabaseClient
@@ -217,8 +222,6 @@ async function loadProblems() {
         if (error) throw error;
 
         allProblems = data || [];
-        console.log("PROBLEMS LOADED:", allProblems);
-
         renderProblems();
         updateStatistics();
     } catch (error) {
@@ -232,21 +235,15 @@ async function loadProblems() {
                 </div>
             `;
         }
-
         showMessage("โหลดข้อมูลไม่สำเร็จ: " + error.message, "error");
     } finally {
-        if (loading) {
-            loading.style.display = "none";
-        }
+        if (loading) loading.style.display = "none";
     }
 }
 
 function renderProblems() {
     const container = $("problemTable") || $("problemList");
-    if (!container) {
-        console.warn("ไม่พบคอนเทนเนอร์แสดงรายการปัญหา");
-        return;
-    }
+    if (!container) return;
 
     container.innerHTML = "";
 
@@ -281,7 +278,6 @@ function renderProblems() {
             </div>
 
             <h3>${escapeHtml(problem.title || "ไม่มีชื่อปัญหา")}</h3>
-
             <p>${escapeHtml(problem.description || "ไม่มีรายละเอียด")}</p>
 
             <div class="problem-info">
@@ -337,26 +333,16 @@ function bindProblemButtons() {
     });
 }
 
-// ============================================================
-// UPDATE STATISTICS
-// ============================================================
-
 function updateStatistics() {
     const total = allProblems.length;
-    const pending = allProblems.filter((item) => item.status === "pending").length;
-    const published = allProblems.filter((item) => item.status === "published").length;
-    const rejected = allProblems.filter((item) => item.status === "rejected").length;
+    const pending = allProblems.filter((i) => i.status === "pending").length;
+    const published = allProblems.filter((i) => i.status === "published").length;
+    const rejected = allProblems.filter((i) => i.status === "rejected").length;
 
     setText("totalProblems", total);
     setText("pendingProblems", pending);
     setText("publishedProblems", published);
     setText("rejectedProblems", rejected);
-
-    // รองรับ Element ID รูปแบบอื่น
-    setText("totalCount", total);
-    setText("pendingCount", pending);
-    setText("publishedCount", published);
-    setText("rejectedCount", rejected);
 }
 
 // ============================================================
@@ -367,39 +353,30 @@ function openAddProblemModal() {
     editingProblemId = null;
     resetProblemForm();
 
-    const hiddenId = $("editingProblemId");
-    if (hiddenId) hiddenId.value = "";
-
     setText("problemModalTitle", "เพิ่มปัญหาใหม่");
 
     const modal = $("problemModal");
-    if (modal) {
-        modal.style.display = "flex";
-    }
+    if (modal) modal.style.display = "flex";
 }
 
 function closeProblemModal() {
     const modal = $("problemModal");
-    if (modal) {
-        modal.style.display = "none";
-    }
+    if (modal) modal.style.display = "none";
     resetProblemForm();
 }
 
 function resetProblemForm() {
     const form = $("problemForm");
-    if (form) {
-        form.reset();
-    }
-    const statusField = getField("status", "problemStatus");
-    if (statusField) {
-        statusField.value = "pending";
-    }
-    const messageBox = $("formMessage");
-    if (messageBox) {
-        messageBox.textContent = "";
-        messageBox.className = "form-message";
-    }
+    if (form) form.reset();
+
+    const hiddenId = $("editingProblemId");
+    if (hiddenId) hiddenId.value = "";
+
+    const statusField = $("status") || $("problemStatus");
+    if (statusField) statusField.value = "pending";
+
+    const msgBox = $("formMessage");
+    if (msgBox) msgBox.textContent = "";
 }
 
 function editProblem(id) {
@@ -414,12 +391,12 @@ function editProblem(id) {
     const hiddenId = $("editingProblemId");
     if (hiddenId) hiddenId.value = id;
 
-    const titleField = getField("title", "problemTitle");
-    const descField = getField("description", "problemDescription");
-    const catField = getField("category", "problemCategory");
-    const sympField = getField("symptoms", "problemSymptoms");
-    const causesField = getField("causes", "problemCauses");
-    const statusField = getField("status", "problemStatus");
+    const titleField = $("title") || $("problemTitle");
+    const descField = $("description") || $("problemDescription");
+    const catField = $("category") || $("problemCategory");
+    const sympField = $("symptoms") || $("problemSymptoms");
+    const causesField = $("causes") || $("problemCauses");
+    const statusField = $("status") || $("problemStatus");
 
     if (titleField) titleField.value = problem.title || "";
     if (descField) descField.value = problem.description || "";
@@ -431,9 +408,7 @@ function editProblem(id) {
     setText("problemModalTitle", "แก้ไขปัญหา");
 
     const modal = $("problemModal");
-    if (modal) {
-        modal.style.display = "flex";
-    }
+    if (modal) modal.style.display = "flex";
 }
 
 async function saveProblem(event) {
@@ -444,12 +419,12 @@ async function saveProblem(event) {
         return;
     }
 
-    const titleField = getField("title", "problemTitle");
-    const descField = getField("description", "problemDescription");
-    const catField = getField("category", "problemCategory");
-    const sympField = getField("symptoms", "problemSymptoms");
-    const causesField = getField("causes", "problemCauses");
-    const statusField = getField("status", "problemStatus");
+    const titleField = $("title") || $("problemTitle");
+    const descField = $("description") || $("problemDescription");
+    const catField = $("category") || $("problemCategory");
+    const sympField = $("symptoms") || $("problemSymptoms");
+    const causesField = $("causes") || $("problemCauses");
+    const statusField = $("status") || $("problemStatus");
 
     const title = titleField ? titleField.value.trim() : "";
     const description = descField ? descField.value.trim() : "";
@@ -472,7 +447,6 @@ async function saveProblem(event) {
         let result;
 
         if (editingProblemId) {
-            // อัปเดตข้อมูลเดิม
             result = await supabaseClient
                 .from("problems")
                 .update({
@@ -485,7 +459,6 @@ async function saveProblem(event) {
                 })
                 .eq("id", editingProblemId);
         } else {
-            // เพิ่มข้อมูลใหม่
             result = await supabaseClient
                 .from("problems")
                 .insert({
@@ -510,10 +483,6 @@ async function saveProblem(event) {
         showMessage("บันทึกไม่สำเร็จ: " + error.message, "error");
     }
 }
-
-// ============================================================
-// CHANGE PROBLEM STATUS & DELETE
-// ============================================================
 
 async function changeProblemStatus(id, newStatus) {
     if (!isAdmin) {
@@ -554,7 +523,6 @@ async function deleteProblem(id) {
     }
 
     try {
-        // ลบวิธีแก้ไขที่เกี่ยวข้องก่อน
         const { error: solErr } = await supabaseClient
             .from("solutions")
             .delete()
@@ -564,7 +532,6 @@ async function deleteProblem(id) {
             console.warn("DELETE SOLUTIONS WARNING:", solErr);
         }
 
-        // ลบปัญหา
         const { error } = await supabaseClient
             .from("problems")
             .delete()
@@ -581,19 +548,19 @@ async function deleteProblem(id) {
 }
 
 // ============================================================
-// SOLUTION MANAGEMENT
+// SOLUTIONS MANAGEMENT
 // ============================================================
 
 async function manageSolutions(problemId) {
-    const problem = allProblems.find((item) => String(item.id) === String(problemId));
-    if (!problem) {
+    currentProblemForSolution = allProblems.find((i) => String(i.id) === String(problemId));
+    if (!currentProblemForSolution) {
         showMessage("ไม่พบปัญหา", "error");
         return;
     }
 
     const { data, error } = await supabaseClient
         .from("solutions")
-        .select(`id, problem_id, step_number, content`)
+        .select(`id, problem_id, step_number, title, content`)
         .eq("problem_id", problemId)
         .order("step_number", { ascending: true });
 
@@ -602,7 +569,7 @@ async function manageSolutions(problemId) {
         return;
     }
 
-    renderSolutionModal(problem, data || []);
+    renderSolutionModal(currentProblemForSolution, data || []);
 }
 
 function renderSolutionModal(problem, solutions) {
@@ -617,125 +584,92 @@ function renderSolutionModal(problem, solutions) {
             solutionList.innerHTML = `<p style="color:#888; text-align:center; padding:15px;">ยังไม่มีวิธีแก้ไข</p>`;
         } else {
             solutionList.innerHTML = solutions
-                .map(
-                    (sol, idx) => `
+                .map((sol, idx) => `
                     <div class="solution-item" data-solution-id="${sol.id}" style="margin-bottom:15px; padding:15px; border:1px solid #e2e8f0; border-radius:8px;">
-                        <strong>ขั้นตอนที่ ${sol.step_number || idx + 1}</strong>
-                        <textarea class="solution-content" rows="3" style="width:100%; margin-top:8px; padding:8px; border:1px solid #cbd5e1; border-radius:6px;">${escapeHtml(sol.content)}</textarea>
-                        <div style="margin-top:8px; display:flex; gap:10px;">
-                            <button type="button" class="delete-solution-button" data-id="${sol.id}" data-problem-id="${problem.id}" style="background:#dc2626; color:#fff; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">
-                                🗑️ ลบขั้นตอน
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                            <strong>ขั้นตอนที่ ${sol.step_number || idx + 1}: ${escapeHtml(sol.title || "")}</strong>
+                            <button type="button" class="delete-solution-button" data-id="${sol.id}" style="background:#dc2626; color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">
+                                🗑️ ลบ
                             </button>
                         </div>
+                        <p style="margin:0; color:#334155; white-space:pre-line;">${escapeHtml(sol.content || "")}</p>
                     </div>
-                `
-                )
+                `)
                 .join("");
-
-            solutionList.innerHTML += `
-                <button type="button" id="saveExistingSolutionsBtn" style="background:#2563eb; color:#fff; border:none; padding:8px 16px; border-radius:6px; cursor:pointer; margin-top:10px;">
-                    💾 บันทึกการแก้ไขขั้นตอน
-                </button>
-            `;
         }
     }
 
     document.querySelectorAll(".delete-solution-button").forEach((btn) => {
-        btn.addEventListener("click", () => deleteSolution(btn.dataset.id, btn.dataset.problemId));
+        btn.addEventListener("click", () => deleteSolution(btn.dataset.id));
     });
 
-    const saveExistBtn = $("saveExistingSolutionsBtn");
-    if (saveExistBtn) {
-        saveExistBtn.addEventListener("click", saveExistingSolutions);
-    }
-
+    // ซ่อนกล่องฟอร์มไว้ก่อน
     const formBox = $("solutionFormBox");
-    if (formBox) {
-        formBox.style.display = "block";
-    }
+    if (formBox) formBox.style.display = "none";
 
     modal.style.display = "flex";
+}
 
-    const addSolBtn = $("addSolutionButton");
-    if (addSolBtn) {
-        addSolBtn.onclick = () => addSolution(problem.id);
+function openAddSolutionForm() {
+    const formBox = $("solutionFormBox");
+    const form = $("solutionForm");
+    if (form) form.reset();
+
+    if (formBox) {
+        formBox.style.display = "block";
+        formBox.scrollIntoView({ behavior: "smooth" });
     }
 }
 
-async function addSolution(problemId) {
-    const textarea = $("solutionDescription") || $("newSolutionContent");
-    const stepInput = $("stepNumber");
+async function saveSolution(event) {
+    if (event) event.preventDefault();
 
-    const content = textarea ? textarea.value.trim() : "";
-    if (!content) {
-        showMessage("กรุณากรอกรายละเอียดวิธีแก้ไข", "error");
+    if (!currentProblemForSolution) {
+        showMessage("ไม่พบบัญชีปัญหาที่จะเพิ่มวิธีแก้ไข", "error");
+        return;
+    }
+
+    const stepInput = $("stepNumber");
+    const titleInput = $("solutionTitle");
+    const descInput = $("solutionDescription");
+    const statusSelect = $("solutionStatus");
+
+    const step = stepInput ? Number(stepInput.value) || 1 : 1;
+    const title = titleInput ? titleInput.value.trim() : "";
+    const content = descInput ? descInput.value.trim() : "";
+    const status = statusSelect ? statusSelect.value : "pending";
+
+    if (!title && !content) {
+        showMessage("กรุณากรอกข้อมูลขั้นตอนอย่างน้อย 1 ช่อง", "error");
         return;
     }
 
     try {
-        let nextStep = 1;
-
-        if (stepInput && stepInput.value) {
-            nextStep = Number(stepInput.value);
-        } else {
-            const { data } = await supabaseClient
-                .from("solutions")
-                .select("step_number")
-                .eq("problem_id", problemId)
-                .order("step_number", { ascending: false })
-                .limit(1);
-
-            if (data && data.length > 0) {
-                nextStep = Number(data[0].step_number) + 1;
-            }
-        }
-
-        const { error } = await supabaseClient.from("solutions").insert({
-            problem_id: problemId,
-            step_number: nextStep,
-            content: content
-        });
+        const { error } = await supabaseClient
+            .from("solutions")
+            .insert({
+                problem_id: currentProblemForSolution.id,
+                step_number: step,
+                title: title,
+                content: content,
+                status: status
+            });
 
         if (error) throw error;
 
-        showMessage("เพิ่มวิธีแก้ไขสำเร็จ", "success");
-        if (textarea) textarea.value = "";
-        await manageSolutions(problemId);
+        showMessage("เพิ่มขั้นตอนสำเร็จ", "success");
+
+        const formBox = $("solutionFormBox");
+        if (formBox) formBox.style.display = "none";
+
+        await manageSolutions(currentProblemForSolution.id);
     } catch (error) {
-        console.error("ADD SOLUTION ERROR:", error);
-        showMessage("เพิ่มวิธีแก้ไขไม่สำเร็จ: " + error.message, "error");
-    }
-}
-
-async function saveExistingSolutions() {
-    const items = document.querySelectorAll(".solution-item");
-
-    try {
-        for (const item of items) {
-            const id = item.dataset.solutionId;
-            if (!id) continue;
-
-            const textarea = item.querySelector(".solution-content");
-            if (!textarea) continue;
-
-            const content = textarea.value.trim();
-
-            const { error } = await supabaseClient
-                .from("solutions")
-                .update({ content: content })
-                .eq("id", id);
-
-            if (error) throw error;
-        }
-
-        showMessage("บันทึกวิธีแก้ไขสำเร็จ", "success");
-    } catch (error) {
-        console.error("SAVE SOLUTIONS ERROR:", error);
+        console.error("SAVE SOLUTION ERROR:", error);
         showMessage("บันทึกวิธีแก้ไขไม่สำเร็จ: " + error.message, "error");
     }
 }
 
-async function deleteSolution(solutionId, problemId) {
+async function deleteSolution(solutionId) {
     if (!confirm("ต้องการลบขั้นตอนนี้หรือไม่?")) return;
 
     try {
@@ -747,7 +681,9 @@ async function deleteSolution(solutionId, problemId) {
         if (error) throw error;
 
         showMessage("ลบขั้นตอนสำเร็จ", "success");
-        await manageSolutions(problemId);
+        if (currentProblemForSolution) {
+            await manageSolutions(currentProblemForSolution.id);
+        }
     } catch (error) {
         console.error("DELETE SOLUTION ERROR:", error);
         showMessage("ลบขั้นตอนไม่สำเร็จ: " + error.message, "error");
@@ -755,7 +691,7 @@ async function deleteSolution(solutionId, problemId) {
 }
 
 // ============================================================
-// SEARCH & FILTERS
+// SEARCH & EVENT SETUP
 // ============================================================
 
 function setupSearch() {
@@ -778,31 +714,63 @@ function setupSearch() {
             );
         });
 
-        renderFilteredProblems(filtered);
+        const original = allProblems;
+        allProblems = filtered;
+        renderProblems();
+        allProblems = original;
     });
 }
 
-function renderFilteredProblems(problems) {
-    const original = allProblems;
-    allProblems = problems;
-    renderProblems();
-    allProblems = original;
-}
+function setupEventListeners() {
+    // ปิด Modal ปัญหา
+    const closeProbBtn = $("closeProblemModal");
+    if (closeProbBtn) {
+        closeProbBtn.addEventListener("click", closeProblemModal);
+    }
 
-function setupCategoryFilter() {
-    const buttons = document.querySelectorAll("[data-category]");
-    buttons.forEach((button) => {
-        button.addEventListener("click", () => {
-            const category = button.dataset.category;
-
-            if (!category || category === "all") {
-                renderProblems();
-                return;
-            }
-
-            const filtered = allProblems.filter((p) => p.category === category);
-            renderFilteredProblems(filtered);
+    // ปิด Modal วิธีแก้ไข
+    const closeSolBtn = $("closeSolutionModal");
+    if (closeSolBtn) {
+        closeSolBtn.addEventListener("click", () => {
+            const modal = $("solutionModal");
+            if (modal) modal.style.display = "none";
         });
+    }
+
+    // ปุ่มเปิดฟอร์มเพิ่มวิธีแก้ไข
+    const addSolBtn = $("addSolutionButton");
+    if (addSolBtn) {
+        addSolBtn.addEventListener("click", openAddSolutionForm);
+    }
+
+    // ปุ่ม ยกเลิก ในฟอร์มวิธีแก้ไข
+    const cancelSolBtn = $("cancelSolutionButton");
+    if (cancelSolBtn) {
+        cancelSolBtn.addEventListener("click", () => {
+            const formBox = $("solutionFormBox");
+            if (formBox) formBox.style.display = "none";
+        });
+    }
+
+    // Submit ฟอร์มปัญหา
+    const probForm = $("problemForm");
+    if (probForm) {
+        probForm.addEventListener("submit", saveProblem);
+    }
+
+    // Submit ฟอร์มวิธีแก้ไข
+    const solForm = $("solutionForm");
+    if (solForm) {
+        solForm.addEventListener("submit", saveSolution);
+    }
+
+    // คลิกพื้นหลังนอก Modal เพื่อปิด
+    window.addEventListener("click", (e) => {
+        const probModal = $("problemModal");
+        if (e.target === probModal) closeProblemModal();
+
+        const solModal = $("solutionModal");
+        if (e.target === solModal) solModal.style.display = "none";
     });
 }
 
@@ -813,59 +781,8 @@ function setupAddButton() {
     }
 }
 
-// ============================================================
-// EVENT LISTENERS & INITIALIZATION
-// ============================================================
-
-function setupEventListeners() {
-    // ปุ่มปิด Modal
-    const closeProbModal = $("closeProblemModal");
-    if (closeProbModal) {
-        closeProbModal.addEventListener("click", closeProblemModal);
-    }
-
-    const closeSolModal = $("closeSolutionModal");
-    if (closeSolModal) {
-        closeSolModal.addEventListener("click", () => {
-            const modal = $("solutionModal");
-            if (modal) modal.style.display = "none";
-        });
-    }
-
-    // คลิกพื้นหลังเพื่อปิด Modal
-    const probModal = $("problemModal");
-    if (probModal) {
-        probModal.addEventListener("click", (e) => {
-            if (e.target === probModal) closeProblemModal();
-        });
-    }
-
-    const solModal = $("solutionModal");
-    if (solModal) {
-        solModal.addEventListener("click", (e) => {
-            if (e.target === solModal) solModal.style.display = "none";
-        });
-    }
-
-    // ฟอร์มบันทึกข้อมูล
-    const probForm = $("problemForm");
-    if (probForm) {
-        probForm.addEventListener("submit", saveProblem);
-    }
-
-    const solForm = $("solutionForm");
-    if (solForm) {
-        solForm.addEventListener("submit", (e) => {
-            e.preventDefault();
-            const editingId = $("editingProblemId") ? $("editingProblemId").value : null;
-            if (editingId) addSolution(editingId);
-        });
-    }
-}
-
 function setupAuthListener() {
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
-        console.log("AUTH EVENT:", event);
         if (!session) {
             window.location.href = "login.html";
             return;
@@ -892,10 +809,9 @@ async function startDashboard() {
     // 2. โหลดรายการปัญหา
     await loadProblems();
 
-    // 3. เริ่มต้นการทำงานส่วน Event และ Listener
+    // 3. ผูก Event Listeners ทั้งหมด
     setupAddButton();
     setupSearch();
-    setupCategoryFilter();
     setupEventListeners();
     setupAuthListener();
 
