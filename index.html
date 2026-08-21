@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        IoT Problem Center
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+    <!-- Supabase Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+</head>
+
+
+<body>
+
+
+<!-- ==================================================
+     NAVBAR
+================================================== -->
+
+<header class="navbar">
+
+    <div class="navbar-inner">
+
+
+        <!-- LOGO -->
+
+        <div class="logo-text">
+
+            🤖
+
+            <span>
+                IoT Problem Center
+            </span>
+
+        </div>
+
+
+        <!-- USER AREA -->
+
+        <div
+            id="userArea"
+            class="user-area"
+        >
+
+            <a
+                href="login.html"
+                class="login-link"
+            >
+                เข้าสู่ระบบ
+            </a>
+
+        </div>
+
+
+    </div>
+
+</header>
+
+
+
+<!-- ==================================================
+     HERO
+================================================== -->
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <h1>
+            ศูนย์รวมปัญหาและวิธีแก้ไขระบบ IoT
+        </h1>
+
+        <p>
+            ค้นหาปัญหา อาการ สาเหตุ และวิธีแก้ไข
+            สำหรับอุปกรณ์ IoT และระบบ Robotics
+        </p>
+
+
+        <!-- SEARCH -->
+
+        <div class="search-box">
+
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="🔍 ค้นหาปัญหา เช่น ESP32 ไม่พบ COM Port"
+            >
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ==================================================
+     CATEGORY
+================================================== -->
+
+<section class="section">
+
+    <div class="section-container">
+
+        <h2>
+            หมวดหมู่
+        </h2>
+
+
+        <div
+            id="categories"
+            class="categories"
+        >
+
+            <button
+                class="category-button active"
+                data-category="all"
+            >
+                ทั้งหมด
+            </button>
+
+
+            <button
+                class="category-button"
+                data-category="ESP32"
+            >
+                ESP32
+            </button>
+
+
+            <button
+                class="category-button"
+                data-category="ESP8266"
+            >
+                ESP8266
+            </button>
+
+
+            <button
+                class="category-button"
+                data-category="Arduino"
+            >
+                Arduino
+            </button>
+
+
+            <button
+                class="category-button"
+                data-category="Servo"
+            >
+                Servo
+            </button>
+
+
+            <button
+                class="category-button"
+                data-category="Sensor"
+            >
+                Sensor
+            </button>
+
+
+            <button
+                class="category-button"
+                data-category="WiFi"
+            >
+                WiFi
+            </button>
+
+
+            <button
+                class="category-button"
+                data-category="Hardware"
+            >
+                Hardware
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ==================================================
+     PROBLEMS
+================================================== -->
+
+<section
+    class="section problems-section"
+>
+
+    <div class="section-container">
+
+
+        <div class="section-title">
+
+            <div>
+
+                <h2>
+                    ปัญหาที่เผยแพร่
+                </h2>
+
+                <p>
+                    เลือกปัญหาที่ต้องการดูรายละเอียด
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- LOADING -->
+
+        <div
+            id="loading"
+            class="loading"
+        >
+            กำลังโหลดข้อมูล...
+        </div>
+
+
+        <!-- PROBLEM LIST -->
+
+        <div
+            id="problemList"
+            class="problem-grid"
+        >
+        </div>
+
+
+        <!-- NO RESULT -->
+
+        <div
+            id="noResult"
+            class="no-result"
+            style="display:none;"
+        >
+            ไม่พบปัญหาที่ค้นหา
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- ==================================================
+     SUBMIT PROBLEM MODAL
+================================================== -->
+
+<div
+    id="submitProblemModal"
+    class="modal"
+>
+
+
+    <div class="modal-content submit-modal">
+
+
+        <!-- HEADER -->
+
+        <div class="modal-header">
+
+            <div>
+
+                <h2>
+                    ส่งปัญหาและวิธีแก้ไข
+                </h2>
+
+                <p class="modal-subtitle">
+                    ข้อมูลจะถูกส่งให้ Admin
+                    ตรวจสอบก่อนเผยแพร่
+                </p>
+
+            </div>
+
+
+            <button
+                id="closeSubmitModal"
+                class="close-button"
+                type="button"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+
+        <!-- FORM -->
+
+        <form id="submitProblemForm">
+
+
+            <!-- PROBLEM -->
+
+            <h3>
+                🐞 ข้อมูลปัญหา
+            </h3>
+
+
+            <!-- TITLE -->
+
+            <label for="submitTitle">
+                ชื่อปัญหา
+            </label>
+
+            <input
+                type="text"
+                id="submitTitle"
+                placeholder="เช่น ESP32 ไม่พบ COM Port"
+                required
+            >
+
+
+            <!-- DESCRIPTION -->
+
+            <label for="submitDescription">
+                รายละเอียดปัญหา
+            </label>
+
+            <textarea
+                id="submitDescription"
+                rows="4"
+                placeholder="อธิบายรายละเอียดของปัญหา"
+                required
+            ></textarea>
+
+
+            <!-- CATEGORY -->
+
+            <label for="submitCategory">
+                หมวดหมู่
+            </label>
+
+            <select
+                id="submitCategory"
+                required
+            >
+
+                <option value="">
+                    -- เลือกหมวดหมู่ --
+                </option>
+
+                <option value="ESP32">
+                    ESP32
+                </option>
+
+                <option value="ESP8266">
+                    ESP8266
+                </option>
+
+                <option value="Arduino">
+                    Arduino
+                </option>
+
+                <option value="Servo">
+                    Servo
+                </option>
+
+                <option value="Sensor">
+                    Sensor
+                </option>
+
+                <option value="WiFi">
+                    WiFi
+                </option>
+
+                <option value="Hardware">
+                    Hardware
+                </option>
+
+            </select>
+
+
+            <!-- SYMPTOMS -->
+
+            <label for="submitSymptoms">
+                อาการ
+            </label>
+
+            <textarea
+                id="submitSymptoms"
+                rows="3"
+                placeholder="อาการที่พบ"
+            ></textarea>
+
+
+            <!-- CAUSES -->
+
+            <label for="submitCauses">
+                สาเหตุที่คาดว่าเกิดจาก
+            </label>
+
+            <textarea
+                id="submitCauses"
+                rows="3"
+                placeholder="สาเหตุที่เป็นไปได้"
+            ></textarea>
+
+
+
+            <!-- SOLUTIONS -->
+
+            <div class="submit-solution-header">
+
+                <h3>
+                    🛠 วิธีแก้ไข
+                </h3>
+
+                <p>
+                    เพิ่มวิธีแก้ไขได้หลายขั้นตอน
+                </p>
+
+            </div>
+
+
+            <div
+                id="submitSolutions"
+                class="submit-solutions"
+            >
+            </div>
+
+
+            <!-- ADD STEP -->
+
+            <button
+                type="button"
+                id="addSubmitSolutionButton"
+                class="add-button"
+            >
+                + เพิ่มขั้นตอน
+            </button>
+
+
+            <!-- MESSAGE -->
+
+            <div
+                id="submitMessage"
+                class="submit-message"
+                style="display:none;"
+            >
+            </div>
+
+
+            <!-- SUBMIT -->
+
+            <button
+                type="submit"
+                id="submitButton"
+                class="save-button"
+            >
+                🚀 ส่งปัญหาให้ Admin ตรวจสอบ
+            </button>
+
+
+        </form>
+
+    </div>
+
+</div>
+
+
+
+<!-- ==================================================
+     FOOTER
+================================================== -->
+
+<footer class="footer">
+
+    <p>
+        © 2026 IoT Problem Center
+    </p>
+
+</footer>
+
+
+
+<!-- ==================================================
+     JAVASCRIPT
+================================================== -->
+
+<script src="js/supabase.js"></script>
+
+<script src="js/index.js"></script>
+
+
+</body>
+
+</html>
