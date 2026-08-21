@@ -1,0 +1,304 @@
+/* ========================================
+   PROBLEM DETAIL
+======================================== */
+
+.problem-detail {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 50px 20px;
+}
+
+
+/* ========================================
+   CATEGORY
+======================================== */
+
+.problem-detail .problem-category {
+    display: inline-block;
+
+    padding: 8px 16px;
+
+    background: #eef4ff;
+
+    color: #2563eb;
+
+    border-radius: 20px;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    margin-bottom: 15px;
+}
+
+
+/* ========================================
+   TITLE
+======================================== */
+
+.problem-detail h1 {
+    font-size: 36px;
+
+    line-height: 1.3;
+
+    margin-bottom: 40px;
+}
+
+
+/* ========================================
+   SECTION
+======================================== */
+
+.detail-section,
+.solutions-section {
+
+    background: #ffffff;
+
+    border-radius: 16px;
+
+    padding: 30px;
+
+    margin-bottom: 25px;
+
+    box-shadow:
+        0 5px 20px
+        rgba(0, 0, 0, 0.06);
+}
+
+
+.detail-section h2,
+.solutions-section h2 {
+
+    margin-top: 0;
+
+    margin-bottom: 20px;
+
+    font-size: 23px;
+}
+
+
+/* ========================================
+   TEXT
+======================================== */
+
+.detail-text {
+
+    white-space: pre-line;
+
+    line-height: 1.8;
+
+    color: #444;
+
+    font-size: 16px;
+}
+
+
+/* ========================================
+   IMAGES
+======================================== */
+
+.image-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(220px, 1fr)
+        );
+
+    gap: 20px;
+}
+
+
+.problem-image img,
+.solution-image img {
+
+    width: 100%;
+
+    display: block;
+
+    border-radius: 12px;
+
+    object-fit: cover;
+}
+
+
+.problem-image p,
+.solution-image p {
+
+    margin-top: 8px;
+
+    color: #666;
+
+    font-size: 14px;
+}
+
+
+/* ========================================
+   SOLUTIONS
+======================================== */
+
+.solutions-list {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 20px;
+}
+
+
+.solution-card {
+
+    display: flex;
+
+    gap: 20px;
+
+    padding: 25px;
+
+    background: #f8fafc;
+
+    border-radius: 15px;
+
+    border-left: 5px solid #2563eb;
+}
+
+
+.solution-number {
+
+    width: 45px;
+
+    height: 45px;
+
+    min-width: 45px;
+
+    border-radius: 50%;
+
+    background: #2563eb;
+
+    color: white;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-weight: bold;
+
+    font-size: 18px;
+}
+
+
+.solution-content {
+
+    flex: 1;
+}
+
+
+.solution-content h3 {
+
+    margin-top: 0;
+
+    margin-bottom: 10px;
+
+    font-size: 20px;
+}
+
+
+.solution-content p {
+
+    white-space: pre-line;
+
+    line-height: 1.8;
+
+    color: #444;
+}
+
+
+.solution-images {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(180px, 1fr)
+        );
+
+    gap: 15px;
+
+    margin-top: 20px;
+}
+
+
+/* ========================================
+   ERROR
+======================================== */
+
+.error-message {
+
+    background: #fee2e2;
+
+    color: #b91c1c;
+
+    padding: 20px;
+
+    border-radius: 12px;
+
+    text-align: center;
+}
+
+
+.no-solution {
+
+    padding: 30px;
+
+    text-align: center;
+
+    color: #777;
+
+    background: #f8fafc;
+
+    border-radius: 12px;
+}
+
+
+/* ========================================
+   MOBILE
+======================================== */
+
+@media (
+    max-width: 600px
+) {
+
+    .problem-detail {
+
+        padding: 30px 15px;
+
+    }
+
+
+    .problem-detail h1 {
+
+        font-size: 28px;
+
+    }
+
+
+    .detail-section,
+    .solutions-section {
+
+        padding: 20px;
+
+    }
+
+
+    .solution-card {
+
+        padding: 20px;
+
+    }
+
+}
