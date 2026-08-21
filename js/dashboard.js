@@ -1,5 +1,5 @@
 // ============================================================
-// IoT PROBLEM CENTER - DASHBOARD.JS (FULL WORKING VERSION)
+// IoT PROBLEM CENTER - DASHBOARD.JS (UPDATED & FULL VERSION)
 // ============================================================
 
 let currentUser = null;
@@ -101,7 +101,7 @@ async function checkAdmin() {
 
         console.log("LOGIN USER EMAIL:", currentUser.email);
 
-        // 1. อนุญาตสิทธิ์โดยตรงจาก List Email แอดมิน (ป้องกัน DB พลาด)
+        // List Email แอดมินสำหรับปลดล็อกสิทธิ์
         const allowedAdminEmails = [
             "kiattisak.t@mws.ac.th",
             "nun160661@gmail.com",
@@ -115,7 +115,6 @@ async function checkAdmin() {
             adminResult = true;
         }
 
-        // 2. ตรวจสอบสำรองผ่านตาราง profiles
         if (!adminResult) {
             try {
                 const { data, error } = await supabaseClient
@@ -375,7 +374,7 @@ async function saveProblem(event) {
         if (editingProblemId) {
             result = await supabaseClient.from("problems").update(payload).eq("id", editingProblemId);
         } else {
-            payload.created_by = currentUser.id;
+            payload.created_by = currentUser ? currentUser.id : null;
             result = await supabaseClient.from("problems").insert([payload]);
         }
 
@@ -457,7 +456,7 @@ function renderSolutionList(solutions) {
         <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px 16px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:flex-start;">
             <div>
                 <strong style="color:#1e293b;">ขั้นตอนที่ ${sol.step_number}: ${escapeHtml(sol.title || "")}</strong>
-                <p style="margin:4px 0 0 0; font-size:14px; color:#475569; white-space:pre-line;">${escapeHtml(sol.content || sol.description || "")}</p>
+                <p style="margin:4px 0 0 0; font-size:14px; color:#475569; white-space:pre-line;">${escapeHtml(sol.description || "")}</p>
             </div>
             <button type="button" class="btn-del-sol" data-id="${sol.id}" style="background:#fee2e2; color:#dc2626; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:12px;">🗑️ ลบ</button>
         </div>
@@ -484,7 +483,7 @@ async function saveSolution(event) {
 
     const stepNumber = Number($("stepNumber").value) || 1;
     const title = $("solutionTitle").value.trim();
-    const content = $("solutionDescription").value.trim();
+    const description = $("solutionDescription").value.trim();
     const status = $("solutionStatus").value;
 
     if (!title) {
@@ -498,8 +497,9 @@ async function saveSolution(event) {
                 problem_id: currentProblemForSolution.id,
                 step_number: stepNumber,
                 title: title,
-                content: content,
-                status: status
+                description: description,
+                status: status,
+                created_by: currentUser ? currentUser.id : null
             }
         ]);
 
@@ -508,6 +508,7 @@ async function saveSolution(event) {
         showMessage("เพิ่มขั้นตอนสำเร็จ", "success");
         await manageSolutions(currentProblemForSolution.id);
     } catch (error) {
+        console.error("SAVE SOLUTION ERROR:", error);
         showMessage("บันทึกขั้นตอนไม่สำเร็จ: " + error.message, "error");
     }
 }
