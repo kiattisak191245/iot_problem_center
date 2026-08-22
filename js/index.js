@@ -640,6 +640,22 @@ async function loadProblems() {
 // RENDER PROBLEMS
 // ==================================================
 
+function normalizeFilterValue(value) {
+    return String(value ?? "")
+        .replace(/\u00A0/g, " ")
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, " ");
+}
+
+function normalizeClassValue(value) {
+    let text = normalizeFilterValue(value);
+    if (text === "" || text === "all" || text === "ทั้งหมด") {
+        return "all";
+    }
+    return text.replace(/lv\.\s+/g, "lv.");
+}
+
 function renderProblems() {
 
     if (!problemList) {
