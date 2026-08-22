@@ -3,10 +3,6 @@
 // ==================================================
 
 
-// ==================================================
-// GLOBAL
-// ==================================================
-
 let allProblems = [];
 
 let currentCategory = "all";
@@ -14,49 +10,34 @@ let currentCategory = "all";
 let solutionStepCount = 0;
 
 
+
 // ==================================================
 // DOM
 // ==================================================
 
 const userArea =
-    document.getElementById(
-        "userArea"
-    );
+    document.getElementById("userArea");
 
 const problemList =
-    document.getElementById(
-        "problemList"
-    );
+    document.getElementById("problemList");
 
 const loading =
-    document.getElementById(
-        "loading"
-    );
+    document.getElementById("loading");
 
 const noResult =
-    document.getElementById(
-        "noResult"
-    );
+    document.getElementById("noResult");
 
 const searchInput =
-    document.getElementById(
-        "searchInput"
-    );
+    document.getElementById("searchInput");
 
 const submitProblemModal =
-    document.getElementById(
-        "submitProblemModal"
-    );
+    document.getElementById("submitProblemModal");
 
 const closeSubmitModal =
-    document.getElementById(
-        "closeSubmitModal"
-    );
+    document.getElementById("closeSubmitModal");
 
 const submitSolutions =
-    document.getElementById(
-        "submitSolutions"
-    );
+    document.getElementById("submitSolutions");
 
 const addSubmitSolutionButton =
     document.getElementById(
@@ -68,21 +49,6 @@ const submitProblemForm =
         "submitProblemForm"
     );
 
-const submitProblemImage =
-    document.getElementById(
-        "submitProblemImage"
-    );
-
-const problemImagePreview =
-    document.getElementById(
-        "problemImagePreview"
-    );
-
-const problemPreviewImage =
-    document.getElementById(
-        "problemPreviewImage"
-    );
-
 
 
 // ==================================================
@@ -92,14 +58,13 @@ const problemPreviewImage =
 function escapeHtml(value) {
 
     const div =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     div.textContent =
         value ?? "";
 
     return div.innerHTML;
+
 }
 
 
@@ -117,6 +82,7 @@ async function checkLogin() {
         );
 
         return;
+
     }
 
 
@@ -144,12 +110,13 @@ async function checkLogin() {
             );
 
             return;
+
         }
 
 
 
         // ==================================================
-        // NOT LOGIN
+        // ยังไม่ได้ Login
         // ==================================================
 
         if (!session) {
@@ -166,12 +133,13 @@ async function checkLogin() {
             `;
 
             return;
+
         }
 
 
 
         // ==================================================
-        // USER
+        // LOGIN
         // ==================================================
 
         const user =
@@ -190,7 +158,7 @@ async function checkLogin() {
 
 
         // ==================================================
-        // CHECK ADMIN
+        // ตรวจสอบ ADMIN
         // ==================================================
 
         let isAdmin =
@@ -268,7 +236,7 @@ async function checkLogin() {
                         display:inline-block;
                     "
                 >
-                    🛠️ Admin Dashboard
+                    🛠 Admin Dashboard
                 </a>
 
             `;
@@ -284,14 +252,10 @@ async function checkLogin() {
         userArea.innerHTML = `
 
             <span class="user-email">
-
                 👤 ${escapeHtml(email)}
-
             </span>
 
-
             ${adminButton}
-
 
             <button
                 id="submitProblemButton"
@@ -300,7 +264,6 @@ async function checkLogin() {
             >
                 + ส่งปัญหา / วิธีแก้ไข
             </button>
-
 
             <button
                 id="logoutButton"
@@ -378,6 +341,7 @@ function openSubmitModal() {
     if (!submitProblemModal) {
 
         return;
+
     }
 
 
@@ -401,6 +365,7 @@ function closeSubmitProblemModal() {
     if (!submitProblemModal) {
 
         return;
+
     }
 
 
@@ -431,7 +396,7 @@ if (closeSubmitModal) {
 
 
 // ==================================================
-// CLICK BACKGROUND TO CLOSE
+// CLICK OUTSIDE MODAL
 // ==================================================
 
 if (submitProblemModal) {
@@ -453,36 +418,6 @@ if (submitProblemModal) {
     );
 
 }
-
-
-
-// ==================================================
-// ESC TO CLOSE
-// ==================================================
-
-document.addEventListener(
-    "keydown",
-    event => {
-
-        if (
-            event.key ===
-            "Escape"
-        ) {
-
-            if (
-                submitProblemModal &&
-                submitProblemModal.style.display ===
-                    "flex"
-            ) {
-
-                closeSubmitProblemModal();
-
-            }
-
-        }
-
-    }
-);
 
 
 
@@ -510,6 +445,7 @@ async function logout() {
         );
 
         return;
+
     }
 
 
@@ -529,6 +465,7 @@ async function loadProblems() {
     if (!problemList) {
 
         return;
+
     }
 
 
@@ -557,6 +494,7 @@ async function loadProblems() {
                     title,
                     description,
                     category,
+                    class_name,
                     symptoms,
                     causes,
                     status,
@@ -643,6 +581,7 @@ function renderProblems() {
     if (!problemList) {
 
         return;
+
     }
 
 
@@ -674,8 +613,8 @@ function renderProblems() {
                     "";
 
 
-                const causes =
-                    problem.causes ||
+                const className =
+                    problem.class_name ||
                     "";
 
 
@@ -704,7 +643,7 @@ function renderProblems() {
 
                     ||
 
-                    causes
+                    className
                         .toLowerCase()
                         .includes(search);
 
@@ -750,6 +689,7 @@ function renderProblems() {
         }
 
         return;
+
     }
 
 
@@ -779,14 +719,35 @@ function renderProblems() {
 
             card.innerHTML = `
 
-                <span
-                    class="problem-category"
-                >
+                <span class="problem-category">
+
                     ${escapeHtml(
                         problem.category ||
                         "ทั่วไป"
                     )}
+
                 </span>
+
+
+                <div
+                    style="
+                        display:inline-block;
+                        margin-left:6px;
+                        padding:4px 9px;
+                        border-radius:999px;
+                        background:#eef2ff;
+                        color:#4338ca;
+                        font-size:12px;
+                        font-weight:600;
+                    "
+                >
+
+                    ${escapeHtml(
+                        problem.class_name ||
+                        "ไม่ระบุ Class"
+                    )}
+
+                </div>
 
 
                 <h3>
@@ -809,10 +770,10 @@ function renderProblems() {
                 </p>
 
 
-                <span
-                    class="problem-link"
-                >
+                <span class="problem-link">
+
                     ดูวิธีแก้ไข →
+
                 </span>
 
             `;
@@ -914,6 +875,7 @@ function addSolutionStep() {
     if (!submitSolutions) {
 
         return;
+
     }
 
 
@@ -932,9 +894,7 @@ function addSolutionStep() {
 
     step.innerHTML = `
 
-        <div
-            class="solution-step-header"
-        >
+        <div class="solution-step-header">
 
             <h4>
                 ขั้นตอนที่
@@ -946,14 +906,14 @@ function addSolutionStep() {
                 type="button"
                 class="remove-step"
             >
-                ลบขั้นตอน
+                ลบ
             </button>
 
         </div>
 
 
         <label>
-            หัวข้อขั้นตอน *
+            หัวข้อขั้นตอน
         </label>
 
 
@@ -973,22 +933,18 @@ function addSolutionStep() {
         <textarea
             class="submit-solution-description"
             rows="4"
-            placeholder="อธิบายวิธีแก้ไขขั้นตอนนี้"
+            placeholder="อธิบายวิธีแก้ไข"
         ></textarea>
 
     `;
 
 
 
-    const removeButton =
-        step.querySelector(
+    step
+        .querySelector(
             ".remove-step"
-        );
-
-
-    if (removeButton) {
-
-        removeButton.addEventListener(
+        )
+        .addEventListener(
             "click",
             () => {
 
@@ -998,8 +954,6 @@ function addSolutionStep() {
 
             }
         );
-
-    }
 
 
     submitSolutions.appendChild(
@@ -1011,7 +965,7 @@ function addSolutionStep() {
 
 
 // ==================================================
-// RENUMBER STEPS
+// RENUMBER
 // ==================================================
 
 function renumberSteps() {
@@ -1019,6 +973,7 @@ function renumberSteps() {
     if (!submitSolutions) {
 
         return;
+
     }
 
 
@@ -1066,408 +1021,12 @@ if (submitSolutions) {
 }
 
 
-
-// ==================================================
-// ADD STEP BUTTON
-// ==================================================
-
 if (addSubmitSolutionButton) {
 
     addSubmitSolutionButton.addEventListener(
         "click",
         addSolutionStep
     );
-
-}
-
-
-
-// ==================================================
-// IMAGE PREVIEW
-// ==================================================
-
-if (submitProblemImage) {
-
-    submitProblemImage.addEventListener(
-        "change",
-        () => {
-
-
-            const file =
-                submitProblemImage.files[0];
-
-
-            if (!file) {
-
-                if (problemImagePreview) {
-
-                    problemImagePreview.style.display =
-                        "none";
-
-                }
-
-                return;
-            }
-
-
-
-            // ==============================
-            // CHECK TYPE
-            // ==============================
-
-            const allowedTypes = [
-
-                "image/jpeg",
-
-                "image/png",
-
-                "image/webp"
-
-            ];
-
-
-            if (
-                !allowedTypes.includes(
-                    file.type
-                )
-            ) {
-
-                alert(
-                    "รองรับเฉพาะ JPG, PNG และ WEBP"
-                );
-
-
-                submitProblemImage.value =
-                    "";
-
-
-                return;
-
-            }
-
-
-
-            // ==============================
-            // CHECK SIZE
-            // ==============================
-
-            const maxSize =
-                5 * 1024 * 1024;
-
-
-            if (
-                file.size >
-                maxSize
-            ) {
-
-                alert(
-                    "รูปภาพต้องมีขนาดไม่เกิน 5 MB"
-                );
-
-
-                submitProblemImage.value =
-                    "";
-
-
-                return;
-
-            }
-
-
-
-            // ==============================
-            // PREVIEW
-            // ==============================
-
-            const reader =
-                new FileReader();
-
-
-            reader.onload =
-                event => {
-
-                    if (
-                        problemPreviewImage
-                    ) {
-
-                        problemPreviewImage.src =
-                            event.target.result;
-
-                    }
-
-
-                    if (
-                        problemImagePreview
-                    ) {
-
-                        problemImagePreview.style.display =
-                            "block";
-
-                    }
-
-                };
-
-
-            reader.readAsDataURL(
-                file
-            );
-
-        }
-    );
-
-}
-
-
-
-// ==================================================
-// RESET IMAGE PREVIEW
-// ==================================================
-
-function resetImagePreview() {
-
-    if (submitProblemImage) {
-
-        submitProblemImage.value =
-            "";
-
-    }
-
-
-    if (problemPreviewImage) {
-
-        problemPreviewImage.src =
-            "";
-
-    }
-
-
-    if (problemImagePreview) {
-
-        problemImagePreview.style.display =
-            "none";
-
-    }
-
-}
-
-
-
-// ==================================================
-// SAFE FILE NAME
-// ==================================================
-
-function createSafeFileName(
-    fileName
-) {
-
-    return fileName
-
-        .normalize(
-            "NFKD"
-        )
-
-        .replace(
-            /[^\w.\-]+/g,
-            "_"
-        )
-
-        .replace(
-            /_+/g,
-            "_"
-        )
-
-        .substring(
-            0,
-            100
-        );
-
-}
-
-
-
-// ==================================================
-// UPLOAD PROBLEM IMAGE
-// ==================================================
-
-async function uploadProblemImage(
-    file,
-    problemId,
-    userId
-) {
-
-    if (!file) {
-
-        return null;
-
-    }
-
-
-
-    const fileName =
-        createSafeFileName(
-            file.name
-        );
-
-
-    const filePath =
-
-        `${userId}/${problemId}/` +
-
-        `${Date.now()}_${fileName}`;
-
-
-
-    console.log(
-        "UPLOAD IMAGE PATH:",
-        filePath
-    );
-
-
-
-    // ==================================================
-    // UPLOAD STORAGE
-    // ==================================================
-
-    const {
-
-        error: uploadError
-
-    } =
-        await supabaseClient
-
-            .storage
-
-            .from("problem-images")
-
-            .upload(
-                filePath,
-                file,
-                {
-                    cacheControl:
-                        "3600",
-
-                    upsert:
-                        false,
-
-                    contentType:
-                        file.type
-                }
-            );
-
-
-    if (uploadError) {
-
-        throw new Error(
-            "อัปโหลดรูปไม่สำเร็จ: " +
-            uploadError.message
-        );
-
-    }
-
-
-
-    // ==================================================
-    // PUBLIC URL
-    // ==================================================
-
-    const {
-
-        data: publicUrlData
-
-    } =
-        supabaseClient
-
-            .storage
-
-            .from("problem-images")
-
-            .getPublicUrl(
-                filePath
-            );
-
-
-    const imageUrl =
-        publicUrlData?.publicUrl;
-
-
-
-    if (!imageUrl) {
-
-        throw new Error(
-            "ไม่สามารถสร้าง URL รูปภาพได้"
-        );
-
-    }
-
-
-
-    console.log(
-        "IMAGE URL:",
-        imageUrl
-    );
-
-
-
-    // ==================================================
-    // INSERT problem_images
-    // ==================================================
-
-    const {
-
-        error: imageInsertError
-
-    } =
-        await supabaseClient
-
-            .from("problem_images")
-
-            .insert({
-
-                problem_id:
-                    problemId,
-
-                image_url:
-                    imageUrl,
-
-                caption:
-                    "รูปภาพปัญหาที่ผู้ใช้แนบ",
-
-                created_by:
-                    userId
-
-            });
-
-
-    if (imageInsertError) {
-
-        // พยายามลบไฟล์จาก Storage
-        await supabaseClient
-
-            .storage
-
-            .from("problem-images")
-
-            .remove([
-                filePath
-            ]);
-
-
-        throw new Error(
-            "บันทึกข้อมูลรูปไม่สำเร็จ: " +
-            imageInsertError.message
-        );
-
-    }
-
-
-
-    return {
-
-        imageUrl,
-
-        filePath
-
-    };
 
 }
 
@@ -1486,7 +1045,6 @@ if (submitProblemForm) {
             event.preventDefault();
 
 
-
             const submitButton =
                 document.getElementById(
                     "submitButton"
@@ -1499,12 +1057,11 @@ if (submitProblemForm) {
                 );
 
 
-
             try {
 
 
                 // ==================================================
-                // BUTTON LOADING
+                // BUTTON
                 // ==================================================
 
                 if (submitButton) {
@@ -1513,7 +1070,7 @@ if (submitProblemForm) {
                         true;
 
                     submitButton.textContent =
-                        "⏳ กำลังส่งข้อมูล...";
+                        "กำลังส่งข้อมูล...";
 
                 }
 
@@ -1550,15 +1107,8 @@ if (submitProblemForm) {
 
 
 
-                console.log(
-                    "SUBMIT USER UUID:",
-                    user.id
-                );
-
-
-
                 // ==================================================
-                // FORM DATA
+                // FORM
                 // ==================================================
 
                 const title =
@@ -1583,6 +1133,14 @@ if (submitProblemForm) {
                     document
                         .getElementById(
                             "submitCategory"
+                        )
+                        .value;
+
+
+                const className =
+                    document
+                        .getElementById(
+                            "submitClassName"
                         )
                         .value;
 
@@ -1637,6 +1195,15 @@ if (submitProblemForm) {
                 }
 
 
+                if (!className) {
+
+                    throw new Error(
+                        "กรุณาเลือก Class"
+                    );
+
+                }
+
+
 
                 // ==================================================
                 // INSERT PROBLEM
@@ -1663,6 +1230,9 @@ if (submitProblemForm) {
 
                             category:
                                 category,
+
+                            class_name:
+                                className,
 
                             symptoms:
                                 symptoms,
@@ -1704,18 +1274,15 @@ if (submitProblemForm) {
 
                 const steps =
                     submitSolutions
-
                         ? submitSolutions
                             .querySelectorAll(
                                 ".solution-step"
                             )
-
                         : [];
 
 
                 const solutionData =
                     [];
-
 
 
                 steps.forEach(
@@ -1724,25 +1291,19 @@ if (submitProblemForm) {
 
                         const solutionTitle =
                             step
-
                                 .querySelector(
                                     ".submit-solution-title"
                                 )
-
                                 .value
-
                                 .trim();
 
 
                         const solutionDescription =
                             step
-
                                 .querySelector(
                                     ".submit-solution-description"
                                 )
-
                                 .value
-
                                 .trim();
 
 
@@ -1789,7 +1350,6 @@ if (submitProblemForm) {
                     0
                 ) {
 
-
                     const {
 
                         error:
@@ -1809,8 +1369,6 @@ if (submitProblemForm) {
 
                     if (solutionError) {
 
-
-                        // ลบ Problem
                         await supabaseClient
 
                             .from(
@@ -1828,34 +1386,6 @@ if (submitProblemForm) {
                         throw solutionError;
 
                     }
-
-                }
-
-
-
-                // ==================================================
-                // IMAGE
-                // ==================================================
-
-                const imageFile =
-                    submitProblemImage
-                        ? submitProblemImage
-                            .files[0]
-                        : null;
-
-
-
-                if (imageFile) {
-
-                    await uploadProblemImage(
-
-                        imageFile,
-
-                        problem.id,
-
-                        user.id
-
-                    );
 
                 }
 
@@ -1881,14 +1411,10 @@ if (submitProblemForm) {
 
 
                 // ==================================================
-                // RESET FORM
+                // RESET
                 // ==================================================
 
                 submitProblemForm.reset();
-
-
-                resetImagePreview();
-
 
 
                 if (submitSolutions) {
@@ -1912,7 +1438,7 @@ if (submitProblemForm) {
 
 
                 // ==================================================
-                // CLOSE AFTER 2 SEC
+                // CLOSE
                 // ==================================================
 
                 setTimeout(
@@ -1921,9 +1447,7 @@ if (submitProblemForm) {
                         closeSubmitProblemModal();
 
 
-                        if (
-                            submitMessage
-                        ) {
+                        if (submitMessage) {
 
                             submitMessage.style.display =
                                 "none";
@@ -1934,13 +1458,8 @@ if (submitProblemForm) {
                     2000
                 );
 
-
             }
 
-
-            // ==================================================
-            // ERROR
-            // ==================================================
 
             catch (error) {
 
@@ -1960,19 +1479,12 @@ if (submitProblemForm) {
 
                     submitMessage.textContent =
                         "❌ ส่งข้อมูลไม่สำเร็จ: " +
-                        (
-                            error.message ||
-                            "เกิดข้อผิดพลาด"
-                        );
+                        error.message;
 
                 }
 
             }
 
-
-            // ==================================================
-            // RESET BUTTON
-            // ==================================================
 
             finally {
 
