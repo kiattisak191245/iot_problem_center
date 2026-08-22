@@ -47,82 +47,94 @@ const solutionList =
 
 async function checkLogin() {
 
-    const {
-        data: {
-            session
+    try {
+
+        const {
+            data: {
+                session
+            }
+        } = await supabaseClient.auth.getSession();
+
+
+        const userArea =
+            document.getElementById("userArea");
+
+
+        if (!userArea) {
+            return;
         }
-    } = await supabaseClient.auth.getSession();
 
 
-    const userArea =
-        document.getElementById("userArea");
+        // ==============================
+        // NOT LOGIN
+        // ==============================
+
+        if (!session) {
+
+            userArea.innerHTML = `
+
+                <a
+                    href="login.html"
+                    class="login-link"
+                >
+                    เข้าสู่ระบบ
+                </a>
+
+            `;
+
+            return;
+
+        }
 
 
-    // ถ้าไม่มี userArea
-    if (!userArea) {
-        return;
-    }
+        // ==============================
+        // LOGIN
+        // ==============================
 
+        const email =
+            session.user.email;
 
-    // ====================================
-    // NOT LOGIN
-    // ====================================
-
-    if (!session) {
 
         userArea.innerHTML = `
 
-            <a
-                href="login.html"
-                class="login-link"
+            <span class="user-email">
+
+                👤 ${escapeHtml(email)}
+
+            </span>
+
+            <button
+                id="logoutButton"
+                class="logout-button"
             >
-                เข้าสู่ระบบ
-            </a>
+                ออกจากระบบ
+            </button>
 
         `;
 
-        return;
+
+        const logoutButton =
+            document.getElementById(
+                "logoutButton"
+            );
+
+
+        if (logoutButton) {
+
+            logoutButton.addEventListener(
+                "click",
+                logout
+            );
+
+        }
 
     }
 
+    catch (error) {
 
-    // ====================================
-    // LOGIN
-    // ====================================
-
-    const email =
-        session.user.email;
-
-
-    userArea.innerHTML = `
-
-        <span class="user-email">
-
-            👤 ${escapeHtml(email)}
-
-        </span>
-
-        <button
-            id="logoutButton"
-            class="logout-button"
-        >
-            ออกจากระบบ
-        </button>
-
-    `;
-
-
-    const logoutButton =
-        document.getElementById(
-            "logoutButton"
-        );
-
-
-    if (logoutButton) {
-
-        logoutButton.addEventListener(
-            "click",
-            logout
+        console.error(
+            "Check login error:",
+            error
         );
 
     }
@@ -162,6 +174,10 @@ async function logout() {
 // ========================================
 
 async function loadProblem() {
+
+    // ==============================
+    // CHECK PROBLEM ID
+    // ==============================
 
     if (!problemId) {
 
@@ -227,24 +243,34 @@ async function loadProblem() {
 
 
         // ==============================
-        // DISPLAY PROBLEM
+        // DISPLAY TITLE
         // ==============================
 
         if (problemTitle) {
 
             problemTitle.textContent =
-                problem.title || "ไม่มีชื่อปัญหา";
+                problem.title ||
+                "ไม่มีชื่อปัญหา";
 
         }
 
+
+        // ==============================
+        // DISPLAY CATEGORY
+        // ==============================
 
         if (problemCategory) {
 
             problemCategory.textContent =
-                problem.category || "ทั่วไป";
+                problem.category ||
+                "ทั่วไป";
 
         }
 
+
+        // ==============================
+        // DISPLAY DESCRIPTION
+        // ==============================
 
         if (problemDescription) {
 
@@ -255,6 +281,10 @@ async function loadProblem() {
         }
 
 
+        // ==============================
+        // DISPLAY SYMPTOMS
+        // ==============================
+
         if (problemSymptoms) {
 
             problemSymptoms.textContent =
@@ -263,6 +293,10 @@ async function loadProblem() {
 
         }
 
+
+        // ==============================
+        // DISPLAY CAUSES
+        // ==============================
 
         if (problemCauses) {
 
@@ -334,7 +368,7 @@ async function loadProblemImages() {
     try {
 
         // ==============================
-        // GET IMAGE DATA
+        // QUERY problem_images
         // ==============================
 
         const {
@@ -349,6 +383,7 @@ async function loadProblemImages() {
                 problem_id,
                 image_url,
                 caption,
+                created_by,
                 created_at
             `)
 
@@ -365,10 +400,14 @@ async function loadProblemImages() {
             );
 
 
+        // ==============================
+        // DATABASE ERROR
+        // ==============================
+
         if (error) {
 
             console.error(
-                "Load problem images error:",
+                "Load problem_images error:",
                 error
             );
 
@@ -377,8 +416,14 @@ async function loadProblemImages() {
         }
 
 
+        console.log(
+            "Problem images:",
+            images
+        );
+
+
         // ==============================
-        // FIND IMAGE CONTAINER
+        // FIND CONTAINER
         // ==============================
 
         let imageContainer =
@@ -388,22 +433,27 @@ async function loadProblemImages() {
 
 
         // ==============================
-        // CREATE CONTAINER IF NOT EXISTS
+        // CREATE CONTAINER
         // ==============================
 
         if (!imageContainer) {
 
             imageContainer =
                 document.createElement(
-                    "div"
+                    "section"
                 );
+
 
             imageContainer.id =
                 "problemImages";
 
 
-            imageContainer.style.margin =
-                "30px 0";
+            imageContainer.style.marginTop =
+                "30px";
+
+
+            imageContainer.style.marginBottom =
+                "30px";
 
 
             imageContainer.style.width =
@@ -426,6 +476,10 @@ async function loadProblemImages() {
 
             }
 
+            // ==========================
+            // OTHERWISE APPEND
+            // ==========================
+
             else if (problemDetail) {
 
                 problemDetail.appendChild(
@@ -444,11 +498,15 @@ async function loadProblemImages() {
         }
 
 
+        // ==============================
+        // CLEAR
+        // ==============================
+
         imageContainer.innerHTML = "";
 
 
         // ==============================
-        // NO IMAGE
+        // NO IMAGES
         // ==============================
 
         if (
@@ -462,30 +520,30 @@ async function loadProblemImages() {
 
 
         // ==============================
-        // IMAGE TITLE
+        // TITLE
         // ==============================
 
-        const title =
+        const heading =
             document.createElement(
                 "h2"
             );
 
 
-        title.textContent =
+        heading.textContent =
             "🖼️ รูปภาพปัญหา";
 
 
-        title.style.marginBottom =
+        heading.style.marginBottom =
             "15px";
 
 
         imageContainer.appendChild(
-            title
+            heading
         );
 
 
         // ==============================
-        // IMAGE GRID
+        // GRID
         // ==============================
 
         const imageGrid =
@@ -506,13 +564,17 @@ async function loadProblemImages() {
             "20px";
 
 
+        imageGrid.style.width =
+            "100%";
+
+
         imageContainer.appendChild(
             imageGrid
         );
 
 
         // ==============================
-        // DISPLAY EACH IMAGE
+        // LOOP IMAGES
         // ==============================
 
         images.forEach(
@@ -524,6 +586,10 @@ async function loadProblemImages() {
 
                 }
 
+
+                // ==========================
+                // CARD
+                // ==========================
 
                 const card =
                     document.createElement(
@@ -549,10 +615,20 @@ async function loadProblemImages() {
                     );
 
 
-                img.src =
+                const imageUrl =
                     getImageUrl(
                         image.image_url
                     );
+
+
+                console.log(
+                    "Image URL:",
+                    imageUrl
+                );
+
+
+                img.src =
+                    imageUrl;
 
 
                 img.alt =
@@ -580,6 +656,10 @@ async function loadProblemImages() {
                     "auto";
 
 
+                img.style.maxHeight =
+                    "600px";
+
+
                 img.style.objectFit =
                     "contain";
 
@@ -592,20 +672,20 @@ async function loadProblemImages() {
                     "pointer";
 
 
-                img.style.backgroundColor =
+                img.style.background =
                     "#f5f5f5";
 
 
                 // ==========================
-                // CLICK IMAGE
+                // CLICK
                 // ==========================
 
                 img.addEventListener(
                     "click",
-                    function () {
+                    () => {
 
                         window.open(
-                            img.src,
+                            imageUrl,
                             "_blank"
                         );
 
@@ -614,15 +694,16 @@ async function loadProblemImages() {
 
 
                 // ==========================
-                // IMAGE ERROR
+                // ERROR
                 // ==========================
 
-                img.onerror =
-                    function () {
+                img.addEventListener(
+                    "error",
+                    () => {
 
                         console.error(
-                            "ไม่สามารถโหลดรูปภาพ:",
-                            img.src
+                            "Image failed:",
+                            imageUrl
                         );
 
 
@@ -634,6 +715,7 @@ async function loadProblemImages() {
                                     border:1px solid #ddd;
                                     border-radius:10px;
                                     text-align:center;
+                                    color:#777;
                                 "
                             >
 
@@ -643,7 +725,8 @@ async function loadProblemImages() {
 
                         `;
 
-                    };
+                    }
+                );
 
 
                 card.appendChild(
@@ -673,6 +756,10 @@ async function loadProblemImages() {
 
                     caption.style.marginBottom =
                         "0";
+
+
+                    caption.style.textAlign =
+                        "center";
 
 
                     card.appendChild(
@@ -709,6 +796,10 @@ async function loadProblemImages() {
 
 function getImageUrl(imageUrl) {
 
+    // ==============================
+    // EMPTY
+    // ==============================
+
     if (!imageUrl) {
 
         return "";
@@ -717,7 +808,7 @@ function getImageUrl(imageUrl) {
 
 
     // ==============================
-    // ALREADY FULL URL
+    // FULL HTTP URL
     // ==============================
 
     if (
@@ -736,7 +827,52 @@ function getImageUrl(imageUrl) {
 
 
     // ==============================
-    // STORAGE PATH
+    // REMOVE LEADING SLASH
+    // ==============================
+
+    let path =
+        imageUrl;
+
+
+    if (
+        path.startsWith("/")
+    ) {
+
+        path =
+            path.substring(1);
+
+    }
+
+
+    // ==============================
+    // IF URL CONTAINS STORAGE PATH
+    // ==============================
+
+    const storageMarker =
+        "/storage/v1/object/public/problem-images/";
+
+
+    const markerIndex =
+        path.indexOf(
+            storageMarker
+        );
+
+
+    if (
+        markerIndex !== -1
+    ) {
+
+        path =
+            path.substring(
+                markerIndex +
+                storageMarker.length
+            );
+
+    }
+
+
+    // ==============================
+    // GET PUBLIC URL
     // ==============================
 
     const {
@@ -748,7 +884,7 @@ function getImageUrl(imageUrl) {
         )
 
         .getPublicUrl(
-            imageUrl
+            path
         );
 
 
@@ -814,7 +950,7 @@ async function loadSolutions() {
 
 
     // ==============================
-    // NO SOLUTION
+    // NO SOLUTIONS
     // ==============================
 
     if (
@@ -868,15 +1004,14 @@ async function loadSolutions() {
 
                 </div>
 
-
                 <h3>
 
                     ${escapeHtml(
-                        solution.title
+                        solution.title ||
+                        ""
                     )}
 
                 </h3>
-
 
                 <p>
 
