@@ -1,4 +1,163 @@
 // ========================================
+// GET PROBLEM ID
+// ========================================
+
+const params = new URLSearchParams(
+    window.location.search
+);
+
+const problemId = params.get("id");
+
+
+// ========================================
+// ELEMENTS
+// ========================================
+
+const loading =
+    document.getElementById("loading");
+
+const errorMessage =
+    document.getElementById("errorMessage");
+
+const problemDetail =
+    document.getElementById("problemDetail");
+
+const problemTitle =
+    document.getElementById("problemTitle");
+
+const problemCategory =
+    document.getElementById("problemCategory");
+
+const problemDescription =
+    document.getElementById("problemDescription");
+
+const problemSymptoms =
+    document.getElementById("problemSymptoms");
+
+const problemCauses =
+    document.getElementById("problemCauses");
+
+const solutionList =
+    document.getElementById("solutionList");
+
+
+// ========================================
+// CHECK LOGIN
+// ========================================
+
+async function checkLogin() {
+
+    const {
+        data: {
+            session
+        }
+    } = await supabaseClient.auth.getSession();
+
+
+    const userArea =
+        document.getElementById("userArea");
+
+
+    // ถ้าไม่มี userArea
+    if (!userArea) {
+        return;
+    }
+
+
+    // ====================================
+    // NOT LOGIN
+    // ====================================
+
+    if (!session) {
+
+        userArea.innerHTML = `
+
+            <a
+                href="login.html"
+                class="login-link"
+            >
+                เข้าสู่ระบบ
+            </a>
+
+        `;
+
+        return;
+
+    }
+
+
+    // ====================================
+    // LOGIN
+    // ====================================
+
+    const email =
+        session.user.email;
+
+
+    userArea.innerHTML = `
+
+        <span class="user-email">
+
+            👤 ${escapeHtml(email)}
+
+        </span>
+
+        <button
+            id="logoutButton"
+            class="logout-button"
+        >
+            ออกจากระบบ
+        </button>
+
+    `;
+
+
+    const logoutButton =
+        document.getElementById(
+            "logoutButton"
+        );
+
+
+    if (logoutButton) {
+
+        logoutButton.addEventListener(
+            "click",
+            logout
+        );
+
+    }
+
+}
+
+
+// ========================================
+// LOGOUT
+// ========================================
+
+async function logout() {
+
+    try {
+
+        await supabaseClient.auth.signOut();
+
+        window.location.href =
+            "login.html";
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Logout error:",
+            error
+        );
+
+    }
+
+}
+
+
+// ========================================
 // LOAD PROBLEM
 // ========================================
 
@@ -58,31 +217,60 @@ async function loadProblem() {
         }
 
 
+        if (!problem) {
+
+            throw new Error(
+                "ไม่พบข้อมูลปัญหา"
+            );
+
+        }
+
+
         // ==============================
         // DISPLAY PROBLEM
         // ==============================
 
-        problemTitle.textContent =
-            problem.title;
+        if (problemTitle) {
+
+            problemTitle.textContent =
+                problem.title || "ไม่มีชื่อปัญหา";
+
+        }
 
 
-        problemCategory.textContent =
-            problem.category || "ทั่วไป";
+        if (problemCategory) {
+
+            problemCategory.textContent =
+                problem.category || "ทั่วไป";
+
+        }
 
 
-        problemDescription.textContent =
-            problem.description ||
-            "ไม่มีรายละเอียด";
+        if (problemDescription) {
+
+            problemDescription.textContent =
+                problem.description ||
+                "ไม่มีรายละเอียด";
+
+        }
 
 
-        problemSymptoms.textContent =
-            problem.symptoms ||
-            "ไม่มีข้อมูล";
+        if (problemSymptoms) {
+
+            problemSymptoms.textContent =
+                problem.symptoms ||
+                "ไม่มีข้อมูล";
+
+        }
 
 
-        problemCauses.textContent =
-            problem.causes ||
-            "ไม่มีข้อมูล";
+        if (problemCauses) {
+
+            problemCauses.textContent =
+                problem.causes ||
+                "ไม่มีข้อมูล";
+
+        }
 
 
         // ==============================
@@ -100,14 +288,23 @@ async function loadProblem() {
 
 
         // ==============================
-        // SHOW
+        // SHOW PAGE
         // ==============================
 
-        loading.style.display =
-            "none";
+        if (loading) {
 
-        problemDetail.style.display =
-            "block";
+            loading.style.display =
+                "none";
+
+        }
+
+
+        if (problemDetail) {
+
+            problemDetail.style.display =
+                "block";
+
+        }
 
     }
 
@@ -126,3 +323,644 @@ async function loadProblem() {
     }
 
 }
+
+
+// ========================================
+// LOAD PROBLEM IMAGES
+// ========================================
+
+async function loadProblemImages() {
+
+    try {
+
+        // ==============================
+        // GET IMAGE DATA
+        // ==============================
+
+        const {
+            data: images,
+            error
+        } = await supabaseClient
+
+            .from("problem_images")
+
+            .select(`
+                id,
+                problem_id,
+                image_url,
+                caption,
+                created_at
+            `)
+
+            .eq(
+                "problem_id",
+                problemId
+            )
+
+            .order(
+                "created_at",
+                {
+                    ascending: true
+                }
+            );
+
+
+        if (error) {
+
+            console.error(
+                "Load problem images error:",
+                error
+            );
+
+            return;
+
+        }
+
+
+        // ==============================
+        // FIND IMAGE CONTAINER
+        // ==============================
+
+        let imageContainer =
+            document.getElementById(
+                "problemImages"
+            );
+
+
+        // ==============================
+        // CREATE CONTAINER IF NOT EXISTS
+        // ==============================
+
+        if (!imageContainer) {
+
+            imageContainer =
+                document.createElement(
+                    "div"
+                );
+
+            imageContainer.id =
+                "problemImages";
+
+
+            imageContainer.style.margin =
+                "30px 0";
+
+
+            imageContainer.style.width =
+                "100%";
+
+
+            // ==========================
+            // INSERT BEFORE SOLUTIONS
+            // ==========================
+
+            if (
+                solutionList &&
+                solutionList.parentNode
+            ) {
+
+                solutionList.parentNode.insertBefore(
+                    imageContainer,
+                    solutionList
+                );
+
+            }
+
+            else if (problemDetail) {
+
+                problemDetail.appendChild(
+                    imageContainer
+                );
+
+            }
+
+        }
+
+
+        if (!imageContainer) {
+
+            return;
+
+        }
+
+
+        imageContainer.innerHTML = "";
+
+
+        // ==============================
+        // NO IMAGE
+        // ==============================
+
+        if (
+            !images ||
+            images.length === 0
+        ) {
+
+            return;
+
+        }
+
+
+        // ==============================
+        // IMAGE TITLE
+        // ==============================
+
+        const title =
+            document.createElement(
+                "h2"
+            );
+
+
+        title.textContent =
+            "🖼️ รูปภาพปัญหา";
+
+
+        title.style.marginBottom =
+            "15px";
+
+
+        imageContainer.appendChild(
+            title
+        );
+
+
+        // ==============================
+        // IMAGE GRID
+        // ==============================
+
+        const imageGrid =
+            document.createElement(
+                "div"
+            );
+
+
+        imageGrid.style.display =
+            "grid";
+
+
+        imageGrid.style.gridTemplateColumns =
+            "repeat(auto-fit, minmax(250px, 1fr))";
+
+
+        imageGrid.style.gap =
+            "20px";
+
+
+        imageContainer.appendChild(
+            imageGrid
+        );
+
+
+        // ==============================
+        // DISPLAY EACH IMAGE
+        // ==============================
+
+        images.forEach(
+            image => {
+
+                if (!image.image_url) {
+
+                    return;
+
+                }
+
+
+                const card =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                card.style.width =
+                    "100%";
+
+
+                card.style.boxSizing =
+                    "border-box";
+
+
+                // ==========================
+                // IMAGE
+                // ==========================
+
+                const img =
+                    document.createElement(
+                        "img"
+                    );
+
+
+                img.src =
+                    getImageUrl(
+                        image.image_url
+                    );
+
+
+                img.alt =
+                    image.caption ||
+                    "รูปภาพปัญหา";
+
+
+                img.loading =
+                    "lazy";
+
+
+                img.style.display =
+                    "block";
+
+
+                img.style.width =
+                    "100%";
+
+
+                img.style.maxWidth =
+                    "100%";
+
+
+                img.style.height =
+                    "auto";
+
+
+                img.style.objectFit =
+                    "contain";
+
+
+                img.style.borderRadius =
+                    "10px";
+
+
+                img.style.cursor =
+                    "pointer";
+
+
+                img.style.backgroundColor =
+                    "#f5f5f5";
+
+
+                // ==========================
+                // CLICK IMAGE
+                // ==========================
+
+                img.addEventListener(
+                    "click",
+                    function () {
+
+                        window.open(
+                            img.src,
+                            "_blank"
+                        );
+
+                    }
+                );
+
+
+                // ==========================
+                // IMAGE ERROR
+                // ==========================
+
+                img.onerror =
+                    function () {
+
+                        console.error(
+                            "ไม่สามารถโหลดรูปภาพ:",
+                            img.src
+                        );
+
+
+                        card.innerHTML = `
+
+                            <div
+                                style="
+                                    padding:20px;
+                                    border:1px solid #ddd;
+                                    border-radius:10px;
+                                    text-align:center;
+                                "
+                            >
+
+                                ❌ ไม่สามารถโหลดรูปภาพได้
+
+                            </div>
+
+                        `;
+
+                    };
+
+
+                card.appendChild(
+                    img
+                );
+
+
+                // ==========================
+                // CAPTION
+                // ==========================
+
+                if (image.caption) {
+
+                    const caption =
+                        document.createElement(
+                            "p"
+                        );
+
+
+                    caption.textContent =
+                        image.caption;
+
+
+                    caption.style.marginTop =
+                        "8px";
+
+
+                    caption.style.marginBottom =
+                        "0";
+
+
+                    card.appendChild(
+                        caption
+                    );
+
+                }
+
+
+                imageGrid.appendChild(
+                    card
+                );
+
+            }
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Problem image error:",
+            error
+        );
+
+    }
+
+}
+
+
+// ========================================
+// GET IMAGE URL
+// ========================================
+
+function getImageUrl(imageUrl) {
+
+    if (!imageUrl) {
+
+        return "";
+
+    }
+
+
+    // ==============================
+    // ALREADY FULL URL
+    // ==============================
+
+    if (
+        imageUrl.startsWith(
+            "http://"
+        ) ||
+
+        imageUrl.startsWith(
+            "https://"
+        )
+    ) {
+
+        return imageUrl;
+
+    }
+
+
+    // ==============================
+    // STORAGE PATH
+    // ==============================
+
+    const {
+        data
+    } = supabaseClient.storage
+
+        .from(
+            "problem-images"
+        )
+
+        .getPublicUrl(
+            imageUrl
+        );
+
+
+    return data.publicUrl;
+
+}
+
+
+// ========================================
+// LOAD SOLUTIONS
+// ========================================
+
+async function loadSolutions() {
+
+    const {
+        data: solutions,
+        error
+    } = await supabaseClient
+
+        .from("solutions")
+
+        .select(`
+            id,
+            step_number,
+            title,
+            description,
+            status
+        `)
+
+        .eq(
+            "problem_id",
+            problemId
+        )
+
+        .eq(
+            "status",
+            "published"
+        )
+
+        .order(
+            "step_number",
+            {
+                ascending: true
+            }
+        );
+
+
+    if (error) {
+
+        throw error;
+
+    }
+
+
+    if (!solutionList) {
+
+        return;
+
+    }
+
+
+    solutionList.innerHTML = "";
+
+
+    // ==============================
+    // NO SOLUTION
+    // ==============================
+
+    if (
+        !solutions ||
+        solutions.length === 0
+    ) {
+
+        solutionList.innerHTML = `
+
+            <div class="no-result">
+
+                ยังไม่มีวิธีแก้ไข
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    // ==============================
+    // DISPLAY SOLUTIONS
+    // ==============================
+
+    solutions.forEach(
+        solution => {
+
+            const div =
+                document.createElement(
+                    "div"
+                );
+
+
+            div.className =
+                "solution-card";
+
+
+            div.innerHTML = `
+
+                <div class="solution-number">
+
+                    ขั้นตอนที่
+                    ${escapeHtml(
+                        String(
+                            solution.step_number ??
+                            ""
+                        )
+                    )}
+
+                </div>
+
+
+                <h3>
+
+                    ${escapeHtml(
+                        solution.title
+                    )}
+
+                </h3>
+
+
+                <p>
+
+                    ${escapeHtml(
+                        solution.description ||
+                        ""
+                    )}
+
+                </p>
+
+            `;
+
+
+            solutionList.appendChild(
+                div
+            );
+
+        }
+    );
+
+}
+
+
+// ========================================
+// ERROR
+// ========================================
+
+function showError(text) {
+
+    if (loading) {
+
+        loading.style.display =
+            "none";
+
+    }
+
+
+    if (problemDetail) {
+
+        problemDetail.style.display =
+            "none";
+
+    }
+
+
+    if (errorMessage) {
+
+        errorMessage.textContent =
+            text;
+
+
+        errorMessage.style.display =
+            "block";
+
+    }
+
+}
+
+
+// ========================================
+// ESCAPE HTML
+// ========================================
+
+function escapeHtml(value) {
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+
+    div.textContent =
+        value ?? "";
+
+
+    return div.innerHTML;
+
+}
+
+
+// ========================================
+// START
+// ========================================
+
+checkLogin();
+
+loadProblem();
