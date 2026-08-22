@@ -461,6 +461,7 @@ async function loadProblems() {
                     title,
                     description,
                     category,
+                    class_name,
                     symptoms,
                     causes,
                     status,
@@ -700,24 +701,48 @@ function renderProblems(
                     "
                 >
 
-                    <span
+                    <div
                         style="
-                            background:#e0f2fe;
-                            color:#0369a1;
-                            padding:4px 12px;
-                            border-radius:6px;
-                            font-size:13px;
-                            font-weight:600;
+                            display:flex;
+                            gap:8px;
+                            align-items:center;
+                            flex-wrap:wrap;
                         "
                     >
 
-                        ${escapeHtml(
-                            problem.category ||
-                            "ทั่วไป"
-                        )}
+                        <span
+                            style="
+                                background:#e0f2fe;
+                                color:#0369a1;
+                                padding:4px 12px;
+                                border-radius:6px;
+                                font-size:13px;
+                                font-weight:600;
+                            "
+                        >
+                            ${escapeHtml(
+                                problem.category ||
+                                "ทั่วไป"
+                            )}
+                        </span>
 
-                    </span>
+                        <span
+                            style="
+                                background:#ede9fe;
+                                color:#6d28d9;
+                                padding:4px 12px;
+                                border-radius:6px;
+                                font-size:13px;
+                                font-weight:600;
+                            "
+                        >
+                            🎓 ${escapeHtml(
+                                problem.class_name ||
+                                "ไม่ระบุ Class"
+                            )}
+                        </span>
 
+                    </div>
 
                     ${statusBadge}
 
@@ -1184,6 +1209,14 @@ function editProblem(id) {
     }
 
 
+    if ($("class_name")) {
+
+        $("class_name").value =
+            problem.class_name || "";
+
+    }
+
+
     if ($("symptoms")) {
 
         $("symptoms").value =
@@ -1610,6 +1643,12 @@ async function saveProblem(
             : "";
 
 
+    const className =
+        $("class_name")
+            ? $("class_name").value
+            : "";
+
+
     const symptoms =
         $("symptoms")
             ? $("symptoms").value.trim()
@@ -1637,11 +1676,12 @@ async function saveProblem(
     if (
         !title ||
         !description ||
-        !category
+        !category ||
+        !className
     ) {
 
         showMessage(
-            "กรุณากรอกชื่อเรื่อง รายละเอียด และเลือกหมวดหมู่",
+            "กรุณากรอกชื่อเรื่อง รายละเอียด เลือกหมวดหมู่ และเลือก Class",
             "error"
         );
 
@@ -1675,6 +1715,9 @@ async function saveProblem(
 
             category:
                 category,
+
+            class_name:
+                className,
 
             symptoms:
                 symptoms,
@@ -2850,6 +2893,17 @@ function setupSearch() {
                                     keyword
                                 )
 
+                            ||
+
+                            (
+                                p.class_name ||
+                                ""
+                            )
+                                .toLowerCase()
+                                .includes(
+                                    keyword
+                                )
+
                         );
 
                     }
@@ -3031,6 +3085,23 @@ function setupEvents() {
                 "click",
                 closeProblemModal
             );
+
+    }
+
+
+    // ปิด Modal เมื่อคลิกพื้นที่ด้านนอก
+    if ($("problemModal")) {
+
+        $("problemModal").addEventListener(
+            "click",
+            (event) => {
+
+                if (event.target === $("problemModal")) {
+                    closeProblemModal();
+                }
+
+            }
+        );
 
     }
 
