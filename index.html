@@ -19,8 +19,778 @@
         href="css/style.css"
     >
 
-    <!-- Supabase Library -->
+    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+    <!-- ==================================================
+         MODAL STYLE
+    ================================================== -->
+
+    <style>
+
+        /* ===============================
+           ADD BUTTON
+        =============================== */
+
+        .add-button {
+
+            border: none;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #2563eb,
+                    #4f46e5
+                );
+
+            color: white;
+
+            padding:
+                11px 18px;
+
+            border-radius: 10px;
+
+            cursor: pointer;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            transition:
+                0.2s;
+
+            box-shadow:
+                0 5px 15px
+                rgba(
+                    37,
+                    99,
+                    235,
+                    0.20
+                );
+
+        }
+
+
+        .add-button:hover {
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                0 8px 20px
+                rgba(
+                    37,
+                    99,
+                    235,
+                    0.30
+                );
+
+        }
+
+
+        /* ===============================
+           MODAL
+        =============================== */
+
+        .modal {
+
+            position: fixed;
+
+            inset: 0;
+
+            background:
+                rgba(
+                    15,
+                    23,
+                    42,
+                    0.70
+                );
+
+            display: none;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 20px;
+
+            z-index: 9999;
+
+            backdrop-filter:
+                blur(5px);
+
+        }
+
+
+        .modal-content {
+
+            width: 100%;
+
+            max-width: 760px;
+
+            max-height:
+                calc(100vh - 40px);
+
+            overflow-y: auto;
+
+            background: white;
+
+            border-radius: 20px;
+
+            box-shadow:
+                0 25px 70px
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.30
+                );
+
+            animation:
+                modalShow
+                0.2s
+                ease;
+
+        }
+
+
+        @keyframes modalShow {
+
+            from {
+
+                opacity: 0;
+
+                transform:
+                    translateY(20px)
+                    scale(0.98);
+
+            }
+
+            to {
+
+                opacity: 1;
+
+                transform:
+                    translateY(0)
+                    scale(1);
+
+            }
+
+        }
+
+
+        /* ===============================
+           MODAL HEADER
+        =============================== */
+
+        .modal-header {
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 2;
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items:
+                flex-start;
+
+            gap: 20px;
+
+            padding:
+                24px 28px;
+
+            background: white;
+
+            border-bottom:
+                1px solid #e5e7eb;
+
+        }
+
+
+        .modal-header h2 {
+
+            margin: 0;
+
+            color: #111827;
+
+            font-size: 24px;
+
+        }
+
+
+        .modal-subtitle {
+
+            margin-top: 6px;
+
+            color: #6b7280;
+
+            font-size: 14px;
+
+        }
+
+
+        .close-button {
+
+            width: 40px;
+
+            height: 40px;
+
+            border: none;
+
+            border-radius: 50%;
+
+            background:
+                #f3f4f6;
+
+            color: #374151;
+
+            font-size: 26px;
+
+            cursor: pointer;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            flex-shrink: 0;
+
+        }
+
+
+        .close-button:hover {
+
+            background:
+                #fee2e2;
+
+            color:
+                #dc2626;
+
+        }
+
+
+        /* ===============================
+           FORM
+        =============================== */
+
+        #submitProblemForm {
+
+            padding:
+                26px 28px 30px;
+
+        }
+
+
+        #submitProblemForm h3 {
+
+            margin:
+                10px 0 18px;
+
+            color:
+                #111827;
+
+            font-size:
+                18px;
+
+        }
+
+
+        #submitProblemForm label {
+
+            display: block;
+
+            margin:
+                16px 0 7px;
+
+            color:
+                #374151;
+
+            font-size:
+                14px;
+
+            font-weight:
+                600;
+
+        }
+
+
+        #submitProblemForm input[type="text"],
+        #submitProblemForm textarea,
+        #submitProblemForm select {
+
+            width: 100%;
+
+            border:
+                1px solid #d1d5db;
+
+            border-radius:
+                10px;
+
+            padding:
+                12px 14px;
+
+            font-size:
+                15px;
+
+            font-family:
+                inherit;
+
+            outline: none;
+
+            background:
+                white;
+
+            transition:
+                0.2s;
+
+        }
+
+
+        #submitProblemForm textarea {
+
+            resize:
+                vertical;
+
+            min-height:
+                90px;
+
+            line-height:
+                1.6;
+
+        }
+
+
+        #submitProblemForm input:focus,
+        #submitProblemForm textarea:focus,
+        #submitProblemForm select:focus {
+
+            border-color:
+                #2563eb;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(
+                    37,
+                    99,
+                    235,
+                    0.10
+                );
+
+        }
+
+
+        /* ===============================
+           IMAGE UPLOAD
+        =============================== */
+
+        .image-upload-box {
+
+            margin-top:
+                12px;
+
+            padding:
+                18px;
+
+            border:
+                2px dashed #cbd5e1;
+
+            border-radius:
+                14px;
+
+            background:
+                #f8fafc;
+
+            text-align:
+                center;
+
+        }
+
+
+        .image-upload-box input[type="file"] {
+
+            width: 100%;
+
+            padding:
+                10px;
+
+            border:
+                1px solid #d1d5db;
+
+            border-radius:
+                8px;
+
+            background:
+                white;
+
+        }
+
+
+        .upload-hint {
+
+            margin-top:
+                8px;
+
+            color:
+                #6b7280;
+
+            font-size:
+                13px;
+
+        }
+
+
+        .image-preview {
+
+            margin-top:
+                15px;
+
+            display:
+                none;
+
+        }
+
+
+        .image-preview img {
+
+            max-width:
+                100%;
+
+            max-height:
+                280px;
+
+            border-radius:
+                12px;
+
+            border:
+                1px solid #e5e7eb;
+
+            object-fit:
+                contain;
+
+        }
+
+
+        /* ===============================
+           SOLUTIONS
+        =============================== */
+
+        .submit-solution-header {
+
+            margin-top:
+                28px;
+
+            margin-bottom:
+                15px;
+
+        }
+
+
+        .submit-solution-header h3 {
+
+            margin-bottom:
+                5px !important;
+
+        }
+
+
+        .submit-solution-header p {
+
+            color:
+                #6b7280;
+
+            font-size:
+                13px;
+
+        }
+
+
+        .submit-solutions {
+
+            display:
+                flex;
+
+            flex-direction:
+                column;
+
+            gap:
+                15px;
+
+        }
+
+
+        .solution-step {
+
+            border:
+                1px solid #dbeafe;
+
+            background:
+                #f8fbff;
+
+            border-radius:
+                14px;
+
+            padding:
+                18px;
+
+        }
+
+
+        .solution-step-header {
+
+            display:
+                flex;
+
+            justify-content:
+                space-between;
+
+            align-items:
+                center;
+
+            margin-bottom:
+                12px;
+
+        }
+
+
+        .solution-step-header h4 {
+
+            margin:
+                0;
+
+            color:
+                #1d4ed8;
+
+            font-size:
+                16px;
+
+        }
+
+
+        .remove-step {
+
+            border:
+                none;
+
+            background:
+                #fee2e2;
+
+            color:
+                #dc2626;
+
+            padding:
+                7px 12px;
+
+            border-radius:
+                8px;
+
+            cursor:
+                pointer;
+
+            font-size:
+                13px;
+
+        }
+
+
+        .remove-step:hover {
+
+            background:
+                #fecaca;
+
+        }
+
+
+        .add-button {
+
+            margin-top:
+                15px;
+
+        }
+
+
+        /* ===============================
+           SUBMIT BUTTON
+        =============================== */
+
+        .save-button {
+
+            width:
+                100%;
+
+            margin-top:
+                24px;
+
+            padding:
+                14px 20px;
+
+            border:
+                none;
+
+            border-radius:
+                11px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #2563eb,
+                    #4f46e5
+                );
+
+            color:
+                white;
+
+            font-size:
+                16px;
+
+            font-weight:
+                700;
+
+            cursor:
+                pointer;
+
+            transition:
+                0.2s;
+
+        }
+
+
+        .save-button:hover {
+
+            transform:
+                translateY(-1px);
+
+        }
+
+
+        .save-button:disabled {
+
+            opacity:
+                0.65;
+
+            cursor:
+                not-allowed;
+
+            transform:
+                none;
+
+        }
+
+
+        /* ===============================
+           MESSAGE
+        =============================== */
+
+        .submit-message {
+
+            margin-top:
+                18px;
+
+            padding:
+                13px 15px;
+
+            border-radius:
+                10px;
+
+            font-size:
+                14px;
+
+            line-height:
+                1.5;
+
+        }
+
+
+        .success-message {
+
+            background:
+                #dcfce7;
+
+            color:
+                #166534;
+
+        }
+
+
+        .error-message {
+
+            background:
+                #fee2e2;
+
+            color:
+                #991b1b;
+
+        }
+
+
+        /* ===============================
+           MOBILE
+        =============================== */
+
+        @media (max-width: 600px) {
+
+            .modal {
+
+                padding:
+                    10px;
+
+            }
+
+
+            .modal-content {
+
+                max-height:
+                    calc(100vh - 20px);
+
+                border-radius:
+                    16px;
+
+            }
+
+
+            .modal-header {
+
+                padding:
+                    18px;
+
+            }
+
+
+            .modal-header h2 {
+
+                font-size:
+                    20px;
+
+            }
+
+
+            #submitProblemForm {
+
+                padding:
+                    18px;
+
+            }
+
+
+            .user-area {
+
+                flex-wrap:
+                    wrap;
+
+                justify-content:
+                    flex-end;
+
+            }
+
+        }
+
+    </style>
 
 </head>
 
@@ -50,7 +820,7 @@
         </div>
 
 
-        <!-- USER AREA -->
+        <!-- USER -->
 
         <div
             id="userArea"
@@ -272,7 +1042,9 @@
 >
 
 
-    <div class="modal-content submit-modal">
+    <div
+        class="modal-content submit-modal"
+    >
 
 
         <!-- HEADER -->
@@ -282,11 +1054,11 @@
             <div>
 
                 <h2>
-                    ส่งปัญหาและวิธีแก้ไข
+                    🐞 ส่งปัญหาและวิธีแก้ไข
                 </h2>
 
                 <p class="modal-subtitle">
-                    ข้อมูลจะถูกส่งให้ Admin
+                    กรอกข้อมูลที่พบ ระบบจะส่งให้ Admin
                     ตรวจสอบก่อนเผยแพร่
                 </p>
 
@@ -297,6 +1069,7 @@
                 id="closeSubmitModal"
                 class="close-button"
                 type="button"
+                aria-label="ปิด"
             >
                 ×
             </button>
@@ -307,20 +1080,24 @@
 
         <!-- FORM -->
 
-        <form id="submitProblemForm">
+        <form
+            id="submitProblemForm"
+        >
 
 
-            <!-- PROBLEM -->
+            <!-- =========================
+                 PROBLEM
+            ========================= -->
 
             <h3>
-                🐞 ข้อมูลปัญหา
+                📋 ข้อมูลปัญหา
             </h3>
 
 
             <!-- TITLE -->
 
             <label for="submitTitle">
-                ชื่อปัญหา
+                ชื่อปัญหา *
             </label>
 
             <input
@@ -334,7 +1111,7 @@
             <!-- DESCRIPTION -->
 
             <label for="submitDescription">
-                รายละเอียดปัญหา
+                รายละเอียดปัญหา *
             </label>
 
             <textarea
@@ -348,7 +1125,7 @@
             <!-- CATEGORY -->
 
             <label for="submitCategory">
-                หมวดหมู่
+                หมวดหมู่ *
             </label>
 
             <select
@@ -394,13 +1171,13 @@
             <!-- SYMPTOMS -->
 
             <label for="submitSymptoms">
-                อาการ
+                อาการที่พบ
             </label>
 
             <textarea
                 id="submitSymptoms"
                 rows="3"
-                placeholder="อาการที่พบ"
+                placeholder="เช่น เปิดโปรแกรมแล้วไม่พบอุปกรณ์"
             ></textarea>
 
 
@@ -413,21 +1190,65 @@
             <textarea
                 id="submitCauses"
                 rows="3"
-                placeholder="สาเหตุที่เป็นไปได้"
+                placeholder="เช่น สาย USB หรือ Driver"
             ></textarea>
 
 
 
-            <!-- SOLUTIONS -->
+            <!-- =========================
+                 IMAGE
+            ========================= -->
+
+            <h3>
+                🖼️ รูปภาพปัญหา
+            </h3>
+
+
+            <div class="image-upload-box">
+
+                <input
+                    type="file"
+                    id="submitProblemImage"
+                    accept="image/jpeg,image/png,image/webp"
+                >
+
+                <div class="upload-hint">
+
+                    รองรับ JPG, PNG, WEBP
+                    ขนาดไม่เกิน 5 MB
+
+                </div>
+
+
+                <div
+                    id="problemImagePreview"
+                    class="image-preview"
+                >
+
+                    <img
+                        id="problemPreviewImage"
+                        src=""
+                        alt="ตัวอย่างรูปปัญหา"
+                    >
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =========================
+                 SOLUTIONS
+            ========================= -->
 
             <div class="submit-solution-header">
 
                 <h3>
-                    🛠 วิธีแก้ไข
+                    🛠️ วิธีแก้ไขปัญหา
                 </h3>
 
                 <p>
-                    เพิ่มวิธีแก้ไขได้หลายขั้นตอน
+                    สามารถเพิ่มวิธีแก้ไขได้หลายขั้นตอน
                 </p>
 
             </div>
@@ -451,6 +1272,7 @@
             </button>
 
 
+
             <!-- MESSAGE -->
 
             <div
@@ -459,6 +1281,7 @@
                 style="display:none;"
             >
             </div>
+
 
 
             <!-- SUBMIT -->
