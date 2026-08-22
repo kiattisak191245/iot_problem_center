@@ -713,25 +713,13 @@ function renderProblems() {
 
 
                 const matchCategory =
-
-                    currentCategory ===
-                    "all"
-
-                    ||
-
-                    problem.category ===
-                    currentCategory;
+                    currentCategory === "all" ||
+                    (problem.category && problem.category.trim().toLowerCase() === currentCategory.trim().toLowerCase());
 
 
                 const matchClass =
-
-                    currentClass ===
-                    "all"
-
-                    ||
-
-                    problem.class_name ===
-                    currentClass;
+                    currentClass === "all" ||
+                    (problem.class_name && problem.class_name.trim().toLowerCase() === currentClass.trim().toLowerCase());
 
 
 
@@ -884,7 +872,7 @@ if (searchInput) {
 
 document
     .querySelectorAll(
-        ".category-button"
+        ".category-button[data-category]" // กำหนดให้เลือกเฉพาะปุ่มที่มี data-category 
     )
     .forEach(
         button => {
@@ -896,7 +884,7 @@ document
 
                     document
                         .querySelectorAll(
-                            ".category-button"
+                            ".category-button[data-category]"
                         )
                         .forEach(
                             btn => {
