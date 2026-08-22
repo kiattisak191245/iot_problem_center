@@ -16,33 +16,58 @@ let solutionStepCount = 0;
 // ==================================================
 
 const userArea =
-    document.getElementById("userArea");
+    document.getElementById(
+        "userArea"
+    );
+
 
 const problemList =
-    document.getElementById("problemList");
+    document.getElementById(
+        "problemList"
+    );
+
 
 const loading =
-    document.getElementById("loading");
+    document.getElementById(
+        "loading"
+    );
+
 
 const noResult =
-    document.getElementById("noResult");
+    document.getElementById(
+        "noResult"
+    );
+
 
 const searchInput =
-    document.getElementById("searchInput");
+    document.getElementById(
+        "searchInput"
+    );
+
 
 const submitProblemModal =
-    document.getElementById("submitProblemModal");
+    document.getElementById(
+        "submitProblemModal"
+    );
+
 
 const closeSubmitModal =
-    document.getElementById("closeSubmitModal");
+    document.getElementById(
+        "closeSubmitModal"
+    );
+
 
 const submitSolutions =
-    document.getElementById("submitSolutions");
+    document.getElementById(
+        "submitSolutions"
+    );
+
 
 const addSubmitSolutionButton =
     document.getElementById(
         "addSubmitSolutionButton"
     );
+
 
 const submitProblemForm =
     document.getElementById(
@@ -58,10 +83,14 @@ const submitProblemForm =
 function escapeHtml(value) {
 
     const div =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     div.textContent =
         value ?? "";
+
 
     return div.innerHTML;
 
@@ -89,13 +118,10 @@ async function checkLogin() {
     try {
 
         const {
-
             data: {
                 session
             },
-
             error
-
         } =
             await supabaseClient
                 .auth
@@ -116,7 +142,7 @@ async function checkLogin() {
 
 
         // ==================================================
-        // ยังไม่ได้ Login
+        // NOT LOGIN
         // ==================================================
 
         if (!session) {
@@ -139,11 +165,12 @@ async function checkLogin() {
 
 
         // ==================================================
-        // LOGIN
+        // USER
         // ==================================================
 
         const user =
             session.user;
+
 
         const email =
             user.email ||
@@ -158,19 +185,15 @@ async function checkLogin() {
 
 
         // ==================================================
-        // ตรวจสอบ ADMIN
+        // CHECK ADMIN
         // ==================================================
 
-        let isAdmin =
-            false;
+        let isAdmin = false;
 
 
         const {
-
             data: profile,
-
             error: profileError
-
         } =
             await supabaseClient
 
@@ -188,6 +211,7 @@ async function checkLogin() {
                 .maybeSingle();
 
 
+
         if (profileError) {
 
             console.error(
@@ -203,16 +227,9 @@ async function checkLogin() {
             profile.role === "admin"
         ) {
 
-            isAdmin =
-                true;
+            isAdmin = true;
 
         }
-
-
-        console.log(
-            "IS ADMIN:",
-            isAdmin
-        );
 
 
 
@@ -220,8 +237,7 @@ async function checkLogin() {
         // ADMIN BUTTON
         // ==================================================
 
-        let adminButton =
-            "";
+        let adminButton = "";
 
 
         if (isAdmin) {
@@ -255,7 +271,9 @@ async function checkLogin() {
                 👤 ${escapeHtml(email)}
             </span>
 
+
             ${adminButton}
+
 
             <button
                 id="submitProblemButton"
@@ -264,6 +282,7 @@ async function checkLogin() {
             >
                 + ส่งปัญหา / วิธีแก้ไข
             </button>
+
 
             <button
                 id="logoutButton"
@@ -278,7 +297,7 @@ async function checkLogin() {
 
 
         // ==================================================
-        // SUBMIT BUTTON
+        // OPEN SUBMIT BUTTON
         // ==================================================
 
         const submitButton =
@@ -352,6 +371,26 @@ function openSubmitModal() {
     document.body.style.overflow =
         "hidden";
 
+
+    setTimeout(
+        () => {
+
+            const title =
+                document.getElementById(
+                    "submitTitle"
+                );
+
+
+            if (title) {
+
+                title.focus();
+
+            }
+
+        },
+        100
+    );
+
 }
 
 
@@ -396,7 +435,7 @@ if (closeSubmitModal) {
 
 
 // ==================================================
-// CLICK OUTSIDE MODAL
+// CLICK OUTSIDE
 // ==================================================
 
 if (submitProblemModal) {
@@ -422,15 +461,37 @@ if (submitProblemModal) {
 
 
 // ==================================================
+// ESC KEY
+// ==================================================
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key === "Escape" &&
+            submitProblemModal &&
+            submitProblemModal.style.display ===
+            "flex"
+        ) {
+
+            closeSubmitProblemModal();
+
+        }
+
+    }
+);
+
+
+
+// ==================================================
 // LOGOUT
 // ==================================================
 
 async function logout() {
 
     const {
-
         error
-
     } =
         await supabaseClient
             .auth
@@ -480,10 +541,8 @@ async function loadProblems() {
     try {
 
         const {
-
             data,
             error
-
         } =
             await supabaseClient
 
@@ -494,7 +553,7 @@ async function loadProblems() {
                     title,
                     description,
                     category,
-                    class_name,
+                    class_level,
                     symptoms,
                     causes,
                     status,
@@ -510,10 +569,10 @@ async function loadProblems() {
                 .order(
                     "created_at",
                     {
-                        ascending:
-                            false
+                        ascending: false
                     }
                 );
+
 
 
         if (error) {
@@ -593,6 +652,7 @@ function renderProblems() {
             : "";
 
 
+
     const filtered =
         allProblems.filter(
             problem => {
@@ -613,11 +673,13 @@ function renderProblems() {
                     "";
 
 
-                const className =
-                    problem.class_name ||
+                const classLevel =
+                    problem.class_level ||
                     "";
 
 
+
+                // SEARCH
 
                 const matchSearch =
 
@@ -643,11 +705,13 @@ function renderProblems() {
 
                     ||
 
-                    className
+                    classLevel
                         .toLowerCase()
                         .includes(search);
 
 
+
+                // CATEGORY
 
                 const matchCategory =
 
@@ -703,6 +767,10 @@ function renderProblems() {
 
 
 
+    // ==================================================
+    // CARDS
+    // ==================================================
+
     filtered.forEach(
         problem => {
 
@@ -717,35 +785,46 @@ function renderProblems() {
                 "problem-card";
 
 
+
+            const category =
+                problem.category ||
+                "ทั่วไป";
+
+
+            const classLevel =
+                problem.class_level ||
+                "ไม่ระบุ Class";
+
+
+
             card.innerHTML = `
-
-                <span class="problem-category">
-
-                    ${escapeHtml(
-                        problem.category ||
-                        "ทั่วไป"
-                    )}
-
-                </span>
-
 
                 <div
                     style="
-                        display:inline-block;
-                        margin-left:6px;
-                        padding:4px 9px;
-                        border-radius:999px;
-                        background:#eef2ff;
-                        color:#4338ca;
-                        font-size:12px;
-                        font-weight:600;
+                        display:flex;
+                        align-items:center;
+                        gap:6px;
+                        flex-wrap:wrap;
+                        margin-bottom:10px;
                     "
                 >
 
-                    ${escapeHtml(
-                        problem.class_name ||
-                        "ไม่ระบุ Class"
-                    )}
+                    <span
+                        class="problem-category"
+                    >
+                        ${escapeHtml(
+                            category
+                        )}
+                    </span>
+
+
+                    <span
+                        class="problem-class"
+                    >
+                        ${escapeHtml(
+                            classLevel
+                        )}
+                    </span>
 
                 </div>
 
@@ -770,13 +849,14 @@ function renderProblems() {
                 </p>
 
 
-                <span class="problem-link">
-
+                <span
+                    class="problem-link"
+                >
                     ดูวิธีแก้ไข →
-
                 </span>
 
             `;
+
 
 
             card.addEventListener(
@@ -817,7 +897,7 @@ if (searchInput) {
 
 
 // ==================================================
-// CATEGORY
+// CATEGORY FILTER
 // ==================================================
 
 document
@@ -867,7 +947,7 @@ document
 
 
 // ==================================================
-// SOLUTION STEP
+// ADD SOLUTION STEP
 // ==================================================
 
 function addSolutionStep() {
@@ -894,7 +974,9 @@ function addSolutionStep() {
 
     step.innerHTML = `
 
-        <div class="solution-step-header">
+        <div
+            class="solution-step-header"
+        >
 
             <h4>
                 ขั้นตอนที่
@@ -906,14 +988,14 @@ function addSolutionStep() {
                 type="button"
                 class="remove-step"
             >
-                ลบ
+                ลบขั้นตอน
             </button>
 
         </div>
 
 
         <label>
-            หัวข้อขั้นตอน
+            หัวข้อขั้นตอน *
         </label>
 
 
@@ -933,12 +1015,16 @@ function addSolutionStep() {
         <textarea
             class="submit-solution-description"
             rows="4"
-            placeholder="อธิบายวิธีแก้ไข"
+            placeholder="อธิบายวิธีแก้ไขขั้นตอนนี้..."
         ></textarea>
 
     `;
 
 
+
+    // ==================================================
+    // REMOVE STEP
+    // ==================================================
 
     step
         .querySelector(
@@ -956,6 +1042,7 @@ function addSolutionStep() {
         );
 
 
+
     submitSolutions.appendChild(
         step
     );
@@ -965,7 +1052,7 @@ function addSolutionStep() {
 
 
 // ==================================================
-// RENUMBER
+// RENUMBER STEPS
 // ==================================================
 
 function renumberSteps() {
@@ -978,13 +1065,19 @@ function renumberSteps() {
 
 
     const steps =
-        submitSolutions.querySelectorAll(
-            ".solution-step"
-        );
+        submitSolutions
+            .querySelectorAll(
+                ".solution-step"
+            );
 
 
     steps.forEach(
         (step, index) => {
+
+
+            const number =
+                index + 1;
+
 
             const heading =
                 step.querySelector(
@@ -995,7 +1088,7 @@ function renumberSteps() {
             if (heading) {
 
                 heading.textContent =
-                    `ขั้นตอนที่ ${index + 1}`;
+                    `ขั้นตอนที่ ${number}`;
 
             }
 
@@ -1011,7 +1104,7 @@ function renumberSteps() {
 
 
 // ==================================================
-// ADD FIRST STEP
+// FIRST STEP
 // ==================================================
 
 if (submitSolutions) {
@@ -1020,6 +1113,11 @@ if (submitSolutions) {
 
 }
 
+
+
+// ==================================================
+// ADD STEP BUTTON
+// ==================================================
 
 if (addSubmitSolutionButton) {
 
@@ -1045,6 +1143,7 @@ if (submitProblemForm) {
             event.preventDefault();
 
 
+
             const submitButton =
                 document.getElementById(
                     "submitButton"
@@ -1055,6 +1154,7 @@ if (submitProblemForm) {
                 document.getElementById(
                     "submitMessage"
                 );
+
 
 
             try {
@@ -1069,29 +1169,28 @@ if (submitProblemForm) {
                     submitButton.disabled =
                         true;
 
+
                     submitButton.textContent =
-                        "กำลังส่งข้อมูล...";
+                        "⏳ กำลังส่งข้อมูล...";
 
                 }
 
 
 
                 // ==================================================
-                // USER
+                // CURRENT USER
                 // ==================================================
 
                 const {
-
                     data: {
                         user
                     },
-
                     error: userError
-
                 } =
                     await supabaseClient
                         .auth
                         .getUser();
+
 
 
                 if (
@@ -1108,7 +1207,7 @@ if (submitProblemForm) {
 
 
                 // ==================================================
-                // FORM
+                // FORM DATA
                 // ==================================================
 
                 const title =
@@ -1137,10 +1236,10 @@ if (submitProblemForm) {
                         .value;
 
 
-                const className =
+                const classLevel =
                     document
                         .getElementById(
-                            "submitClassName"
+                            "submitClass"
                         )
                         .value;
 
@@ -1195,7 +1294,7 @@ if (submitProblemForm) {
                 }
 
 
-                if (!className) {
+                if (!classLevel) {
 
                     throw new Error(
                         "กรุณาเลือก Class"
@@ -1210,11 +1309,8 @@ if (submitProblemForm) {
                 // ==================================================
 
                 const {
-
                     data: problem,
-
                     error: problemError
-
                 } =
                     await supabaseClient
 
@@ -1231,8 +1327,8 @@ if (submitProblemForm) {
                             category:
                                 category,
 
-                            class_name:
-                                className,
+                            class_level:
+                                classLevel,
 
                             symptoms:
                                 symptoms,
@@ -1253,18 +1349,12 @@ if (submitProblemForm) {
                         .single();
 
 
+
                 if (problemError) {
 
                     throw problemError;
 
                 }
-
-
-
-                console.log(
-                    "CREATED PROBLEM:",
-                    problem
-                );
 
 
 
@@ -1281,8 +1371,10 @@ if (submitProblemForm) {
                         : [];
 
 
+
                 const solutionData =
                     [];
+
 
 
                 steps.forEach(
@@ -1350,30 +1442,31 @@ if (submitProblemForm) {
                     0
                 ) {
 
-                    const {
 
+                    const {
                         error:
                             solutionError
-
                     } =
                         await supabaseClient
 
-                            .from(
-                                "solutions"
-                            )
+                            .from("solutions")
 
                             .insert(
                                 solutionData
                             );
 
 
-                    if (solutionError) {
+
+                    if (
+                        solutionError
+                    ) {
+
+
+                        // Rollback Problem
 
                         await supabaseClient
 
-                            .from(
-                                "problems"
-                            )
+                            .from("problems")
 
                             .delete()
 
@@ -1400,8 +1493,10 @@ if (submitProblemForm) {
                     submitMessage.style.display =
                         "block";
 
+
                     submitMessage.className =
                         "submit-message success-message";
+
 
                     submitMessage.textContent =
                         "✅ ส่งข้อมูลเรียบร้อยแล้ว รอ Admin ตรวจสอบและอนุมัติ";
@@ -1417,6 +1512,7 @@ if (submitProblemForm) {
                 submitProblemForm.reset();
 
 
+
                 if (submitSolutions) {
 
                     submitSolutions.innerHTML =
@@ -1429,16 +1525,12 @@ if (submitProblemForm) {
                     0;
 
 
-                if (submitSolutions) {
-
-                    addSolutionStep();
-
-                }
+                addSolutionStep();
 
 
 
                 // ==================================================
-                // CLOSE
+                // CLOSE AFTER 2 SEC
                 // ==================================================
 
                 setTimeout(
@@ -1463,6 +1555,7 @@ if (submitProblemForm) {
 
             catch (error) {
 
+
                 console.error(
                     "SUBMIT ERROR:",
                     error
@@ -1474,12 +1567,17 @@ if (submitProblemForm) {
                     submitMessage.style.display =
                         "block";
 
+
                     submitMessage.className =
                         "submit-message error-message";
 
+
                     submitMessage.textContent =
                         "❌ ส่งข้อมูลไม่สำเร็จ: " +
-                        error.message;
+                        (
+                            error.message ||
+                            "เกิดข้อผิดพลาด"
+                        );
 
                 }
 
@@ -1488,10 +1586,12 @@ if (submitProblemForm) {
 
             finally {
 
+
                 if (submitButton) {
 
                     submitButton.disabled =
                         false;
+
 
                     submitButton.textContent =
                         "🚀 ส่งปัญหาให้ Admin ตรวจสอบ";
