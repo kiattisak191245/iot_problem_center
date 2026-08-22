@@ -712,66 +712,26 @@ function renderProblems() {
 
 
 
-                const problemCategory =
-
-                    String(
-                        problem.category ??
-                        ""
-                    )
-                        .trim()
-                        .toLowerCase();
-
-
-                const selectedCategory =
-
-                    String(
-                        currentCategory ??
-                        "all"
-                    )
-                        .trim()
-                        .toLowerCase();
-
-
                 const matchCategory =
 
-                    selectedCategory ===
+                    currentCategory ===
                     "all"
 
                     ||
 
-                    problemCategory ===
-                    selectedCategory;
-
-
-                const problemClass =
-
-                    String(
-                        problem.class_name ??
-                        ""
-                    )
-                        .trim()
-                        .toLowerCase();
-
-
-                const selectedClass =
-
-                    String(
-                        currentClass ??
-                        "all"
-                    )
-                        .trim()
-                        .toLowerCase();
+                    problem.category ===
+                    currentCategory;
 
 
                 const matchClass =
 
-                    selectedClass ===
+                    currentClass ===
                     "all"
 
                     ||
 
-                    problemClass ===
-                    selectedClass;
+                    problem.class_name ===
+                    currentClass;
 
 
 
@@ -919,14 +879,12 @@ if (searchInput) {
 
 
 // ==================================================
-// CATEGORY FILTER
+// CATEGORY
 // ==================================================
 
-// จับเฉพาะปุ่มที่อยู่ใน #categories
-// เพื่อไม่ให้ปุ่ม Class ถูกนับเป็นหมวดหมู่
 document
     .querySelectorAll(
-        "#categories .category-button"
+        ".category-button"
     )
     .forEach(
         button => {
@@ -935,9 +893,10 @@ document
                 "click",
                 () => {
 
+
                     document
                         .querySelectorAll(
-                            "#categories .category-button"
+                            ".category-button"
                         )
                         .forEach(
                             btn => {
@@ -956,14 +915,7 @@ document
 
 
                     currentCategory =
-                        button.dataset.category ||
-                        "all";
-
-
-                    console.log(
-                        "CATEGORY SELECTED:",
-                        currentCategory
-                    );
+                        button.dataset.category;
 
 
                     renderProblems();
@@ -975,14 +927,14 @@ document
     );
 
 
+
 // ==================================================
 // CLASS FILTER
 // ==================================================
 
-// จับเฉพาะปุ่ม Class ที่อยู่ใน #classFilters
 document
     .querySelectorAll(
-        "#classFilters .class-filter-button"
+        ".class-filter-button"
     )
     .forEach(
         button => {
@@ -993,7 +945,7 @@ document
 
                     document
                         .querySelectorAll(
-                            "#classFilters .class-filter-button"
+                            ".class-filter-button"
                         )
                         .forEach(
                             btn => {
@@ -1005,22 +957,13 @@ document
                             }
                         );
 
-
                     button.classList.add(
                         "active"
                     );
 
-
                     currentClass =
                         button.dataset.class ||
                         "all";
-
-
-                    console.log(
-                        "CLASS SELECTED:",
-                        currentClass
-                    );
-
 
                     renderProblems();
 
