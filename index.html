@@ -14,45 +14,100 @@
         IoT Problem Center
     </title>
 
-
     <link
         rel="stylesheet"
         href="css/style.css"
     >
-
 
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 
     <!-- ==================================================
-         POPUP STYLE
+         MODAL STYLE
     ================================================== -->
 
     <style>
 
-        /* ==================================================
-           MODAL BACKGROUND
-        ================================================== */
+        /* ===============================
+           ADD BUTTON
+        =============================== */
+
+        .add-button {
+
+            border: none;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #2563eb,
+                    #4f46e5
+                );
+
+            color: white;
+
+            padding:
+                11px 18px;
+
+            border-radius: 10px;
+
+            cursor: pointer;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            transition:
+                0.2s;
+
+            box-shadow:
+                0 5px 15px
+                rgba(
+                    37,
+                    99,
+                    235,
+                    0.20
+                );
+
+        }
+
+
+        .add-button:hover {
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                0 8px 20px
+                rgba(
+                    37,
+                    99,
+                    235,
+                    0.30
+                );
+
+        }
+
+
+        /* ===============================
+           MODAL
+        =============================== */
 
         .modal {
-
-            display: none;
 
             position: fixed;
 
             inset: 0;
 
-            z-index: 9999;
-
             background:
-                rgba(15, 23, 42, 0.65);
+                rgba(
+                    15,
+                    23,
+                    42,
+                    0.70
+                );
 
-            backdrop-filter:
-                blur(7px);
-
-            -webkit-backdrop-filter:
-                blur(7px);
+            display: none;
 
             align-items: center;
 
@@ -60,37 +115,42 @@
 
             padding: 20px;
 
+            z-index: 9999;
+
+            backdrop-filter:
+                blur(5px);
+
         }
 
 
-        /* ==================================================
-           MODAL BOX
-        ================================================== */
-
-        .submit-modal {
+        .modal-content {
 
             width: 100%;
 
             max-width: 760px;
 
-            max-height: 90vh;
+            max-height:
+                calc(100vh - 40px);
 
             overflow-y: auto;
 
-            background: #ffffff;
+            background: white;
 
-            border-radius: 24px;
+            border-radius: 20px;
 
             box-shadow:
                 0 25px 70px
-                rgba(0,0,0,0.25);
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.30
+                );
 
             animation:
                 modalShow
-                0.25s
+                0.2s
                 ease;
-
-            position: relative;
 
         }
 
@@ -102,8 +162,8 @@
                 opacity: 0;
 
                 transform:
-                    translateY(30px)
-                    scale(0.97);
+                    translateY(20px)
+                    scale(0.98);
 
             }
 
@@ -120,33 +180,35 @@
         }
 
 
-        /* ==================================================
+        /* ===============================
            MODAL HEADER
-        ================================================== */
+        =============================== */
 
         .modal-header {
 
+            position: sticky;
+
+            top: 0;
+
+            z-index: 2;
+
             display: flex;
 
-            align-items: flex-start;
+            justify-content:
+                space-between;
 
-            justify-content: space-between;
+            align-items:
+                flex-start;
 
             gap: 20px;
 
-            padding: 28px 30px;
+            padding:
+                24px 28px;
 
-            background:
-                linear-gradient(
-                    135deg,
-                    #2563eb,
-                    #4f46e5
-                );
+            background: white;
 
-            color: white;
-
-            border-radius:
-                24px 24px 0 0;
+            border-bottom:
+                1px solid #e5e7eb;
 
         }
 
@@ -155,52 +217,48 @@
 
             margin: 0;
 
-            font-size: 25px;
+            color: #111827;
 
-            font-weight: 800;
+            font-size: 24px;
 
         }
 
 
         .modal-subtitle {
 
-            margin:
-                7px 0 0;
+            margin-top: 6px;
+
+            color: #6b7280;
 
             font-size: 14px;
-
-            opacity: 0.9;
 
         }
 
 
-        /* ==================================================
-           CLOSE BUTTON
-        ================================================== */
-
         .close-button {
 
-            width: 42px;
+            width: 40px;
 
-            height: 42px;
+            height: 40px;
 
             border: none;
 
             border-radius: 50%;
 
             background:
-                rgba(255,255,255,0.18);
+                #f3f4f6;
 
-            color: white;
+            color: #374151;
 
-            font-size: 30px;
-
-            line-height: 1;
+            font-size: 26px;
 
             cursor: pointer;
 
-            transition:
-                0.2s;
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
 
             flex-shrink: 0;
 
@@ -210,21 +268,22 @@
         .close-button:hover {
 
             background:
-                rgba(255,255,255,0.3);
+                #fee2e2;
 
-            transform:
-                rotate(90deg);
+            color:
+                #dc2626;
 
         }
 
 
-        /* ==================================================
+        /* ===============================
            FORM
-        ================================================== */
+        =============================== */
 
         #submitProblemForm {
 
-            padding: 30px;
+            padding:
+                26px 28px 30px;
 
         }
 
@@ -232,16 +291,13 @@
         #submitProblemForm h3 {
 
             margin:
-                0 0 20px;
-
-            padding-bottom:
-                12px;
-
-            border-bottom:
-                2px solid #eef2f7;
+                10px 0 18px;
 
             color:
-                #172033;
+                #111827;
+
+            font-size:
+                18px;
 
         }
 
@@ -251,44 +307,45 @@
             display: block;
 
             margin:
-                18px 0 8px;
-
-            font-weight: 700;
+                16px 0 7px;
 
             color:
-                #263247;
+                #374151;
+
+            font-size:
+                14px;
+
+            font-weight:
+                600;
 
         }
 
 
-        #submitProblemForm input,
+        #submitProblemForm input[type="text"],
         #submitProblemForm textarea,
         #submitProblemForm select {
 
             width: 100%;
 
-            box-sizing: border-box;
-
             border:
-                1px solid #d8e0eb;
+                1px solid #d1d5db;
 
-            border-radius: 12px;
+            border-radius:
+                10px;
 
             padding:
-                13px 15px;
+                12px 14px;
 
-            font-size: 16px;
+            font-size:
+                15px;
 
             font-family:
                 inherit;
 
-            background:
-                #ffffff;
-
-            color:
-                #172033;
-
             outline: none;
+
+            background:
+                white;
 
             transition:
                 0.2s;
@@ -298,9 +355,14 @@
 
         #submitProblemForm textarea {
 
-            min-height: 110px;
+            resize:
+                vertical;
 
-            resize: vertical;
+            min-height:
+                90px;
+
+            line-height:
+                1.6;
 
         }
 
@@ -313,66 +375,111 @@
                 #2563eb;
 
             box-shadow:
-                0 0 0 4px
-                rgba(37,99,235,0.10);
-
-        }
-
-
-        /* ==================================================
-           CLASS SELECT
-        ================================================== */
-
-        .class-box {
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #eff6ff,
-                    #eef2ff
+                0 0 0 3px
+                rgba(
+                    37,
+                    99,
+                    235,
+                    0.10
                 );
 
-            border:
-                1px solid #bfdbfe;
+        }
+
+
+        /* ===============================
+           IMAGE UPLOAD
+        =============================== */
+
+        .image-upload-box {
+
+            margin-top:
+                12px;
 
             padding:
-                16px;
-
-            border-radius:
-                16px;
-
-            margin-top:
                 18px;
 
+            border:
+                2px dashed #cbd5e1;
+
+            border-radius:
+                14px;
+
+            background:
+                #f8fafc;
+
+            text-align:
+                center;
+
         }
 
 
-        .class-box label {
+        .image-upload-box input[type="file"] {
 
-            margin-top: 0 !important;
+            width: 100%;
 
-            color:
-                #1d4ed8 !important;
+            padding:
+                10px;
+
+            border:
+                1px solid #d1d5db;
+
+            border-radius:
+                8px;
+
+            background:
+                white;
 
         }
 
 
-        .class-hint {
-
-            font-size: 13px;
-
-            color:
-                #64748b;
+        .upload-hint {
 
             margin-top:
-                7px;
+                8px;
+
+            color:
+                #6b7280;
+
+            font-size:
+                13px;
 
         }
 
 
-        /* ==================================================
-           SOLUTION SECTION
-        ================================================== */
+        .image-preview {
+
+            margin-top:
+                15px;
+
+            display:
+                none;
+
+        }
+
+
+        .image-preview img {
+
+            max-width:
+                100%;
+
+            max-height:
+                280px;
+
+            border-radius:
+                12px;
+
+            border:
+                1px solid #e5e7eb;
+
+            object-fit:
+                contain;
+
+        }
+
+
+        /* ===============================
+           SOLUTIONS
+        =============================== */
 
         .submit-solution-header {
 
@@ -390,27 +497,19 @@
             margin-bottom:
                 5px !important;
 
-            border-bottom:
-                none !important;
-
         }
 
 
         .submit-solution-header p {
 
-            margin: 0;
-
             color:
-                #64748b;
+                #6b7280;
 
-            font-size: 14px;
+            font-size:
+                13px;
 
         }
 
-
-        /* ==================================================
-           SOLUTION CARD
-        ================================================== */
 
         .submit-solutions {
 
@@ -420,21 +519,22 @@
             flex-direction:
                 column;
 
-            gap: 15px;
+            gap:
+                15px;
 
         }
 
 
         .solution-step {
 
-            background:
-                #f8fafc;
-
             border:
-                1px solid #e2e8f0;
+                1px solid #dbeafe;
+
+            background:
+                #f8fbff;
 
             border-radius:
-                16px;
+                14px;
 
             padding:
                 18px;
@@ -444,35 +544,39 @@
 
         .solution-step-header {
 
-            display: flex;
-
-            align-items: center;
+            display:
+                flex;
 
             justify-content:
                 space-between;
 
+            align-items:
+                center;
+
             margin-bottom:
-                8px;
+                12px;
 
         }
 
 
         .solution-step-header h4 {
 
-            margin: 0;
+            margin:
+                0;
 
             color:
-                #2563eb;
+                #1d4ed8;
 
             font-size:
-                17px;
+                16px;
 
         }
 
 
         .remove-step {
 
-            border: none;
+            border:
+                none;
 
             background:
                 #fee2e2;
@@ -486,9 +590,11 @@
             border-radius:
                 8px;
 
-            cursor: pointer;
+            cursor:
+                pointer;
 
-            font-weight: 600;
+            font-size:
+                13px;
 
         }
 
@@ -501,66 +607,34 @@
         }
 
 
-        /* ==================================================
-           ADD STEP
-        ================================================== */
-
-        #addSubmitSolutionButton {
+        .add-button {
 
             margin-top:
                 15px;
 
-            width: 100%;
-
-            padding:
-                13px;
-
-            border: none;
-
-            border-radius:
-                12px;
-
-            background:
-                #eef2ff;
-
-            color:
-                #4338ca;
-
-            font-weight:
-                700;
-
-            cursor:
-                pointer;
-
         }
 
 
-        #addSubmitSolutionButton:hover {
-
-            background:
-                #e0e7ff;
-
-        }
-
-
-        /* ==================================================
+        /* ===============================
            SUBMIT BUTTON
-        ================================================== */
+        =============================== */
 
-        #submitButton {
+        .save-button {
 
-            width: 100%;
+            width:
+                100%;
 
             margin-top:
-                25px;
+                24px;
 
             padding:
-                15px;
+                14px 20px;
 
-            border: none;
+            border:
+                none;
 
             border-radius:
-                13px;
+                11px;
 
             background:
                 linear-gradient(
@@ -573,17 +647,13 @@
                 white;
 
             font-size:
-                17px;
+                16px;
 
             font-weight:
-                800;
+                700;
 
             cursor:
                 pointer;
-
-            box-shadow:
-                0 8px 20px
-                rgba(37,99,235,0.25);
 
             transition:
                 0.2s;
@@ -591,22 +661,18 @@
         }
 
 
-        #submitButton:hover {
+        .save-button:hover {
 
             transform:
                 translateY(-1px);
 
-            box-shadow:
-                0 12px 25px
-                rgba(37,99,235,0.3);
-
         }
 
 
-        #submitButton:disabled {
+        .save-button:disabled {
 
             opacity:
-                0.6;
+                0.65;
 
             cursor:
                 not-allowed;
@@ -617,9 +683,9 @@
         }
 
 
-        /* ==================================================
+        /* ===============================
            MESSAGE
-        ================================================== */
+        =============================== */
 
         .submit-message {
 
@@ -630,10 +696,13 @@
                 13px 15px;
 
             border-radius:
-                12px;
+                10px;
 
-            font-weight:
-                600;
+            font-size:
+                14px;
+
+            line-height:
+                1.5;
 
         }
 
@@ -660,63 +729,27 @@
         }
 
 
-        /* ==================================================
-           CLASS BADGE
-        ================================================== */
-
-        .problem-class {
-
-            display:
-                inline-block;
-
-            margin-left:
-                6px;
-
-            padding:
-                5px 10px;
-
-            border-radius:
-                999px;
-
-            background:
-                #ede9fe;
-
-            color:
-                #6d28d9;
-
-            font-size:
-                12px;
-
-            font-weight:
-                700;
-
-        }
-
-
-        /* ==================================================
+        /* ===============================
            MOBILE
-        ================================================== */
+        =============================== */
 
-        @media (max-width: 700px) {
+        @media (max-width: 600px) {
 
             .modal {
 
                 padding:
                     10px;
 
-                align-items:
-                    flex-end;
-
             }
 
 
-            .submit-modal {
+            .modal-content {
 
                 max-height:
-                    94vh;
+                    calc(100vh - 20px);
 
                 border-radius:
-                    20px 20px 0 0;
+                    16px;
 
             }
 
@@ -724,18 +757,7 @@
             .modal-header {
 
                 padding:
-                    22px;
-
-                border-radius:
-                    20px 20px 0 0;
-
-            }
-
-
-            #submitProblemForm {
-
-                padding:
-                    22px;
+                    18px;
 
             }
 
@@ -743,7 +765,26 @@
             .modal-header h2 {
 
                 font-size:
-                    21px;
+                    20px;
+
+            }
+
+
+            #submitProblemForm {
+
+                padding:
+                    18px;
+
+            }
+
+
+            .user-area {
+
+                flex-wrap:
+                    wrap;
+
+                justify-content:
+                    flex-end;
 
             }
 
@@ -766,6 +807,8 @@
     <div class="navbar-inner">
 
 
+        <!-- LOGO -->
+
         <div class="logo-text">
 
             🤖
@@ -776,6 +819,8 @@
 
         </div>
 
+
+        <!-- USER -->
 
         <div
             id="userArea"
@@ -815,6 +860,8 @@
             สำหรับอุปกรณ์ IoT และระบบ Robotics
         </p>
 
+
+        <!-- SEARCH -->
 
         <div class="search-box">
 
@@ -949,6 +996,8 @@
         </div>
 
 
+        <!-- LOADING -->
+
         <div
             id="loading"
             class="loading"
@@ -957,12 +1006,16 @@
         </div>
 
 
+        <!-- PROBLEM LIST -->
+
         <div
             id="problemList"
             class="problem-grid"
         >
         </div>
 
+
+        <!-- NO RESULT -->
 
         <div
             id="noResult"
@@ -1005,8 +1058,8 @@
                 </h2>
 
                 <p class="modal-subtitle">
-                    กรอกข้อมูลให้ครบถ้วน
-                    เพื่อส่งให้ Admin ตรวจสอบ
+                    กรอกข้อมูลที่พบ ระบบจะส่งให้ Admin
+                    ตรวจสอบก่อนเผยแพร่
                 </p>
 
             </div>
@@ -1032,7 +1085,9 @@
         >
 
 
-            <!-- PROBLEM -->
+            <!-- =========================
+                 PROBLEM
+            ========================= -->
 
             <h3>
                 📋 ข้อมูลปัญหา
@@ -1041,12 +1096,9 @@
 
             <!-- TITLE -->
 
-            <label
-                for="submitTitle"
-            >
+            <label for="submitTitle">
                 ชื่อปัญหา *
             </label>
-
 
             <input
                 type="text"
@@ -1056,33 +1108,25 @@
             >
 
 
-
             <!-- DESCRIPTION -->
 
-            <label
-                for="submitDescription"
-            >
+            <label for="submitDescription">
                 รายละเอียดปัญหา *
             </label>
-
 
             <textarea
                 id="submitDescription"
                 rows="4"
-                placeholder="อธิบายรายละเอียดของปัญหา..."
+                placeholder="อธิบายรายละเอียดของปัญหา"
                 required
             ></textarea>
 
 
-
             <!-- CATEGORY -->
 
-            <label
-                for="submitCategory"
-            >
+            <label for="submitCategory">
                 หมวดหมู่ *
             </label>
-
 
             <select
                 id="submitCategory"
@@ -1124,100 +1168,105 @@
             </select>
 
 
-
             <!-- CLASS -->
 
-            <div class="class-box">
+            <label for="submitClass">
+                ระดับ Class
+            </label>
 
-                <label
-                    for="submitClass"
+            <select
+                id="submitClass"
+                name="class_name"
+                required
+            >
+                <option value="">
+                    -- เลือก Class --
+                </option>
+                <option value="idektep Lv.1">idektep Lv.1</option>
+                <option value="idektep Lv.2">idektep Lv.2</option>
+                <option value="idektep Lv.3">idektep Lv.3</option>
+                <option value="idektep Lv.4">idektep Lv.4</option>
+                <option value="idektep Lv.5">idektep Lv.5</option>
+            </select>
+
+
+            <!-- SYMPTOMS -->
+
+            <label for="submitSymptoms">
+                อาการที่พบ
+            </label>
+
+            <textarea
+                id="submitSymptoms"
+                rows="3"
+                placeholder="เช่น เปิดโปรแกรมแล้วไม่พบอุปกรณ์"
+            ></textarea>
+
+
+            <!-- CAUSES -->
+
+            <label for="submitCauses">
+                สาเหตุที่คาดว่าเกิดจาก
+            </label>
+
+            <textarea
+                id="submitCauses"
+                rows="3"
+                placeholder="เช่น สาย USB หรือ Driver"
+            ></textarea>
+
+
+
+            <!-- =========================
+                 IMAGE
+            ========================= -->
+
+            <h3>
+                🖼️ รูปภาพปัญหา
+            </h3>
+
+
+            <div class="image-upload-box">
+
+                <input
+                    type="file"
+                    id="submitProblemImage"
+                    accept="image/jpeg,image/png,image/webp"
                 >
-                    🎓 Class *
-                </label>
+
+                <div class="upload-hint">
+
+                    รองรับ JPG, PNG, WEBP
+                    ขนาดไม่เกิน 5 MB
+
+                </div>
 
 
-                <select
-                    id="submitClass"
-                    required
+                <div
+                    id="problemImagePreview"
+                    class="image-preview"
                 >
 
-                    <option value="">
-                        -- เลือก Class --
-                    </option>
+                    <img
+                        id="problemPreviewImage"
+                        src=""
+                        alt="ตัวอย่างรูปปัญหา"
+                    >
 
-                    <option value="idektep Lv.1">
-                        idektep Lv.1
-                    </option>
-
-                    <option value="idektep Lv.2">
-                        idektep Lv.2
-                    </option>
-
-                    <option value="idektep Lv.3">
-                        idektep Lv.3
-                    </option>
-
-                    <option value="idektep Lv.4">
-                        idektep Lv.4
-                    </option>
-
-                    <option value="idektep Lv.5">
-                        idektep Lv.5
-                    </option>
-
-                </select>
-
-
-                <div class="class-hint">
-                    เลือกระดับ Class ที่เกี่ยวข้องกับปัญหานี้
                 </div>
 
             </div>
 
 
 
-            <!-- SYMPTOMS -->
+            <!-- =========================
+                 SOLUTIONS
+            ========================= -->
 
-            <label
-                for="submitSymptoms"
-            >
-                ⚠️ อาการที่พบ
-            </label>
-
-
-            <textarea
-                id="submitSymptoms"
-                rows="3"
-                placeholder="อธิบายอาการที่พบ..."
-            ></textarea>
-
-
-
-            <!-- CAUSES -->
-
-            <label
-                for="submitCauses"
-            >
-                🔎 สาเหตุที่คาดว่าเกิดจาก
-            </label>
-
-
-            <textarea
-                id="submitCauses"
-                rows="3"
-                placeholder="อธิบายสาเหตุที่เป็นไปได้..."
-            ></textarea>
-
-
-
-            <!-- SOLUTIONS -->
-
-            <div
-                class="submit-solution-header"
-            >
+            <div class="submit-solution-header">
 
                 <h3>
-                    🛠 วิธีแก้ไข
+                    🛠️ วิธีแก้ไขปัญหา
                 </h3>
 
                 <p>
@@ -1234,11 +1283,14 @@
             </div>
 
 
+            <!-- ADD STEP -->
+
             <button
                 type="button"
                 id="addSubmitSolutionButton"
+                class="add-button"
             >
-                + เพิ่มขั้นตอนการแก้ไข
+                + เพิ่มขั้นตอน
             </button>
 
 
@@ -1259,6 +1311,7 @@
             <button
                 type="submit"
                 id="submitButton"
+                class="save-button"
             >
                 🚀 ส่งปัญหาให้ Admin ตรวจสอบ
             </button>
