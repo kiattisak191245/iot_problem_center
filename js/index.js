@@ -10,6 +10,7 @@
 let allProblems = [];
 
 let currentCategory = "all";
+let currentClass = "all";
 
 let solutionStepCount = 0;
 
@@ -557,6 +558,7 @@ async function loadProblems() {
                     title,
                     description,
                     category,
+                    class_name,
                     symptoms,
                     causes,
                     status,
@@ -721,10 +723,22 @@ function renderProblems() {
                     currentCategory;
 
 
+                const matchClass =
+
+                    currentClass ===
+                    "all"
+
+                    ||
+
+                    problem.class_name ===
+                    currentClass;
+
+
 
                 return (
                     matchSearch &&
-                    matchCategory
+                    matchCategory &&
+                    matchClass
                 );
 
             }
@@ -779,14 +793,23 @@ function renderProblems() {
 
             card.innerHTML = `
 
-                <span
-                    class="problem-category"
-                >
-                    ${escapeHtml(
-                        problem.category ||
-                        "ทั่วไป"
-                    )}
-                </span>
+                <div class="problem-badges">
+
+                    <span class="problem-category">
+                        ${escapeHtml(
+                            problem.category ||
+                            "ทั่วไป"
+                        )}
+                    </span>
+
+                    <span class="problem-class">
+                        🎓 ${escapeHtml(
+                            problem.class_name ||
+                            "ไม่ระบุ Class"
+                        )}
+                    </span>
+
+                </div>
 
 
                 <h3>
@@ -903,6 +926,52 @@ document
         }
     );
 
+
+
+// ==================================================
+// CLASS FILTER
+// ==================================================
+
+document
+    .querySelectorAll(
+        ".class-filter-button"
+    )
+    .forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    document
+                        .querySelectorAll(
+                            ".class-filter-button"
+                        )
+                        .forEach(
+                            btn => {
+
+                                btn.classList.remove(
+                                    "active"
+                                );
+
+                            }
+                        );
+
+                    button.classList.add(
+                        "active"
+                    );
+
+                    currentClass =
+                        button.dataset.class ||
+                        "all";
+
+                    renderProblems();
+
+                }
+            );
+
+        }
+    );
 
 
 // ==================================================
