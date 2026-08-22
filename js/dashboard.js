@@ -484,9 +484,44 @@ async function loadProblems() {
         }
 
 
-        allProblems =
-            data || [];
+        // โหลดรูปภาพของแต่ละปัญหาเพิ่มเติม
+        const {
+            data: imageRows,
+            error: imageLoadError
+        } = await supabaseClient
+            .from("problem_images")
+            .select("problem_id, image_url, caption, created_at")
+            .order("created_at", { ascending: false });
 
+        if (imageLoadError) {
+            console.warn("LOAD PROBLEM IMAGES ERROR:", imageLoadError);
+        }
+
+        const latestImageByProblem = new Map();
+
+        (imageRows || []).forEach((row) => {
+            if (
+                row &&
+                row.problem_id &&
+                row.image_url &&
+                !latestImageByProblem.has(String(row.problem_id))
+            ) {
+                latestImageByProblem.set(
+                    String(row.problem_id),
+                    row
+                );
+            }
+        });
+
+        allProblems = (data || []).map((problem) => ({
+            ...problem,
+            image_url:
+                latestImageByProblem.get(String(problem.id))?.image_url ||
+                null,
+            image_caption:
+                latestImageByProblem.get(String(problem.id))?.caption ||
+                ""
+        }));
 
         renderProblems(
             allProblems
@@ -747,6 +782,36 @@ function renderProblems(
                     ${statusBadge}
 
                 </div>
+
+
+                ${
+                    problem.image_url
+                        ? `
+                            <div
+                                style="
+                                    margin:0 0 16px 0;
+                                    border-radius:12px;
+                                    overflow:hidden;
+                                    background:#f8fafc;
+                                    border:1px solid #e2e8f0;
+                                "
+                            >
+                                <img
+                                    src="${escapeHtml(problem.image_url)}"
+                                    alt="${escapeHtml(problem.title || "รูปภาพปัญหา")}"
+                                    style="
+                                        width:100%;
+                                        max-height:240px;
+                                        object-fit:contain;
+                                        display:block;
+                                        background:#f8fafc;
+                                    "
+                                    loading="lazy"
+                                >
+                            </div>
+                        `
+                        : ""
+                }
 
 
                 <h3
