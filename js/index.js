@@ -637,7 +637,7 @@ async function loadProblems() {
 
 
 // ==================================================
-// RENDER PROBLEMS
+// FILTER VALUE NORMALIZATION
 // ==================================================
 
 function normalizeFilterValue(value) {
@@ -650,11 +650,20 @@ function normalizeFilterValue(value) {
 
 function normalizeClassValue(value) {
     let text = normalizeFilterValue(value);
-    if (text === "" || text === "all" || text === "ทั้งหมด") {
+
+    if (!text || text === "all" || text === "ทั้งหมด") {
         return "all";
     }
-    return text.replace(/lv\.\s+/g, "lv.");
+
+    // Keep "idektep lv.1" ... "idektep lv.5" consistent.
+    text = text.replace(/lv\s*\.\s*/g, "lv.");
+    return text;
 }
+
+
+// ==================================================
+// RENDER PROBLEMS
+// ==================================================
 
 function renderProblems() {
 
@@ -898,10 +907,7 @@ if (searchInput) {
 // CATEGORY
 // ==================================================
 
-document
-    .querySelectorAll(
-        ".category-button"
-    )
+document.querySelectorAll("#categories .category-button")
     .forEach(
         button => {
 
@@ -910,10 +916,7 @@ document
                 () => {
 
 
-                    document
-                        .querySelectorAll(
-                            ".category-button"
-                        )
+                    document.querySelectorAll("#categories .category-button")
                         .forEach(
                             btn => {
 
@@ -948,10 +951,7 @@ document
 // CLASS FILTER
 // ==================================================
 
-document
-    .querySelectorAll(
-        ".class-filter-button"
-    )
+document.querySelectorAll("#classFilters .class-filter-button")
     .forEach(
         button => {
 
@@ -959,10 +959,7 @@ document
                 "click",
                 () => {
 
-                    document
-                        .querySelectorAll(
-                            ".class-filter-button"
-                        )
+                    document.querySelectorAll("#classFilters .class-filter-button")
                         .forEach(
                             btn => {
 
@@ -978,8 +975,7 @@ document
                     );
 
                     currentClass =
-                        button.dataset.class ||
-                        "all";
+                        (button.dataset.class || "all").trim();
 
                     renderProblems();
 
@@ -2105,3 +2101,19 @@ if (submitProblemForm) {
 checkLogin();
 
 loadProblems();
+
+// ==================================================
+// FILTER DIAGNOSTIC
+// ==================================================
+console.log(
+    "Filter ready:",
+    document.querySelectorAll("#categories .category-button").length,
+    "category buttons,",
+    document.querySelectorAll("#classFilters .class-filter-button").length,
+    "class buttons"
+);
+
+if (!document.querySelectorAll("#classFilters .class-filter-button").length) {
+    console.warn("CLASS FILTER BUTTONS NOT FOUND");
+}
+
