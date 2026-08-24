@@ -663,39 +663,36 @@
                         ระดับ Class
                     </label>
 
-                    <select
+                    <div
                         id="class_name"
-                        name="class_name"
-                        multiple
-                        size="5"
-                        required
-                        style="min-height:140px;"
+                        role="group"
+                        aria-label="ระดับ Class"
+                        style="display:flex;flex-direction:column;gap:10px;border:1px solid #cbd5e1;border-radius:12px;padding:14px 16px;background:#fff;"
                     >
-
-                        <option value="idektep Lv.1">
-                            idektep Lv.1
-                        </option>
-
-                        <option value="idektep Lv.2">
-                            idektep Lv.2
-                        </option>
-
-                        <option value="idektep Lv.3">
-                            idektep Lv.3
-                        </option>
-
-                        <option value="idektep Lv.4">
-                            idektep Lv.4
-                        </option>
-
-                        <option value="idektep Lv.5">
-                            idektep Lv.5
-                        </option>
-
-                    </select>
+                        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:400;">
+                            <input type="checkbox" name="class_name" value="idektep Lv.1" style="width:18px;height:18px;cursor:pointer;">
+                            <span>idektep Lv.1</span>
+                        </label>
+                        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:400;">
+                            <input type="checkbox" name="class_name" value="idektep Lv.2" style="width:18px;height:18px;cursor:pointer;">
+                            <span>idektep Lv.2</span>
+                        </label>
+                        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:400;">
+                            <input type="checkbox" name="class_name" value="idektep Lv.3" style="width:18px;height:18px;cursor:pointer;">
+                            <span>idektep Lv.3</span>
+                        </label>
+                        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:400;">
+                            <input type="checkbox" name="class_name" value="idektep Lv.4" style="width:18px;height:18px;cursor:pointer;">
+                            <span>idektep Lv.4</span>
+                        </label>
+                        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:400;">
+                            <input type="checkbox" name="class_name" value="idektep Lv.5" style="width:18px;height:18px;cursor:pointer;">
+                            <span>idektep Lv.5</span>
+                        </label>
+                    </div>
 
                     <small>
-                        สามารถเลือกได้มากกว่า 1 Class (กด Ctrl ค้างไว้แล้วคลิก หรือใช้ Shift เพื่อเลือกเป็นช่วง)
+                        ติ๊กเลือกได้มากกว่า 1 Class
                     </small>
 
                 </div>
@@ -819,11 +816,13 @@
                     <div
                         id="problemImageDropZone"
                         class="image-drop-zone"
-                        style="border:2px dashed #cbd5e1;border-radius:12px;padding:24px;text-align:center;background:#f8fafc;cursor:pointer;transition:all .2s ease;"
+                        tabindex="0"
+                        role="button"
+                        style="border:2px dashed #cbd5e1;border-radius:12px;padding:24px;text-align:center;background:#f8fafc;cursor:pointer;transition:all .2s ease;outline:none;"
                     >
                         <div style="font-size:32px;margin-bottom:8px;">🖼️</div>
                         <strong style="display:block;color:#334155;">ลากรูปภาพมาวางที่นี่</strong>
-                        <span style="display:block;margin:6px 0;color:#64748b;">หรือคลิกเพื่อเลือกไฟล์</span>
+                        <span style="display:block;margin:6px 0;color:#64748b;">หรือคลิกเพื่อเลือกไฟล์ / กด Ctrl+V เพื่อวางรูป</span>
                         <small style="color:#94a3b8;">JPG, PNG, WEBP ขนาดไม่เกิน 5 MB</small>
                         <input
                             type="file"
@@ -1121,11 +1120,13 @@
                     <div
                         id="solutionImageDropZone"
                         class="image-drop-zone"
-                        style="border:2px dashed #cbd5e1;border-radius:12px;padding:24px;text-align:center;background:#f8fafc;cursor:pointer;transition:all .2s ease;"
+                        tabindex="0"
+                        role="button"
+                        style="border:2px dashed #cbd5e1;border-radius:12px;padding:24px;text-align:center;background:#f8fafc;cursor:pointer;transition:all .2s ease;outline:none;"
                     >
                         <div style="font-size:32px;margin-bottom:8px;">🖼️</div>
                         <strong style="display:block;color:#334155;">ลากรูปภาพมาวางที่นี่</strong>
-                        <span style="display:block;margin:6px 0;color:#64748b;">หรือคลิกเพื่อเลือกไฟล์</span>
+                        <span style="display:block;margin:6px 0;color:#64748b;">หรือคลิกเพื่อเลือกไฟล์ / กด Ctrl+V เพื่อวางรูป</span>
                         <small style="color:#94a3b8;">JPG, PNG, WEBP ขนาดไม่เกิน 5 MB</small>
                         <input
                             type="file"
