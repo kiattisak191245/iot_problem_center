@@ -1186,6 +1186,17 @@ function resetProblemForm() {
 
         form.reset();
 
+        // Reset Class checkboxes explicitly
+        if ($("class_name")) {
+            Array.from(
+                $("class_name").querySelectorAll(
+                    'input[type="checkbox"][name="class_name"]'
+                )
+            ).forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        }
+
     }
 
 
@@ -1284,11 +1295,13 @@ function editProblem(id) {
             .filter(Boolean);
 
         Array.from(
-            $("class_name").options
-        ).forEach(option => {
-            option.selected =
+            $("class_name").querySelectorAll(
+                'input[type="checkbox"][name="class_name"]'
+            )
+        ).forEach(checkbox => {
+            checkbox.checked =
                 savedClasses.includes(
-                    option.value
+                    checkbox.value
                 );
         });
 
@@ -1724,9 +1737,11 @@ async function saveProblem(
     const className =
         $("class_name")
             ? Array.from(
-                $("class_name").selectedOptions
+                $("class_name").querySelectorAll(
+                    'input[type="checkbox"][name="class_name"]:checked'
+                )
             )
-                .map(option => option.value)
+                .map(checkbox => checkbox.value)
                 .filter(Boolean)
                 .join(", ")
             : "";
@@ -3164,6 +3179,69 @@ function setupImageDropZone(
     };
 
     dropZone.addEventListener("click", openFilePicker);
+
+    dropZone.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            openFilePicker();
+        }
+    });
+
+    // ให้กด Ctrl+V หลังจากคลิก/โฟกัสช่องนี้ เพื่อวางรูปจาก Clipboard ได้
+    dropZone.addEventListener("paste", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const items = event.clipboardData?.items || [];
+        let imageItem = null;
+
+        for (const item of items) {
+            if (item.type && item.type.startsWith("image/")) {
+                imageItem = item;
+                break;
+            }
+        }
+
+        if (!imageItem) {
+            showMessage("Clipboard ไม่มีรูปภาพ กรุณา Copy รูปภาพก่อนกด Ctrl+V", "error");
+            return;
+        }
+
+        const blob = imageItem.getAsFile();
+
+        if (!blob) {
+            showMessage("ไม่สามารถอ่านรูปภาพจาก Clipboard ได้", "error");
+            return;
+        }
+
+        const extensionMap = {
+            "image/jpeg": "jpg",
+            "image/png": "png",
+            "image/webp": "webp"
+        };
+
+        const extension = extensionMap[blob.type] || "png";
+        const file = new File(
+            [blob],
+            `pasted-image-${Date.now()}.${extension}`,
+            { type: blob.type }
+        );
+
+        try {
+            validateImageFile(file);
+
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            input.files = dataTransfer.files;
+            input.dispatchEvent(
+                new Event("change", { bubbles: true })
+            );
+            setDropZoneState(false);
+        }
+        catch (error) {
+            showMessage(error.message, "error");
+        }
+    });
 
     ["dragenter", "dragover"].forEach((eventName) => {
         dropZone.addEventListener(eventName, (event) => {
