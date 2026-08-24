@@ -4,865 +4,738 @@
 <head>
 
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Support Problem — for Coach &amp; Trainer</title>
 
-    <link
-        rel="stylesheet"
-        href="css/style.css"
-    >
-   
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
 
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-
-    <!-- ==================================================
-         MODAL STYLE
-    ================================================== -->
-
     <style>
+
+        :root{
+            --ink:#0B0D10;
+            --panel:#15181D;
+            --panel-2:#1B1F25;
+            --panel-3:#20242B;
+            --border:#282D34;
+            --border-bright:#3A414A;
+            --accent:#5EE6A6;
+            --accent-strong:#3ED98D;
+            --accent-soft:rgba(94,230,166,.10);
+            --accent-soft-2:rgba(94,230,166,.18);
+            --text:#EDEFF1;
+            --text-muted:#83898F;
+            --text-faint:#565C63;
+            --danger:#F0716D;
+            --danger-soft:rgba(240,113,109,.12);
+        }
+
+        *{ box-sizing:border-box; }
+        html,body{ margin:0; padding:0; }
+
+        body{
+            background:var(--ink);
+            color:var(--text);
+            font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;
+            font-size:15px;
+            line-height:1.6;
+        }
+
+        h1,h2,h3,h4{
+            font-family:'Chakra Petch',sans-serif;
+            font-weight:600;
+            color:var(--text);
+            margin:0;
+        }
+
+        p{ margin:0; }
+        a{ color:inherit; }
+        button{ font-family:inherit; }
+
+        /* ===============================
+           NAVBAR
+        =============================== */
+
+        .navbar{
+            position:sticky;
+            top:0;
+            z-index:100;
+            background:rgba(11,13,16,.85);
+            backdrop-filter:blur(10px);
+            border-bottom:1px solid var(--border);
+        }
+
+        .navbar-inner{
+            max-width:1120px;
+            margin:0 auto;
+            padding:14px 24px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+        }
+
+        .logo-text{
+            display:flex;
+            align-items:center;
+            gap:11px;
+            text-decoration:none;
+        }
+
+        .brand-mark img{
+            width:32px;
+            height:32px;
+            border-radius:8px;
+            display:block;
+        }
+
+        .brand-copy strong{
+            font-family:'Chakra Petch',sans-serif;
+            font-weight:600;
+            font-size:15px;
+            color:var(--text);
+            display:block;
+        }
+
+        .brand-copy strong em{
+            font-style:normal;
+            color:var(--accent);
+        }
+
+        .brand-copy small{
+            display:block;
+            font-size:11px;
+            color:var(--text-faint);
+            margin-top:1px;
+        }
+
+        .user-area{
+            display:flex;
+            align-items:center;
+            gap:10px;
+        }
+
+        .login-link{
+            text-decoration:none;
+            font-size:13.5px;
+            font-weight:600;
+            color:var(--ink);
+            background:var(--accent);
+            padding:9px 18px;
+            border-radius:8px;
+            transition:opacity .15s ease;
+        }
+
+        .login-link:hover{ opacity:.88; }
+
+        /* ===============================
+           HERO
+        =============================== */
+
+        .hero{
+            padding:76px 24px 56px;
+            text-align:center;
+            border-bottom:1px solid var(--border);
+        }
+
+        .hero-content{
+            max-width:640px;
+            margin:0 auto;
+        }
+
+        .hero h1{
+            font-size:32px;
+            line-height:1.35;
+            letter-spacing:.005em;
+        }
+
+        .hero p{
+            margin-top:14px;
+            color:var(--text-muted);
+            font-size:15px;
+            line-height:1.7;
+        }
+
+        .search-box{
+            margin-top:30px;
+        }
+
+        .search-box input{
+            width:100%;
+            background:var(--panel);
+            border:1px solid var(--border);
+            border-radius:11px;
+            padding:15px 18px;
+            font-family:inherit;
+            font-size:14.5px;
+            color:var(--text);
+            transition:border-color .15s ease, box-shadow .15s ease;
+        }
+
+        .search-box input::placeholder{ color:var(--text-faint); }
+
+        .search-box input:focus{
+            outline:none;
+            border-color:var(--accent);
+            box-shadow:0 0 0 3px var(--accent-soft);
+        }
+
+        /* ===============================
+           SECTIONS
+        =============================== */
+
+        .section{
+            padding:40px 24px;
+            border-bottom:1px solid var(--border);
+        }
+
+        .section-container{
+            max-width:1120px;
+            margin:0 auto;
+        }
+
+        .section h2{
+            font-size:17px;
+            margin-bottom:16px;
+        }
+
+        .section-title{
+            display:flex;
+            justify-content:space-between;
+            align-items:flex-end;
+            margin-bottom:20px;
+        }
+
+        .section-title h2{ margin-bottom:5px; }
+
+        .section-title p{
+            color:var(--text-muted);
+            font-size:13.5px;
+        }
+
+        /* ===============================
+           CATEGORY / CLASS FILTER PILLS
+        =============================== */
+
+        .categories{
+            display:flex;
+            flex-wrap:wrap;
+            gap:8px;
+        }
+
+        .category-button{
+            border:1px solid var(--border);
+            background:var(--panel);
+            color:var(--text-muted);
+            padding:9px 16px;
+            border-radius:999px;
+            font-size:13px;
+            font-weight:500;
+            cursor:pointer;
+            transition:border-color .15s ease, color .15s ease, background .15s ease;
+        }
+
+        .category-button:hover{
+            border-color:var(--border-bright);
+            color:var(--text);
+        }
+
+        .category-button.active{
+            background:var(--accent-soft-2);
+            border-color:var(--accent);
+            color:var(--accent);
+            font-weight:600;
+        }
+
+        .class-filter-section{
+            padding-top:8px;
+            padding-bottom:40px;
+        }
+
+        .filter-heading-row{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:20px;
+            margin-bottom:16px;
+        }
+
+        .filter-heading-row h2{ margin:0; }
+
+        .filter-description{
+            margin:6px 0 0;
+            color:var(--text-muted);
+            font-size:13.5px;
+        }
+
+        .class-filters{ gap:8px; }
+
+        .problem-badges{
+            display:flex;
+            align-items:center;
+            gap:8px;
+            flex-wrap:wrap;
+            margin-bottom:10px;
+        }
+
+        .problem-class{
+            display:inline-flex;
+            align-items:center;
+            gap:5px;
+            padding:5px 11px;
+            border-radius:999px;
+            background:var(--panel-3);
+            border:1px solid var(--border);
+            color:var(--text-muted);
+            font-size:11.5px;
+            font-weight:600;
+        }
+
+        /* ===============================
+           PROBLEM GRID
+        =============================== */
+
+        .problems-section{ border-bottom:none; }
+
+        .loading,
+        .no-result{
+            text-align:center;
+            padding:48px 24px;
+            color:var(--text-muted);
+            font-size:14px;
+        }
+
+        .problem-grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));
+            gap:16px;
+        }
+
+        /* Baseline styling applied to whatever cards index.js injects,
+           regardless of the exact class name it assigns. */
+        .problem-grid > *{
+            background:var(--panel);
+            border:1px solid var(--border);
+            border-radius:14px;
+            padding:20px;
+            cursor:pointer;
+            transition:border-color .15s ease, transform .15s ease;
+        }
+
+        .problem-grid > *:hover{
+            border-color:var(--border-bright);
+            transform:translateY(-2px);
+        }
+
+        .problem-grid h3,
+        .problem-grid h4{
+            font-size:15.5px;
+            margin-bottom:8px;
+            color:var(--text);
+        }
+
+        .problem-grid p{
+            color:var(--text-muted);
+            font-size:13.5px;
+            line-height:1.6;
+        }
 
         /* ===============================
            ADD BUTTON
         =============================== */
 
-        .add-button {
-
-            border: none;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #2563eb,
-                    #4f46e5
-                );
-
-            color: white;
-
-            padding:
-                11px 18px;
-
-            border-radius: 10px;
-
-            cursor: pointer;
-
-            font-size: 14px;
-
-            font-weight: 600;
-
-            transition:
-                0.2s;
-
-            box-shadow:
-                0 5px 15px
-                rgba(
-                    37,
-                    99,
-                    235,
-                    0.20
-                );
-
+        .add-button{
+            border:1px dashed var(--border-bright);
+            background:transparent;
+            color:var(--text-muted);
+            padding:11px 18px;
+            border-radius:10px;
+            cursor:pointer;
+            font-size:13.5px;
+            font-weight:600;
+            transition:.15s ease;
         }
 
-
-        .add-button:hover {
-
-            transform:
-                translateY(-2px);
-
-            box-shadow:
-                0 8px 20px
-                rgba(
-                    37,
-                    99,
-                    235,
-                    0.30
-                );
-
+        .add-button:hover{
+            border-color:var(--accent);
+            color:var(--accent);
         }
-
 
         /* ===============================
            MODAL
         =============================== */
 
-        .modal {
-
-            position: fixed;
-
-            inset: 0;
-
-            background:
-                rgba(
-                    15,
-                    23,
-                    42,
-                    0.70
-                );
-
-            display: none;
-
-            align-items: center;
-
-            justify-content: center;
-
-            padding: 20px;
-
-            z-index: 9999;
-
-            backdrop-filter:
-                blur(5px);
-
+        .modal{
+            position:fixed;
+            inset:0;
+            background:rgba(5,6,8,.72);
+            display:none;
+            align-items:center;
+            justify-content:center;
+            padding:20px;
+            z-index:9999;
+            backdrop-filter:blur(6px);
         }
 
-
-        .modal-content {
-
-            width: 100%;
-
-            max-width: 760px;
-
-            max-height:
-                calc(100vh - 40px);
-
-            overflow-y: auto;
-
-            background: white;
-
-            border-radius: 20px;
-
-            box-shadow:
-                0 25px 70px
-                rgba(
-                    0,
-                    0,
-                    0,
-                    0.30
-                );
-
-            animation:
-                modalShow
-                0.2s
-                ease;
-
+        .modal-content{
+            width:100%;
+            max-width:760px;
+            max-height:calc(100vh - 40px);
+            overflow-y:auto;
+            background:var(--panel);
+            border:1px solid var(--border);
+            border-radius:18px;
+            animation:modalShow .18s ease;
         }
 
-
-        @keyframes modalShow {
-
-            from {
-
-                opacity: 0;
-
-                transform:
-                    translateY(20px)
-                    scale(0.98);
-
-            }
-
-            to {
-
-                opacity: 1;
-
-                transform:
-                    translateY(0)
-                    scale(1);
-
-            }
-
+        @keyframes modalShow{
+            from{ opacity:0; transform:translateY(16px) scale(.98); }
+            to{ opacity:1; transform:translateY(0) scale(1); }
         }
 
-
-        /* ===============================
-           MODAL HEADER
-        =============================== */
-
-        .modal-header {
-
-            position: sticky;
-
-            top: 0;
-
-            z-index: 2;
-
-            display: flex;
-
-            justify-content:
-                space-between;
-
-            align-items:
-                flex-start;
-
-            gap: 20px;
-
-            padding:
-                24px 28px;
-
-            background: white;
-
-            border-bottom:
-                1px solid #e5e7eb;
-
+        .modal-header{
+            position:sticky;
+            top:0;
+            z-index:2;
+            display:flex;
+            justify-content:space-between;
+            align-items:flex-start;
+            gap:20px;
+            padding:24px 28px;
+            background:var(--panel);
+            border-bottom:1px solid var(--border);
         }
 
+        .modal-header h2{ font-size:19px; }
 
-        .modal-header h2 {
-
-            margin: 0;
-
-            color: #111827;
-
-            font-size: 24px;
-
+        .modal-subtitle{
+            margin-top:6px;
+            color:var(--text-muted);
+            font-size:13px;
+            line-height:1.6;
         }
 
-
-        .modal-subtitle {
-
-            margin-top: 6px;
-
-            color: #6b7280;
-
-            font-size: 14px;
-
+        .close-button{
+            width:36px;
+            height:36px;
+            border:1px solid var(--border);
+            border-radius:50%;
+            background:var(--panel-2);
+            color:var(--text-muted);
+            font-size:20px;
+            line-height:1;
+            cursor:pointer;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            flex-shrink:0;
+            transition:.15s ease;
         }
 
-
-        .close-button {
-
-            width: 40px;
-
-            height: 40px;
-
-            border: none;
-
-            border-radius: 50%;
-
-            background:
-                #f3f4f6;
-
-            color: #374151;
-
-            font-size: 26px;
-
-            cursor: pointer;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            flex-shrink: 0;
-
+        .close-button:hover{
+            background:var(--danger-soft);
+            border-color:var(--danger);
+            color:var(--danger);
         }
-
-
-        .close-button:hover {
-
-            background:
-                #fee2e2;
-
-            color:
-                #dc2626;
-
-        }
-
 
         /* ===============================
            FORM
         =============================== */
 
-        #submitProblemForm {
+        #submitProblemForm{ padding:24px 28px 30px; }
 
-            padding:
-                26px 28px 30px;
-
+        #submitProblemForm h3{
+            margin:8px 0 16px;
+            font-size:15.5px;
+            color:var(--text);
         }
 
-
-        #submitProblemForm h3 {
-
-            margin:
-                10px 0 18px;
-
-            color:
-                #111827;
-
-            font-size:
-                18px;
-
+        #submitProblemForm label{
+            display:block;
+            margin:16px 0 7px;
+            color:var(--text-muted);
+            font-size:12.5px;
+            font-weight:500;
         }
-
-
-        #submitProblemForm label {
-
-            display: block;
-
-            margin:
-                16px 0 7px;
-
-            color:
-                #374151;
-
-            font-size:
-                14px;
-
-            font-weight:
-                600;
-
-        }
-
 
         #submitProblemForm input[type="text"],
         #submitProblemForm textarea,
-        #submitProblemForm select {
-
-            width: 100%;
-
-            border:
-                1px solid #d1d5db;
-
-            border-radius:
-                10px;
-
-            padding:
-                12px 14px;
-
-            font-size:
-                15px;
-
-            font-family:
-                inherit;
-
-            outline: none;
-
-            background:
-                white;
-
-            transition:
-                0.2s;
-
+        #submitProblemForm select{
+            width:100%;
+            border:1px solid var(--border);
+            border-radius:9px;
+            padding:12px 14px;
+            font-size:14px;
+            font-family:inherit;
+            outline:none;
+            background:var(--panel-2);
+            color:var(--text);
+            transition:.15s ease;
         }
 
-
-        #submitProblemForm textarea {
-
-            resize:
-                vertical;
-
-            min-height:
-                90px;
-
-            line-height:
-                1.6;
-
+        #submitProblemForm textarea{
+            resize:vertical;
+            min-height:88px;
+            line-height:1.6;
         }
 
+        #submitProblemForm input::placeholder,
+        #submitProblemForm textarea::placeholder{ color:var(--text-faint); }
 
         #submitProblemForm input:focus,
         #submitProblemForm textarea:focus,
-        #submitProblemForm select:focus {
-
-            border-color:
-                #2563eb;
-
-            box-shadow:
-                0 0 0 3px
-                rgba(
-                    37,
-                    99,
-                    235,
-                    0.10
-                );
-
+        #submitProblemForm select:focus{
+            border-color:var(--accent);
+            box-shadow:0 0 0 3px var(--accent-soft);
         }
 
+        #submitProblemForm select{
+            appearance:none;
+            background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2383898F'/%3E%3C/svg%3E");
+            background-repeat:no-repeat;
+            background-position:right 14px center;
+            padding-right:34px;
+        }
+
+        .field-hint{
+            display:block;
+            margin-top:6px;
+            color:var(--text-faint);
+            font-size:12px;
+        }
+
+        /* CLASS PICKER CHECKBOXES */
+
+        .class-picker{
+            display:flex;
+            flex-wrap:wrap;
+            gap:8px;
+        }
+
+        .class-check{
+            display:inline-flex;
+            align-items:center;
+            gap:7px;
+            border:1px solid var(--border);
+            background:var(--panel-2);
+            padding:8px 13px;
+            border-radius:999px;
+            font-size:12.5px;
+            color:var(--text-muted);
+            cursor:pointer;
+            transition:.15s ease;
+        }
+
+        .class-check input{ display:none; }
+
+        .class-check .check-ui{
+            width:13px;
+            height:13px;
+            border-radius:4px;
+            border:1px solid var(--border-bright);
+            background:transparent;
+            position:relative;
+            flex-shrink:0;
+        }
+
+        .class-check input:checked + .check-ui{
+            background:var(--accent);
+            border-color:var(--accent);
+        }
+
+        .class-check input:checked + .check-ui::after{
+            content:"";
+            position:absolute;
+            left:3px;
+            top:0px;
+            width:4px;
+            height:7px;
+            border:solid var(--ink);
+            border-width:0 2px 2px 0;
+            transform:rotate(45deg);
+        }
+
+        .class-check:has(input:checked){
+            border-color:var(--accent);
+            color:var(--accent);
+        }
 
         /* ===============================
            IMAGE UPLOAD
         =============================== */
 
-        .image-upload-box {
-
-            margin-top:
-                12px;
-
-            padding:
-                18px;
-
-            border:
-                2px dashed #cbd5e1;
-
-            border-radius:
-                14px;
-
-            background:
-                #f8fafc;
-
-            text-align:
-                center;
-
+        .image-upload-box{
+            margin-top:12px;
+            padding:18px;
+            border:1.5px dashed var(--border-bright);
+            border-radius:14px;
+            background:var(--panel-2);
+            text-align:center;
         }
 
-
-        .image-upload-box input[type="file"] {
-
-            width: 100%;
-
-            padding:
-                10px;
-
-            border:
-                1px solid #d1d5db;
-
-            border-radius:
-                8px;
-
-            background:
-                white;
-
+        .image-upload-box input[type="file"]{
+            width:100%;
+            padding:9px;
+            border:1px solid var(--border);
+            border-radius:8px;
+            background:var(--panel);
+            color:var(--text-muted);
+            font-size:13px;
         }
 
-
-        .upload-hint {
-
-            margin-top:
-                8px;
-
-            color:
-                #6b7280;
-
-            font-size:
-                13px;
-
+        .upload-hint{
+            margin-top:8px;
+            color:var(--text-faint);
+            font-size:12.5px;
         }
 
+        .image-preview{ margin-top:15px; display:none; }
 
-        .image-preview {
-
-            margin-top:
-                15px;
-
-            display:
-                none;
-
+        .image-preview img{
+            max-width:100%;
+            max-height:280px;
+            border-radius:12px;
+            border:1px solid var(--border);
+            object-fit:contain;
         }
-
-
-        .image-preview img {
-
-            max-width:
-                100%;
-
-            max-height:
-                280px;
-
-            border-radius:
-                12px;
-
-            border:
-                1px solid #e5e7eb;
-
-            object-fit:
-                contain;
-
-        }
-
 
         /* ===============================
            SOLUTIONS
         =============================== */
 
-        .submit-solution-header {
+        .submit-solution-header{ margin-top:26px; margin-bottom:14px; }
 
-            margin-top:
-                28px;
+        .submit-solution-header h3{ margin-bottom:4px !important; }
 
-            margin-bottom:
-                15px;
-
+        .submit-solution-header p{
+            color:var(--text-muted);
+            font-size:12.5px;
         }
 
-
-        .submit-solution-header h3 {
-
-            margin-bottom:
-                5px !important;
-
+        .submit-solutions{
+            display:flex;
+            flex-direction:column;
+            gap:14px;
         }
 
-
-        .submit-solution-header p {
-
-            color:
-                #6b7280;
-
-            font-size:
-                13px;
-
+        .solution-step{
+            border:1px solid var(--border);
+            background:var(--panel-2);
+            border-radius:14px;
+            padding:16px;
         }
 
-
-        .submit-solutions {
-
-            display:
-                flex;
-
-            flex-direction:
-                column;
-
-            gap:
-                15px;
-
+        .solution-step-header{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:12px;
         }
 
-
-        .solution-step {
-
-            border:
-                1px solid #dbeafe;
-
-            background:
-                #f8fbff;
-
-            border-radius:
-                14px;
-
-            padding:
-                18px;
-
+        .solution-step-header h4{
+            color:var(--accent);
+            font-size:14.5px;
         }
 
-
-        .solution-step-header {
-
-            display:
-                flex;
-
-            justify-content:
-                space-between;
-
-            align-items:
-                center;
-
-            margin-bottom:
-                12px;
-
+        .remove-step{
+            border:1px solid var(--border);
+            background:var(--danger-soft);
+            color:var(--danger);
+            padding:6px 12px;
+            border-radius:8px;
+            cursor:pointer;
+            font-size:12.5px;
+            font-weight:600;
         }
 
+        .remove-step:hover{ border-color:var(--danger); }
 
-        .solution-step-header h4 {
-
-            margin:
-                0;
-
-            color:
-                #1d4ed8;
-
-            font-size:
-                16px;
-
-        }
-
-
-        .remove-step {
-
-            border:
-                none;
-
-            background:
-                #fee2e2;
-
-            color:
-                #dc2626;
-
-            padding:
-                7px 12px;
-
-            border-radius:
-                8px;
-
-            cursor:
-                pointer;
-
-            font-size:
-                13px;
-
-        }
-
-
-        .remove-step:hover {
-
-            background:
-                #fecaca;
-
-        }
-
-
-        .add-button {
-
-            margin-top:
-                15px;
-
-        }
-
+        .submit-solutions + .add-button{ margin-top:14px; }
 
         /* ===============================
            SUBMIT BUTTON
         =============================== */
 
-        .save-button {
-
-            width:
-                100%;
-
-            margin-top:
-                24px;
-
-            padding:
-                14px 20px;
-
-            border:
-                none;
-
-            border-radius:
-                11px;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #2563eb,
-                    #4f46e5
-                );
-
-            color:
-                white;
-
-            font-size:
-                16px;
-
-            font-weight:
-                700;
-
-            cursor:
-                pointer;
-
-            transition:
-                0.2s;
-
+        .save-button{
+            width:100%;
+            margin-top:22px;
+            padding:14px 20px;
+            border:none;
+            border-radius:11px;
+            background:var(--accent);
+            color:var(--ink);
+            font-size:15px;
+            font-weight:700;
+            cursor:pointer;
+            transition:.15s ease;
         }
 
+        .save-button:hover{ background:var(--accent-strong); }
 
-        .save-button:hover {
-
-            transform:
-                translateY(-1px);
-
+        .save-button:disabled{
+            opacity:.5;
+            cursor:not-allowed;
         }
-
-
-        .save-button:disabled {
-
-            opacity:
-                0.65;
-
-            cursor:
-                not-allowed;
-
-            transform:
-                none;
-
-        }
-
 
         /* ===============================
            MESSAGE
         =============================== */
 
-        .submit-message {
-
-            margin-top:
-                18px;
-
-            padding:
-                13px 15px;
-
-            border-radius:
-                10px;
-
-            font-size:
-                14px;
-
-            line-height:
-                1.5;
-
+        .submit-message{
+            margin-top:16px;
+            padding:12px 15px;
+            border-radius:10px;
+            font-size:13.5px;
+            line-height:1.5;
+            border:1px solid transparent;
         }
 
-
-        .success-message {
-
-            background:
-                #dcfce7;
-
-            color:
-                #166534;
-
+        .success-message{
+            background:var(--accent-soft);
+            border-color:var(--accent);
+            color:var(--accent);
         }
 
-
-        .error-message {
-
-            background:
-                #fee2e2;
-
-            color:
-                #991b1b;
-
+        .error-message{
+            background:var(--danger-soft);
+            border-color:var(--danger);
+            color:var(--danger);
         }
 
+        /* ===============================
+           FOOTER
+        =============================== */
+
+        .footer{
+            padding:28px 24px;
+            text-align:center;
+            color:var(--text-faint);
+            font-size:12.5px;
+        }
 
         /* ===============================
            MOBILE
         =============================== */
 
-        /* ===============================
-           CLASS FILTER
-        =============================== */
+        @media (max-width:600px){
 
-        .class-filter-section {
-            padding-top: 10px;
-            padding-bottom: 35px;
-        }
+            .hero{ padding:56px 20px 40px; }
+            .hero h1{ font-size:25px; }
 
-        .filter-heading-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-            margin-bottom: 14px;
-        }
+            .modal{ padding:10px; }
+            .modal-content{ max-height:calc(100vh - 20px); border-radius:16px; }
+            .modal-header{ padding:18px; }
+            .modal-header h2{ font-size:17px; }
+            #submitProblemForm{ padding:18px; }
 
-        .filter-heading-row h2 {
-            margin: 0;
-        }
-
-        .filter-description {
-            margin: 6px 0 0;
-            color: #64748b;
-            font-size: 14px;
-        }
-
-        .class-filters {
-            gap: 10px;
-        }
-
-        .class-filter-button {
-            border-color: #ddd6fe;
-            color: #5b21b6;
-            background: #faf5ff;
-        }
-
-        .class-filter-button:hover {
-            border-color: #8b5cf6;
-            background: #f3e8ff;
-            color: #6d28d9;
-        }
-
-        .class-filter-button.active {
-            background: linear-gradient(135deg, #7c3aed, #6366f1);
-            border-color: transparent;
-            color: #fff;
-            box-shadow: 0 5px 14px rgba(124, 58, 237, 0.22);
-        }
-
-        .problem-badges {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 10px;
-        }
-
-        .problem-class {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 5px 10px;
-            border-radius: 999px;
-            background: #ede9fe;
-            color: #6d28d9;
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        @media (max-width: 600px) {
-
-            .modal {
-
-                padding:
-                    10px;
-
-            }
-
-
-            .modal-content {
-
-                max-height:
-                    calc(100vh - 20px);
-
-                border-radius:
-                    16px;
-
-            }
-
-
-            .modal-header {
-
-                padding:
-                    18px;
-
-            }
-
-
-            .modal-header h2 {
-
-                font-size:
-                    20px;
-
-            }
-
-
-            #submitProblemForm {
-
-                padding:
-                    18px;
-
-            }
-
-
-            .user-area {
-
-                flex-wrap:
-                    wrap;
-
-                justify-content:
-                    flex-end;
-
-            }
-
+            .user-area{ flex-wrap:wrap; justify-content:flex-end; }
         }
 
     </style>
 
- <!--  <link rel="stylesheet" href="css/professional.css">-->
-<link rel="stylesheet" href="css/leading-company.css">
 </head>
 
 
@@ -934,7 +807,7 @@
             <input
                 type="text"
                 id="searchInput"
-                placeholder="🔍 ค้นหาปัญหา เช่น ESP32 ไม่พบ COM Port"
+                placeholder="ค้นหาปัญหา เช่น ESP32 ไม่พบ COM Port"
             >
 
         </div>
@@ -1044,7 +917,7 @@
 
         <div class="filter-heading-row">
             <div>
-                <h2>🎓 ระดับ Class</h2>
+                <h2>ระดับ Class</h2>
                 <p class="filter-description">
                     เลือกดูปัญหาเฉพาะระดับ Class ที่ต้องการ
                 </p>
@@ -1170,7 +1043,7 @@
             <div>
 
                 <h2>
-                    🐞 ส่งปัญหาและวิธีแก้ไข
+                    ส่งปัญหาและวิธีแก้ไข
                 </h2>
 
                 <p class="modal-subtitle">
@@ -1206,7 +1079,7 @@
             ========================= -->
 
             <h3>
-                📋 ข้อมูลปัญหา
+                ข้อมูลปัญหา
             </h3>
 
 
@@ -1332,7 +1205,7 @@
             ========================= -->
 
             <h3>
-                🖼️ รูปภาพปัญหา
+                รูปภาพปัญหา
             </h3>
 
 
@@ -1376,7 +1249,7 @@
             <div class="submit-solution-header">
 
                 <h3>
-                    🛠️ วิธีแก้ไขปัญหา
+                    วิธีแก้ไขปัญหา
                 </h3>
 
                 <p>
@@ -1423,7 +1296,7 @@
                 id="submitButton"
                 class="save-button"
             >
-                🚀 ส่งปัญหาให้ Coach & Trainer ตรวจสอบ
+                ส่งปัญหาให้ Coach & Trainer ตรวจสอบ
             </button>
 
 
