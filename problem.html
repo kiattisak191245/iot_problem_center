@@ -1,190 +1,332 @@
 <!DOCTYPE html>
 <html lang="th">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>รายละเอียดปัญหา | IoT Problem Center</title>
 
-  <link
-        rel="stylesheet"
-        href="css/style.css"
-    >
-     
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-     <link rel="stylesheet" href="css/leading-company.css">
 
+    <style>
+
+        :root{
+            --ink:#0B0D10;
+            --panel:#15181D;
+            --panel-2:#1B1F25;
+            --panel-3:#20242B;
+            --border:#282D34;
+            --border-bright:#3A414A;
+            --accent:#5EE6A6;
+            --accent-strong:#3ED98D;
+            --accent-soft:rgba(94,230,166,.10);
+            --accent-soft-2:rgba(94,230,166,.18);
+            --text:#EDEFF1;
+            --text-muted:#83898F;
+            --text-faint:#565C63;
+            --danger:#F0716D;
+            --danger-soft:rgba(240,113,109,.12);
+        }
+
+        *{ box-sizing:border-box; }
+        html,body{ margin:0; padding:0; }
+
+        body{
+            background:var(--ink);
+            color:var(--text);
+            font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;
+            font-size:15px;
+            line-height:1.7;
+        }
+
+        h1,h2{
+            font-family:'Chakra Petch',sans-serif;
+            font-weight:600;
+            color:var(--text);
+            margin:0;
+        }
+
+        p{ margin:0; }
+        a{ color:inherit; }
+
+        /* ===============================
+           NAVBAR
+        =============================== */
+
+        .navbar{
+            position:sticky;
+            top:0;
+            z-index:100;
+            background:rgba(11,13,16,.85);
+            backdrop-filter:blur(10px);
+            border-bottom:1px solid var(--border);
+        }
+
+        .navbar-inner{
+            max-width:920px;
+            margin:0 auto;
+            padding:14px 24px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+        }
+
+        .logo-text{
+            display:flex;
+            align-items:center;
+            gap:11px;
+            text-decoration:none;
+        }
+
+        .brand-mark img{
+            width:32px;
+            height:32px;
+            border-radius:8px;
+            display:block;
+        }
+
+        .logo-text > span{
+            font-family:'Chakra Petch',sans-serif;
+            font-weight:600;
+            font-size:14.5px;
+            color:var(--text);
+        }
+
+        .user-area{
+            display:flex;
+            align-items:center;
+            gap:10px;
+        }
+
+        .login-link{
+            text-decoration:none;
+            font-size:13.5px;
+            font-weight:600;
+            color:var(--ink);
+            background:var(--accent);
+            padding:9px 18px;
+            border-radius:8px;
+            transition:opacity .15s ease;
+        }
+
+        .login-link:hover{ opacity:.88; }
+
+        /* ===============================
+           MAIN / SECTION
+        =============================== */
+
+        .section{ padding:40px 24px 64px; }
+
+        .section-container{
+            max-width:760px;
+            margin:0 auto;
+        }
+
+        .problem-back{
+            display:inline-flex;
+            align-items:center;
+            gap:6px;
+            text-decoration:none;
+            color:var(--text-muted);
+            font-size:13.5px;
+            font-weight:500;
+            margin-bottom:24px;
+            transition:color .15s ease;
+        }
+
+        .problem-back:hover{ color:var(--accent); }
+
+        .loading,
+        .no-result{
+            text-align:center;
+            padding:60px 24px;
+            color:var(--text-muted);
+            font-size:14px;
+        }
+
+        /* ===============================
+           PROBLEM DETAIL
+        =============================== */
+
+        .problem-category{
+            display:inline-block;
+            font-size:11.5px;
+            font-weight:700;
+            letter-spacing:.05em;
+            color:var(--accent);
+            background:var(--accent-soft);
+            border:1px solid var(--accent-soft-2);
+            padding:5px 12px;
+            border-radius:999px;
+            margin-bottom:14px;
+        }
+
+        #problemTitle{
+            font-size:26px;
+            line-height:1.4;
+            margin-bottom:32px;
+        }
+
+        .problem-info{
+            padding:22px 0;
+            border-top:1px solid var(--border);
+        }
+
+        .problem-info h2{
+            font-size:14px;
+            color:var(--text-muted);
+            font-weight:600;
+            margin-bottom:10px;
+        }
+
+        .problem-info p{
+            color:var(--text);
+            font-size:14.5px;
+            line-height:1.75;
+            white-space:pre-line;
+        }
+
+        /* ===============================
+           SOLUTIONS
+        =============================== */
+
+        .solution-section{
+            margin-top:8px;
+            padding-top:22px;
+            border-top:1px solid var(--border);
+        }
+
+        .solution-section h2{
+            font-size:14px;
+            color:var(--text-muted);
+            font-weight:600;
+            margin-bottom:16px;
+        }
+
+        #solutionList{
+            display:flex;
+            flex-direction:column;
+            gap:12px;
+        }
+
+        /* Baseline styling for whatever card markup problem.js injects */
+        #solutionList > *{
+            background:var(--panel);
+            border:1px solid var(--border);
+            border-radius:14px;
+            padding:18px 20px;
+        }
+
+        #solutionList h3,
+        #solutionList h4{
+            font-family:'Chakra Petch',sans-serif;
+            font-size:15px;
+            font-weight:600;
+            color:var(--accent);
+            margin-bottom:8px;
+        }
+
+        #solutionList p{
+            color:var(--text-muted);
+            font-size:14px;
+            line-height:1.7;
+        }
+
+        #solutionList img{
+            max-width:100%;
+            border-radius:10px;
+            border:1px solid var(--border);
+            margin-top:10px;
+            display:block;
+        }
+
+        /* ===============================
+           FOOTER
+        =============================== */
+
+        .footer{
+            padding:28px 24px;
+            text-align:center;
+            color:var(--text-faint);
+            font-size:12.5px;
+            border-top:1px solid var(--border);
+        }
+
+        @media (max-width:600px){
+            #problemTitle{ font-size:21px; }
+            .section{ padding:28px 18px 48px; }
+        }
+
+    </style>
 </head>
-
-
 <body>
 
 <header class="navbar">
-
     <div class="navbar-inner">
-
         <div class="logo-text">
-
-        <a class="logo-text brand-link" href="index.html" aria-label="Support Problem home">
-            <span class="brand-mark"><img src="logo.png" alt="Support Problem"></span>
-            
-        </a>
-
-            <span>
-                Support Problemfor Coach & Trainer
-            </span>
-
-        </div>
-
-
-        <div
-            id="userArea"
-            class="user-area"
-        >
-
-            <a
-                href="login.html"
-                class="login-link"
-            >
-                เข้าสู่ระบบ
+            <a class="logo-text brand-link" href="index.html" aria-label="Support Problem home">
+                <span class="brand-mark"><img src="logo.png" alt="Support Problem"></span>
             </a>
-
+            <span>Support Problem · for Coach &amp; Trainer</span>
         </div>
-
+        <div id="userArea" class="user-area">
+            <a href="login.html" class="login-link">เข้าสู่ระบบ</a>
+        </div>
     </div>
-
 </header>
 
-
-
 <main class="section">
-
     <div class="section-container">
 
-
         <!-- BACK -->
-
-        <a
-            href="index.html"
-            class="problem-back"
-        >
-            ← กลับหน้าปัญหา
-        </a>
-
+        <a href="index.html" class="problem-back">← กลับหน้าปัญหา</a>
 
         <!-- LOADING -->
-
-        <div
-            id="loading"
-            class="loading"
-        >
-            กำลังโหลดข้อมูล...
-        </div>
-
+        <div id="loading" class="loading">กำลังโหลดข้อมูล...</div>
 
         <!-- ERROR -->
-
-        <div
-            id="errorMessage"
-            class="no-result"
-            style="display:none;"
-        >
-        </div>
-
+        <div id="errorMessage" class="no-result" style="display:none;"></div>
 
         <!-- PROBLEM -->
+        <article id="problemDetail" style="display:none;">
 
-        <article
-            id="problemDetail"
-            style="display:none;"
-        >
-
-            <span
-                id="problemCategory"
-                class="problem-category"
-            >
-            </span>
-
-
+            <span id="problemCategory" class="problem-category"></span>
             <h1 id="problemTitle"></h1>
 
-
             <div class="problem-info">
-
-                <h2>
-                    📋 รายละเอียดปัญหา
-                </h2>
-
+                <h2>รายละเอียดปัญหา</h2>
                 <p id="problemDescription"></p>
-
             </div>
 
-
             <div class="problem-info">
-
-                <h2>
-                    ⚠️ อาการ
-                </h2>
-
+                <h2>อาการ</h2>
                 <p id="problemSymptoms"></p>
-
             </div>
-
 
             <div class="problem-info">
-
-                <h2>
-                    🔍 สาเหตุ
-                </h2>
-
+                <h2>สาเหตุ</h2>
                 <p id="problemCauses"></p>
-
             </div>
-
 
             <!-- SOLUTIONS -->
-
             <div class="solution-section">
-
-                <h2>
-                    🔧 วิธีแก้ไข
-                </h2>
-
-
-                <div id="solutionList">
-                </div>
-
+                <h2>วิธีแก้ไข</h2>
+                <div id="solutionList"></div>
             </div>
 
         </article>
 
     </div>
-
 </main>
 
-
-
 <footer class="footer">
-
-    <p>
-        © 2026 IoT Problem Center
-    </p>
-
+    <p>© 2026 IoT Problem Center</p>
 </footer>
 
-
-
 <script src="js/supabase.js"></script>
-
 <script src="js/problem.js"></script>
-
 </body>
-
 </html>
