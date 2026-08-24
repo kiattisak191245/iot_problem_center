@@ -1,205 +1,344 @@
 <!DOCTYPE html>
 <html lang="th">
-
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จัดการวิธีแก้ไข | IoT Problem Center</title>
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>
-        จัดการวิธีแก้ไข | IoT Problem Center
-    </title>
-
-    <link rel="stylesheet"
-          href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-</head>
+    <style>
 
+        :root{
+            --ink:#0B0D10;
+            --panel:#15181D;
+            --panel-2:#1B1F25;
+            --border:#282D34;
+            --border-bright:#3A414A;
+            --accent:#5EE6A6;
+            --accent-strong:#3ED98D;
+            --accent-soft:rgba(94,230,166,.10);
+            --accent-soft-2:rgba(94,230,166,.18);
+            --text:#EDEFF1;
+            --text-muted:#83898F;
+            --text-faint:#565C63;
+            --danger:#F0716D;
+            --danger-soft:rgba(240,113,109,.12);
+        }
+
+        *{ box-sizing:border-box; }
+        html,body{ margin:0; padding:0; }
+
+        body{
+            background:var(--ink);
+            color:var(--text);
+            font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;
+            font-size:15px;
+            line-height:1.6;
+        }
+
+        h1,h2{
+            font-family:'Chakra Petch',sans-serif;
+            font-weight:600;
+            color:var(--text);
+            margin:0;
+        }
+
+        p{ margin:0; }
+
+        /* ===============================
+           NAVBAR
+        =============================== */
+
+        .navbar{
+            position:sticky;
+            top:0;
+            z-index:100;
+            background:rgba(11,13,16,.85);
+            backdrop-filter:blur(10px);
+            border-bottom:1px solid var(--border);
+        }
+
+        .navbar-inner{
+            max-width:760px;
+            margin:0 auto;
+            padding:14px 24px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+        }
+
+        .logo-text{
+            display:flex;
+            align-items:center;
+            gap:10px;
+            font-family:'Chakra Petch',sans-serif;
+            font-weight:600;
+            font-size:14.5px;
+            color:var(--text);
+        }
+
+        .logo-text::before{
+            content:"";
+            width:26px;
+            height:26px;
+            border-radius:7px;
+            background:var(--panel-2);
+            border:1px solid var(--border);
+        }
+
+        /* ===============================
+           MAIN
+        =============================== */
+
+        .admin-container{
+            max-width:640px;
+            margin:0 auto;
+            padding:44px 24px 64px;
+        }
+
+        .admin-container > h1{
+            font-size:22px;
+        }
+
+        .admin-description{
+            margin-top:8px;
+            margin-bottom:32px;
+            color:var(--text-muted);
+            font-size:13.5px;
+        }
+
+        /* ===============================
+           CARD
+        =============================== */
+
+        .admin-card{
+            background:var(--panel);
+            border:1px solid var(--border);
+            border-radius:16px;
+            padding:24px;
+            margin-bottom:16px;
+        }
+
+        .admin-card h2{
+            font-size:14px;
+            font-weight:600;
+            color:var(--text-muted);
+            letter-spacing:.02em;
+            margin-bottom:16px;
+            padding-bottom:14px;
+            border-bottom:1px solid var(--border);
+        }
+
+        /* ===============================
+           FORM
+        =============================== */
+
+        .admin-card label{
+            display:block;
+            margin:16px 0 7px;
+            color:var(--text-muted);
+            font-size:12.5px;
+            font-weight:500;
+        }
+
+        .admin-card label:first-of-type{ margin-top:0; }
+
+        .admin-card input[type="text"],
+        .admin-card input[type="number"],
+        .admin-card input[type="file"],
+        .admin-card textarea,
+        .admin-card select{
+            width:100%;
+            border:1px solid var(--border);
+            border-radius:9px;
+            padding:12px 14px;
+            font-size:14px;
+            font-family:inherit;
+            outline:none;
+            background:var(--panel-2);
+            color:var(--text);
+            transition:border-color .15s ease, box-shadow .15s ease;
+        }
+
+        .admin-card textarea{
+            resize:vertical;
+            min-height:100px;
+            line-height:1.6;
+        }
+
+        .admin-card input::placeholder,
+        .admin-card textarea::placeholder{ color:var(--text-faint); }
+
+        .admin-card input:focus,
+        .admin-card textarea:focus,
+        .admin-card select:focus{
+            border-color:var(--accent);
+            box-shadow:0 0 0 3px var(--accent-soft);
+        }
+
+        .admin-card select{
+            appearance:none;
+            background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2383898F'/%3E%3C/svg%3E");
+            background-repeat:no-repeat;
+            background-position:right 14px center;
+            padding-right:34px;
+        }
+
+        /* ===============================
+           BUTTONS
+        =============================== */
+
+        .primary-button{
+            width:100%;
+            margin-top:20px;
+            padding:13px 18px;
+            border:none;
+            border-radius:10px;
+            background:var(--accent);
+            color:var(--ink);
+            font-size:14.5px;
+            font-weight:700;
+            font-family:inherit;
+            cursor:pointer;
+            transition:background .15s ease;
+        }
+
+        .primary-button:hover{ background:var(--accent-strong); }
+
+        .primary-button:disabled{ opacity:.5; cursor:not-allowed; }
+
+        .secondary-button{
+            width:100%;
+            margin-top:10px;
+            padding:12px 18px;
+            border:1px solid var(--border);
+            border-radius:10px;
+            background:var(--panel-2);
+            color:var(--text-muted);
+            font-size:14px;
+            font-weight:500;
+            font-family:inherit;
+            cursor:pointer;
+            transition:.15s ease;
+        }
+
+        .secondary-button:hover{
+            border-color:var(--border-bright);
+            color:var(--text);
+        }
+
+        /* ===============================
+           SOLUTION LIST
+        =============================== */
+
+        #solutionList{
+            display:flex;
+            flex-direction:column;
+            gap:10px;
+        }
+
+        /* Baseline styling for whatever card markup solutions-admin.js injects */
+        #solutionList > *{
+            background:var(--panel-2);
+            border:1px solid var(--border);
+            border-radius:12px;
+            padding:16px 18px;
+            transition:border-color .15s ease;
+        }
+
+        #solutionList > *:hover{ border-color:var(--border-bright); }
+
+        #solutionList h3,
+        #solutionList h4{
+            font-family:'Chakra Petch',sans-serif;
+            font-size:14.5px;
+            font-weight:600;
+            color:var(--accent);
+            margin-bottom:6px;
+        }
+
+        #solutionList p{
+            color:var(--text-muted);
+            font-size:13.5px;
+            line-height:1.65;
+        }
+
+        #solutionList img{
+            max-width:100%;
+            border-radius:9px;
+            border:1px solid var(--border);
+            margin-top:10px;
+            display:block;
+        }
+
+        @media (max-width:600px){
+            .admin-container{ padding:32px 18px 48px; }
+            .admin-card{ padding:18px; }
+        }
+
+    </style>
+</head>
 <body>
 
 <header class="navbar">
-
     <div class="navbar-inner">
-
         <div class="logo-text">
-
-            🤖
-            <span>
-                IoT Problem Center
-            </span>
-
+            <span>IoT Problem Center</span>
         </div>
-
-        <div id="userArea"
-             class="user-area">
-
-        </div>
-
+        <div id="userArea" class="user-area"></div>
     </div>
-
 </header>
-
 
 <main class="admin-container">
 
-    <h1>
-        🛠️ จัดการวิธีแก้ไขปัญหา
-    </h1>
+    <h1>จัดการวิธีแก้ไขปัญหา</h1>
+    <p class="admin-description">เพิ่ม แก้ไข และลบขั้นตอนการแก้ไขปัญหา</p>
 
-    <p class="admin-description">
-        เพิ่ม แก้ไข และลบขั้นตอนการแก้ไขปัญหา
-    </p>
-
-
-    <!-- =========================
-         เลือกปัญหา
-    ========================= -->
-
+    <!-- เลือกปัญหา -->
     <section class="admin-card">
-
-        <h2>
-            1. เลือกปัญหา
-        </h2>
-
+        <h2>1. เลือกปัญหา</h2>
         <select id="problemSelect">
-
-            <option value="">
-                -- เลือกปัญหา --
-            </option>
-
+            <option value="">-- เลือกปัญหา --</option>
         </select>
-
     </section>
 
-
-    <!-- =========================
-         เพิ่ม Solution
-    ========================= -->
-
-    <section
-        id="solutionSection"
-        class="admin-card"
-        style="display:none;"
-    >
-
-        <h2>
-            2. เพิ่มขั้นตอนการแก้ไข
-        </h2>
-
-
+    <!-- เพิ่ม Solution -->
+    <section id="solutionSection" class="admin-card" style="display:none;">
+        <h2>2. เพิ่มขั้นตอนการแก้ไข</h2>
         <form id="solutionForm">
 
+            <label>ขั้นตอนที่</label>
+            <input type="number" id="stepNumber" min="1" value="1" required>
 
-            <label>
-                ขั้นตอนที่
-            </label>
+            <label>ชื่อขั้นตอน</label>
+            <input type="text" id="solutionTitle" placeholder="เช่น ตรวจสอบสาย USB" required>
 
-            <input
-                type="number"
-                id="stepNumber"
-                min="1"
-                value="1"
-                required
-            >
+            <label>รายละเอียด</label>
+            <textarea id="solutionDescription" rows="5" placeholder="อธิบายวิธีแก้ไข..."></textarea>
 
+            <label>รูปภาพประกอบ</label>
+            <input type="file" id="solutionImage" accept="image/jpeg,image/png,image/webp">
 
-            <label>
-                ชื่อขั้นตอน
-            </label>
-
-            <input
-                type="text"
-                id="solutionTitle"
-                placeholder="เช่น ตรวจสอบสาย USB"
-                required
-            >
-
-
-            <label>
-                รายละเอียด
-            </label>
-
-            <textarea
-                id="solutionDescription"
-                rows="5"
-                placeholder="อธิบายวิธีแก้ไข..."
-            ></textarea>
-
-
-            <label>
-                รูปภาพประกอบ
-            </label>
-
-            <input
-                type="file"
-                id="solutionImage"
-                accept="image/jpeg,image/png,image/webp"
-            >
-
-
-            <button
-                type="submit"
-                id="saveSolutionButton"
-                class="primary-button"
-            >
-
-                ➕ เพิ่มขั้นตอน
-
-            </button>
-
-
-            <button
-                type="button"
-                id="cancelButton"
-                class="secondary-button"
-                style="display:none;"
-            >
-
-                ยกเลิกการแก้ไข
-
-            </button>
-
+            <button type="submit" id="saveSolutionButton" class="primary-button">เพิ่มขั้นตอน</button>
+            <button type="button" id="cancelButton" class="secondary-button" style="display:none;">ยกเลิกการแก้ไข</button>
 
         </form>
-
     </section>
 
-
-    <!-- =========================
-         รายการ Solutions
-    ========================= -->
-
-    <section
-        id="solutionListSection"
-        class="admin-card"
-        style="display:none;"
-    >
-
-        <h2>
-            3. ขั้นตอนการแก้ไข
-        </h2>
-
-
-        <div id="solutionList">
-
-        </div>
-
-
+    <!-- รายการ Solutions -->
+    <section id="solutionListSection" class="admin-card" style="display:none;">
+        <h2>3. ขั้นตอนการแก้ไข</h2>
+        <div id="solutionList"></div>
     </section>
-
 
 </main>
 
-
 <script src="js/supabase.js"></script>
-
 <script src="js/solutions-admin.js"></script>
-
-
 </body>
-
 </html>
