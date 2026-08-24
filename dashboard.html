@@ -4,16 +4,8 @@
 <head>
 
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <meta
-        name="description"
-        content="Admin Dashboard สำหรับจัดการปัญหาและวิธีแก้ไขระบบ IoT"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Admin Dashboard สำหรับจัดการปัญหาและวิธีแก้ไขระบบ IoT">
 
     <title>Support Problem — Admin Console</title>
 
@@ -22,39 +14,9 @@
          GOOGLE FONT
     ================================================== -->
 
-    <link
-        rel="preconnect"
-        href="https://fonts.googleapis.com"
-    >
-
-    <link
-        rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin
-    >
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet"
-    >
-
-
-    <!-- ==================================================
-         MAIN CSS
-    ================================================== -->
-
-    <link
-        rel="stylesheet"
-        href="css/style.css"
-    >
-   
-
-    <link
-        rel="stylesheet"
-        href="css/dashboard.css"
-    >
-
-    <link rel="stylesheet" href="css/professional.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
 
 
     <!-- ==================================================
@@ -62,7 +24,860 @@
     ================================================== -->
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
- <link rel="stylesheet" href="css/leading-company.css">
+
+
+    <style>
+
+        :root{
+            --ink:#0B0D10;
+            --panel:#15181D;
+            --panel-2:#1B1F25;
+            --panel-3:#20242B;
+            --border:#282D34;
+            --border-bright:#3A414A;
+            --accent:#5EE6A6;
+            --accent-strong:#3ED98D;
+            --accent-soft:rgba(94,230,166,.10);
+            --accent-soft-2:rgba(94,230,166,.18);
+            --warning:#F0B94D;
+            --warning-soft:rgba(240,185,77,.12);
+            --text:#EDEFF1;
+            --text-muted:#83898F;
+            --text-faint:#565C63;
+            --danger:#F0716D;
+            --danger-soft:rgba(240,113,109,.12);
+        }
+
+        *{ box-sizing:border-box; }
+        html,body{ margin:0; padding:0; }
+
+        body{
+            background:var(--ink);
+            color:var(--text);
+            font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;
+            font-size:15px;
+            line-height:1.6;
+        }
+
+        h1,h2,h3{
+            font-family:'Chakra Petch',sans-serif;
+            font-weight:600;
+            color:var(--text);
+            margin:0;
+        }
+
+        p{ margin:0; }
+        a{ color:inherit; }
+        button{ font-family:inherit; }
+        small{ color:var(--text-faint); font-size:12px; }
+
+        /* ===============================
+           PAGE LOADING
+        =============================== */
+
+        .page-loading{
+            position:fixed;
+            inset:0;
+            z-index:99999;
+            background:var(--ink);
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            gap:16px;
+            transition:opacity .35s ease;
+        }
+
+        .page-loading.hidden{ opacity:0; pointer-events:none; }
+
+        .page-loading p{
+            color:var(--text-muted);
+            font-size:13px;
+        }
+
+        .loading-spinner{
+            width:26px;
+            height:26px;
+            border-radius:50%;
+            border:2.5px solid var(--border);
+            border-top-color:var(--accent);
+            animation:spin .7s linear infinite;
+        }
+
+        .loading-spinner.small{
+            width:16px;
+            height:16px;
+            border-width:2px;
+        }
+
+        @keyframes spin{ to{ transform:rotate(360deg); } }
+
+        /* ===============================
+           NAVBAR
+        =============================== */
+
+        .navbar{
+            position:sticky;
+            top:0;
+            z-index:100;
+            background:rgba(11,13,16,.85);
+            backdrop-filter:blur(10px);
+            border-bottom:1px solid var(--border);
+        }
+
+        .navbar-inner{
+            max-width:1180px;
+            margin:0 auto;
+            padding:14px 24px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+        }
+
+        .logo-text{
+            display:flex;
+            align-items:center;
+            gap:11px;
+        }
+
+        .brand-mark img{
+            width:32px;
+            height:32px;
+            border-radius:8px;
+            display:block;
+        }
+
+        .brand-copy strong{
+            font-family:'Chakra Petch',sans-serif;
+            font-weight:600;
+            font-size:15px;
+            color:var(--text);
+            display:block;
+        }
+
+        .brand-copy strong em{
+            font-style:normal;
+            color:var(--accent);
+        }
+
+        .brand-copy small{
+            display:block;
+            font-size:11px;
+            color:var(--text-faint);
+            margin-top:1px;
+        }
+
+        .admin-user-area{
+            display:flex;
+            align-items:center;
+            gap:14px;
+        }
+
+        .admin-profile{
+            display:flex;
+            align-items:center;
+            gap:10px;
+        }
+
+        .admin-avatar{
+            width:34px;
+            height:34px;
+            border-radius:9px;
+            background:var(--panel-2);
+            border:1px solid var(--border);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-family:'Chakra Petch',sans-serif;
+            font-weight:600;
+            font-size:13px;
+            color:var(--accent);
+        }
+
+        .admin-info{
+            display:flex;
+            flex-direction:column;
+            line-height:1.35;
+        }
+
+        .admin-label{
+            font-size:10.5px;
+            font-weight:700;
+            letter-spacing:.08em;
+            color:var(--text-faint);
+        }
+
+        .admin-email{
+            font-size:13px;
+            color:var(--text);
+        }
+
+        .logout-button{
+            display:flex;
+            align-items:center;
+            gap:6px;
+            border:1px solid var(--border);
+            background:var(--panel-2);
+            color:var(--text-muted);
+            padding:9px 15px;
+            border-radius:9px;
+            font-size:13px;
+            font-weight:500;
+            cursor:pointer;
+            transition:.15s ease;
+        }
+
+        .logout-button:hover{
+            border-color:var(--danger);
+            color:var(--danger);
+            background:var(--danger-soft);
+        }
+
+        /* ===============================
+           DASHBOARD LAYOUT
+        =============================== */
+
+        .dashboard-container{
+            max-width:1180px;
+            margin:0 auto;
+            padding:36px 24px 64px;
+        }
+
+        .dashboard-hero{
+            display:flex;
+            align-items:flex-end;
+            justify-content:space-between;
+            gap:24px;
+            padding-bottom:28px;
+            margin-bottom:28px;
+            border-bottom:1px solid var(--border);
+        }
+
+        .dashboard-badge{
+            display:inline-flex;
+            align-items:center;
+            gap:6px;
+            font-size:11px;
+            font-weight:700;
+            letter-spacing:.08em;
+            color:var(--accent);
+            background:var(--accent-soft);
+            border:1px solid var(--accent-soft-2);
+            padding:5px 11px;
+            border-radius:999px;
+            margin-bottom:14px;
+        }
+
+        .dashboard-hero h1{
+            font-size:26px;
+        }
+
+        .dashboard-hero-content p{
+            margin-top:8px;
+            color:var(--text-muted);
+            font-size:14px;
+        }
+
+        .add-button{
+            display:inline-flex;
+            align-items:center;
+            gap:7px;
+            border:none;
+            background:var(--accent);
+            color:var(--ink);
+            padding:12px 20px;
+            border-radius:10px;
+            font-size:14px;
+            font-weight:700;
+            cursor:pointer;
+            transition:.15s ease;
+            white-space:nowrap;
+        }
+
+        .add-button:hover{ background:var(--accent-strong); }
+
+        .button-icon{ font-size:15px; line-height:1; }
+
+        /* ===============================
+           STATS
+        =============================== */
+
+        .stats-grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+            gap:14px;
+            margin-bottom:36px;
+        }
+
+        .stat-card{
+            display:flex;
+            align-items:flex-start;
+            gap:14px;
+            background:var(--panel);
+            border:1px solid var(--border);
+            border-radius:14px;
+            padding:20px;
+        }
+
+        .stat-icon{
+            width:36px;
+            height:36px;
+            border-radius:9px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            flex-shrink:0;
+            background:var(--panel-2);
+            position:relative;
+        }
+
+        .stat-icon::before{
+            content:"";
+            width:8px;
+            height:8px;
+            border-radius:50%;
+            background:var(--text-faint);
+        }
+
+        .total-card .stat-icon::before{ background:var(--text-muted); }
+        .pending-card .stat-icon::before{ background:var(--warning); }
+        .published-card .stat-icon::before{ background:var(--accent); }
+        .rejected-card .stat-icon::before{ background:var(--danger); }
+
+        .stat-icon{ font-size:0; }
+
+        .stat-content{
+            display:flex;
+            flex-direction:column;
+        }
+
+        .stat-label{
+            font-size:12.5px;
+            color:var(--text-muted);
+            font-weight:500;
+        }
+
+        .stat-number{
+            font-family:'Chakra Petch',sans-serif;
+            font-size:26px;
+            font-weight:700;
+            color:var(--text);
+            margin:4px 0 2px;
+        }
+
+        .stat-description{
+            font-size:12px;
+            color:var(--text-faint);
+        }
+
+        /* ===============================
+           ADMIN SECTION
+        =============================== */
+
+        .admin-section{
+            background:var(--panel);
+            border:1px solid var(--border);
+            border-radius:16px;
+            padding:26px;
+        }
+
+        .section-header{
+            display:flex;
+            align-items:flex-start;
+            justify-content:space-between;
+            gap:20px;
+            flex-wrap:wrap;
+        }
+
+        .section-heading{
+            display:flex;
+            align-items:flex-start;
+            gap:13px;
+        }
+
+        .section-icon{
+            width:34px;
+            height:34px;
+            border-radius:9px;
+            background:var(--panel-2);
+            border:1px solid var(--border);
+            flex-shrink:0;
+        }
+
+        .section-heading h2{ font-size:17px; }
+
+        .section-heading p{
+            margin-top:4px;
+            color:var(--text-muted);
+            font-size:13px;
+        }
+
+        .search-wrapper{
+            position:relative;
+            min-width:240px;
+        }
+
+        .search-icon{
+            position:absolute;
+            left:14px;
+            top:50%;
+            transform:translateY(-50%);
+            width:6px;
+            height:6px;
+            border-radius:50%;
+            border:1.5px solid var(--text-faint);
+        }
+
+        .admin-search{
+            width:100%;
+            background:var(--panel-2);
+            border:1px solid var(--border);
+            border-radius:9px;
+            padding:10px 14px 10px 30px;
+            font-family:inherit;
+            font-size:13.5px;
+            color:var(--text);
+            transition:.15s ease;
+        }
+
+        .admin-search::placeholder{ color:var(--text-faint); }
+
+        .admin-search:focus{
+            outline:none;
+            border-color:var(--accent);
+            box-shadow:0 0 0 3px var(--accent-soft);
+        }
+
+        .section-divider{
+            height:1px;
+            background:var(--border);
+            margin:22px 0;
+        }
+
+        .loading{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:10px;
+            padding:40px 24px;
+            color:var(--text-muted);
+            font-size:13.5px;
+        }
+
+        .problem-table{
+            display:flex;
+            flex-direction:column;
+            gap:10px;
+        }
+
+        .problem-table > *{
+            background:var(--panel-2);
+            border:1px solid var(--border);
+            border-radius:12px;
+            padding:16px 18px;
+            transition:border-color .15s ease;
+        }
+
+        .problem-table > *:hover{ border-color:var(--border-bright); }
+
+        /* ===============================
+           MODAL
+        =============================== */
+
+        .modal{
+            position:fixed;
+            inset:0;
+            background:rgba(5,6,8,.72);
+            display:none;
+            align-items:center;
+            justify-content:center;
+            padding:20px;
+            z-index:9999;
+            backdrop-filter:blur(6px);
+        }
+
+        .modal-content{
+            width:100%;
+            max-width:720px;
+            max-height:calc(100vh - 40px);
+            overflow-y:auto;
+            background:var(--panel);
+            border:1px solid var(--border);
+            border-radius:18px;
+        }
+
+        .modal-header{
+            position:sticky;
+            top:0;
+            z-index:2;
+            display:flex;
+            justify-content:space-between;
+            align-items:flex-start;
+            gap:20px;
+            padding:24px 28px;
+            background:var(--panel);
+            border-bottom:1px solid var(--border);
+        }
+
+        .modal-title-area{
+            display:flex;
+            align-items:flex-start;
+            gap:13px;
+        }
+
+        .modal-icon{
+            width:34px;
+            height:34px;
+            border-radius:9px;
+            background:var(--panel-2);
+            border:1px solid var(--border);
+            flex-shrink:0;
+        }
+
+        .modal-header h2{ font-size:18px; }
+
+        .modal-header p,
+        .modal-subtitle{
+            margin-top:5px;
+            color:var(--text-muted);
+            font-size:13px;
+        }
+
+        .close-button{
+            width:36px;
+            height:36px;
+            border:1px solid var(--border);
+            border-radius:50%;
+            background:var(--panel-2);
+            color:var(--text-muted);
+            font-size:20px;
+            line-height:1;
+            cursor:pointer;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            flex-shrink:0;
+            transition:.15s ease;
+        }
+
+        .close-button:hover{
+            background:var(--danger-soft);
+            border-color:var(--danger);
+            color:var(--danger);
+        }
+
+        /* ===============================
+           FORM
+        =============================== */
+
+        #problemForm, #solutionForm{ padding:24px 28px 30px; }
+
+        .form-section{ margin-bottom:22px; }
+
+        .form-section-title{
+            display:flex;
+            align-items:center;
+            gap:8px;
+            font-family:'Chakra Petch',sans-serif;
+            font-size:13px;
+            font-weight:600;
+            letter-spacing:.03em;
+            color:var(--text-muted);
+            margin-bottom:16px;
+            padding-bottom:10px;
+            border-bottom:1px solid var(--border);
+        }
+
+        .form-section-title span{ display:none; }
+
+        .form-group{ margin-bottom:16px; }
+
+        .form-group label{
+            display:block;
+            margin-bottom:7px;
+            color:var(--text-muted);
+            font-size:12.5px;
+            font-weight:500;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group input[type="file"],
+        .form-group textarea,
+        .form-group select{
+            width:100%;
+            border:1px solid var(--border);
+            border-radius:9px;
+            padding:12px 14px;
+            font-size:14px;
+            font-family:inherit;
+            outline:none;
+            background:var(--panel-2);
+            color:var(--text);
+            transition:.15s ease;
+        }
+
+        .form-group textarea{
+            resize:vertical;
+            min-height:88px;
+            line-height:1.6;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder{ color:var(--text-faint); }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus{
+            border-color:var(--accent);
+            box-shadow:0 0 0 3px var(--accent-soft);
+        }
+
+        .form-group select{
+            appearance:none;
+            background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2383898F'/%3E%3C/svg%3E");
+            background-repeat:no-repeat;
+            background-position:right 14px center;
+            padding-right:34px;
+        }
+
+        .form-group small{ display:block; margin-top:6px; }
+
+        /* CLASS PICKER */
+
+        .class-picker{
+            display:flex;
+            flex-wrap:wrap;
+            gap:8px;
+        }
+
+        .class-check{
+            display:inline-flex;
+            align-items:center;
+            gap:7px;
+            border:1px solid var(--border);
+            background:var(--panel-2);
+            padding:8px 13px;
+            border-radius:999px;
+            font-size:12.5px;
+            color:var(--text-muted);
+            cursor:pointer;
+            transition:.15s ease;
+        }
+
+        .class-check input{ display:none; }
+
+        .class-check .check-ui{
+            width:13px;
+            height:13px;
+            border-radius:4px;
+            border:1px solid var(--border-bright);
+            background:transparent;
+            position:relative;
+            flex-shrink:0;
+        }
+
+        .class-check input:checked + .check-ui{
+            background:var(--accent);
+            border-color:var(--accent);
+        }
+
+        .class-check input:checked + .check-ui::after{
+            content:"";
+            position:absolute;
+            left:3px;
+            top:0px;
+            width:4px;
+            height:7px;
+            border:solid var(--ink);
+            border-width:0 2px 2px 0;
+            transform:rotate(45deg);
+        }
+
+        .class-check:has(input:checked){
+            border-color:var(--accent);
+            color:var(--accent);
+        }
+
+        /* IMAGE PREVIEW */
+
+        .image-preview{
+            margin-top:12px;
+            display:flex;
+            flex-wrap:wrap;
+            gap:8px;
+        }
+
+        .image-preview:empty{ display:none; margin:0; }
+
+        .image-preview img{
+            max-width:160px;
+            max-height:160px;
+            border-radius:10px;
+            border:1px solid var(--border);
+            object-fit:cover;
+        }
+
+        /* MESSAGE */
+
+        .form-message,
+        .submit-message{
+            margin-top:6px;
+            margin-bottom:16px;
+            padding:12px 15px;
+            border-radius:10px;
+            font-size:13.5px;
+            line-height:1.5;
+            border:1px solid transparent;
+        }
+
+        .form-message:empty{ display:none; margin:0; }
+
+        .form-message.success-message,
+        .success-message{
+            background:var(--accent-soft);
+            border-color:var(--accent);
+            color:var(--accent);
+        }
+
+        .form-message.error-message,
+        .error-message{
+            background:var(--danger-soft);
+            border-color:var(--danger);
+            color:var(--danger);
+        }
+
+        /* SAVE / CANCEL */
+
+        .modal-actions{
+            display:flex;
+            gap:10px;
+        }
+
+        .save-button{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:7px;
+            flex:1;
+            padding:13px 18px;
+            border:none;
+            border-radius:10px;
+            background:var(--accent);
+            color:var(--ink);
+            font-size:14.5px;
+            font-weight:700;
+            cursor:pointer;
+            transition:.15s ease;
+        }
+
+        .save-button:hover{ background:var(--accent-strong); }
+
+        .save-button:disabled{ opacity:.5; cursor:not-allowed; }
+
+        .cancel-button{
+            padding:13px 20px;
+            border:1px solid var(--border);
+            border-radius:10px;
+            background:var(--panel-2);
+            color:var(--text-muted);
+            font-size:14px;
+            font-weight:500;
+            cursor:pointer;
+            transition:.15s ease;
+        }
+
+        .cancel-button:hover{
+            border-color:var(--border-bright);
+            color:var(--text);
+        }
+
+        /* ===============================
+           SOLUTIONS
+        =============================== */
+
+        .solution-modal{ max-width:640px; }
+
+        .solution-toolbar{
+            display:flex;
+            align-items:flex-start;
+            justify-content:space-between;
+            gap:16px;
+            padding:22px 28px 0;
+        }
+
+        .solution-toolbar h3{ font-size:15px; }
+
+        .solution-toolbar p{
+            margin-top:4px;
+            color:var(--text-muted);
+            font-size:12.5px;
+        }
+
+        .solution-add-button{
+            padding:9px 16px;
+            font-size:13px;
+        }
+
+        .solution-list{
+            display:flex;
+            flex-direction:column;
+            gap:10px;
+            padding:18px 28px 0;
+        }
+
+        .solution-list:empty{ padding:0; }
+
+        .solution-list > *{
+            background:var(--panel-2);
+            border:1px solid var(--border);
+            border-radius:12px;
+            padding:14px 16px;
+        }
+
+        .solution-form-box{
+            margin:20px 28px 28px;
+            padding:20px;
+            background:var(--panel-2);
+            border:1px solid var(--border);
+            border-radius:14px;
+        }
+
+        .solution-form-header h3{ font-size:14.5px; }
+
+        .solution-form-header p{
+            margin-top:4px;
+            color:var(--text-muted);
+            font-size:12.5px;
+            margin-bottom:14px;
+        }
+
+        .solution-form-buttons{
+            display:flex;
+            gap:10px;
+        }
+
+        /* ===============================
+           MOBILE
+        =============================== */
+
+        @media (max-width:640px){
+
+            .dashboard-hero{ flex-direction:column; align-items:flex-start; }
+            .dashboard-hero h1{ font-size:22px; }
+
+            .section-header{ flex-direction:column; align-items:stretch; }
+            .search-wrapper{ min-width:0; }
+
+            .modal{ padding:10px; }
+            .modal-content{ max-height:calc(100vh - 20px); border-radius:16px; }
+            .modal-header{ padding:18px; }
+            #problemForm, #solutionForm{ padding:18px; }
+            .solution-toolbar, .solution-list{ padding-left:18px; padding-right:18px; }
+            .solution-form-box{ margin:16px 18px 18px; }
+        }
+
+    </style>
 
 </head>
 
@@ -74,17 +889,9 @@
      PAGE LOADING
 ================================================== -->
 
-<div
-    id="pageLoading"
-    class="page-loading"
->
-
+<div id="pageLoading" class="page-loading">
     <div class="loading-spinner"></div>
-
-    <p>
-        กำลังโหลด Admin Dashboard...
-    </p>
-
+    <p>กำลังโหลด Admin Dashboard...</p>
 </div>
 
 
@@ -97,69 +904,26 @@
 
     <div class="navbar-inner">
 
-
-        <!-- LOGO -->
-
-        <a
-            href="index.html"
-            class="logo-text"
-            style="text-decoration:none;"
-        >
-
+        <a href="index.html" class="logo-text" style="text-decoration:none;">
             <span class="brand-mark"><img src="logo.png" alt="Support Problem"></span>
             <span class="brand-copy"><strong>Support <em>Problem</em></strong><small>for Coach &amp; Trainer</small></span>
-
         </a>
-
-
-
-        <!-- ADMIN AREA -->
 
         <div class="user-area admin-user-area">
 
-
             <div class="admin-profile">
-
-                <div class="admin-avatar">
-                    👨‍💻
-                </div>
-
+                <div class="admin-avatar">A</div>
                 <div class="admin-info">
-
-                    <span class="admin-label">
-                        ADMIN
-                    </span>
-
-                    <span
-                        id="adminEmail"
-                        class="admin-email"
-                    >
-                        กำลังโหลด...
-                    </span>
-
+                    <span class="admin-label">ADMIN</span>
+                    <span id="adminEmail" class="admin-email">กำลังโหลด...</span>
                 </div>
-
             </div>
 
-
-
-            <button
-                id="logoutButton"
-                class="logout-button"
-                type="button"
-            >
-
-                <span>
-                    ↪
-                </span>
-
+            <button id="logoutButton" class="logout-button" type="button">
                 ออกจากระบบ
-
             </button>
 
-
         </div>
-
 
     </div>
 
@@ -174,297 +938,100 @@
 <main class="dashboard-container">
 
 
-    <!-- ==================================================
-         DASHBOARD HERO
-    ================================================== -->
+    <!-- DASHBOARD HERO -->
 
     <section class="dashboard-hero">
 
-
         <div class="dashboard-hero-content">
 
+            <div class="dashboard-badge">ADMIN CONTROL CENTER</div>
 
-            <div class="dashboard-badge">
+            <h1>Admin Dashboard</h1>
 
-                <span>
-                    ⚡
-                </span>
-
-                ADMIN CONTROL CENTER
-
-            </div>
-
-
-            <h1>
-                Admin Dashboard
-            </h1>
-
-
-            <p>
-                จัดการปัญหา วิธีแก้ไข และองค์ความรู้สำหรับ Coach &amp; Trainer
-            </p>
-
+            <p>จัดการปัญหา วิธีแก้ไข และองค์ความรู้สำหรับ Coach &amp; Trainer</p>
 
         </div>
 
-
-
-        <button
-            id="addProblemButton"
-            class="add-button hero-add-button"
-            type="button"
-        >
-
-            <span class="button-icon">
-                ＋
-            </span>
-
+        <button id="addProblemButton" class="add-button hero-add-button" type="button">
+            <span class="button-icon">+</span>
             เพิ่มปัญหา
-
         </button>
-
 
     </section>
 
 
-
-    <!-- ==================================================
-         STATISTICS
-    ================================================== -->
+    <!-- STATISTICS -->
 
     <section class="stats-grid">
 
-
-        <!-- TOTAL -->
-
         <article class="stat-card total-card">
-
-            <div class="stat-icon">
-
-                📚
-
-            </div>
-
-
+            <div class="stat-icon"></div>
             <div class="stat-content">
-
-                <span class="stat-label">
-                    ปัญหาทั้งหมด
-                </span>
-
-                <strong
-                    id="totalProblems"
-                    class="stat-number"
-                >
-                    0
-                </strong>
-
-                <span class="stat-description">
-                    รายการในระบบ
-                </span>
-
+                <span class="stat-label">ปัญหาทั้งหมด</span>
+                <strong id="totalProblems" class="stat-number">0</strong>
+                <span class="stat-description">รายการในระบบ</span>
             </div>
-
         </article>
-
-
-
-        <!-- PENDING -->
 
         <article class="stat-card pending-card">
-
-            <div class="stat-icon">
-
-                🟡
-
-            </div>
-
-
+            <div class="stat-icon"></div>
             <div class="stat-content">
-
-                <span class="stat-label">
-                    รอตรวจสอบ
-                </span>
-
-                <strong
-                    id="pendingProblems"
-                    class="stat-number"
-                >
-                    0
-                </strong>
-
-                <span class="stat-description">
-                    รอ Admin ตรวจสอบ
-                </span>
-
+                <span class="stat-label">รอตรวจสอบ</span>
+                <strong id="pendingProblems" class="stat-number">0</strong>
+                <span class="stat-description">รอ Admin ตรวจสอบ</span>
             </div>
-
         </article>
-
-
-
-        <!-- PUBLISHED -->
 
         <article class="stat-card published-card">
-
-            <div class="stat-icon">
-
-                🟢
-
-            </div>
-
-
+            <div class="stat-icon"></div>
             <div class="stat-content">
-
-                <span class="stat-label">
-                    เผยแพร่แล้ว
-                </span>
-
-                <strong
-                    id="publishedProblems"
-                    class="stat-number"
-                >
-                    0
-                </strong>
-
-                <span class="stat-description">
-                    ผู้ใช้สามารถดูได้
-                </span>
-
+                <span class="stat-label">เผยแพร่แล้ว</span>
+                <strong id="publishedProblems" class="stat-number">0</strong>
+                <span class="stat-description">ผู้ใช้สามารถดูได้</span>
             </div>
-
         </article>
-
-
-
-        <!-- REJECTED -->
 
         <article class="stat-card rejected-card">
-
-            <div class="stat-icon">
-
-                🔴
-
-            </div>
-
-
+            <div class="stat-icon"></div>
             <div class="stat-content">
-
-                <span class="stat-label">
-                    ไม่เผยแพร่
-                </span>
-
-                <strong
-                    id="rejectedProblems"
-                    class="stat-number"
-                >
-                    0
-                </strong>
-
-                <span class="stat-description">
-                    ซ่อนจากผู้ใช้งาน
-                </span>
-
+                <span class="stat-label">ไม่เผยแพร่</span>
+                <strong id="rejectedProblems" class="stat-number">0</strong>
+                <span class="stat-description">ซ่อนจากผู้ใช้งาน</span>
             </div>
-
         </article>
-
 
     </section>
 
 
-
-    <!-- ==================================================
-         PROBLEM MANAGEMENT
-    ================================================== -->
+    <!-- PROBLEM MANAGEMENT -->
 
     <section class="admin-section">
 
-
-        <!-- SECTION HEADER -->
-
         <div class="section-header">
 
-
             <div class="section-heading">
-
-
-                <div class="section-icon">
-                    🛠️
-                </div>
-
-
+                <div class="section-icon"></div>
                 <div>
-
-                    <h2>
-                        จัดการปัญหา
-                    </h2>
-
-                    <p>
-                        เพิ่ม แก้ไข ลบ และจัดการวิธีแก้ไขปัญหา
-                    </p>
-
+                    <h2>จัดการปัญหา</h2>
+                    <p>เพิ่ม แก้ไข ลบ และจัดการวิธีแก้ไขปัญหา</p>
                 </div>
-
-
             </div>
-
-
-
-            <!-- SEARCH -->
 
             <div class="search-wrapper">
-
-                <span class="search-icon">
-                    🔍
-                </span>
-
-                <input
-                    type="text"
-                    id="adminSearch"
-                    placeholder="ค้นหาปัญหา..."
-                    class="admin-search"
-                    autocomplete="off"
-                >
-
+                <span class="search-icon"></span>
+                <input type="text" id="adminSearch" placeholder="ค้นหาปัญหา..." class="admin-search" autocomplete="off">
             </div>
 
-
         </div>
-
-
-
-        <!-- DIVIDER -->
 
         <div class="section-divider"></div>
 
-
-
-        <!-- LOADING -->
-
-        <div
-            id="loading"
-            class="loading"
-        >
-
+        <div id="loading" class="loading">
             <div class="loading-spinner small"></div>
-
-            <span>
-                กำลังโหลดข้อมูล...
-            </span>
-
+            <span>กำลังโหลดข้อมูล...</span>
         </div>
 
-
-
-        <!-- PROBLEM LIST -->
-
-        <div
-            id="problemTable"
-            class="problem-table"
-        >
-        </div>
-
+        <div id="problemTable" class="problem-table"></div>
 
     </section>
 
@@ -477,384 +1044,115 @@
      MODAL : ADD / EDIT PROBLEM
 ================================================== -->
 
-<div
-    id="problemModal"
-    class="modal"
->
-
+<div id="problemModal" class="modal">
 
     <div class="modal-content">
 
-
-        <!-- MODAL HEADER -->
-
         <div class="modal-header">
 
-
             <div class="modal-title-area">
-
-                <div class="modal-icon">
-                    🐞
-                </div>
-
+                <div class="modal-icon"></div>
                 <div>
-
-                    <h2 id="problemModalTitle">
-                        เพิ่มปัญหาใหม่
-                    </h2>
-
-                    <p>
-                        กรอกข้อมูลปัญหาให้ครบถ้วน
-                    </p>
-
+                    <h2 id="problemModalTitle">เพิ่มปัญหาใหม่</h2>
+                    <p>กรอกข้อมูลปัญหาให้ครบถ้วน</p>
                 </div>
-
             </div>
 
-
-
-            <button
-                id="closeProblemModal"
-                class="close-button"
-                type="button"
-                aria-label="ปิด"
-            >
-
-                ×
-
-            </button>
-
+            <button id="closeProblemModal" class="close-button" type="button" aria-label="ปิด">×</button>
 
         </div>
 
-
-
-        <!-- FORM -->
-
         <form id="problemForm">
 
-
-            <!-- Hidden ID -->
-
-            <input
-                type="hidden"
-                id="editingProblemId"
-            >
-
-
-
-            <!-- ==================================================
-                 BASIC INFORMATION
-            ================================================== -->
+            <input type="hidden" id="editingProblemId">
 
             <div class="form-section">
 
-
-                <div class="form-section-title">
-
-                    <span>
-                        📋
-                    </span>
-
-                    ข้อมูลปัญหา
-
-                </div>
-
-
-
-                <!-- TITLE -->
+                <div class="form-section-title"><span></span>ข้อมูลปัญหา</div>
 
                 <div class="form-group">
-
-                    <label for="title">
-                        ชื่อปัญหา
-                    </label>
-
-                    <input
-                        type="text"
-                        id="title"
-                        placeholder="เช่น ESP32 ไม่พบ COM Port"
-                        required
-                    >
-
+                    <label for="title">ชื่อปัญหา</label>
+                    <input type="text" id="title" placeholder="เช่น ESP32 ไม่พบ COM Port" required>
                 </div>
 
-
-
-                <!-- DESCRIPTION -->
-
                 <div class="form-group">
-
-                    <label for="description">
-                        รายละเอียดปัญหา
-                    </label>
-
-                    <textarea
-                        id="description"
-                        rows="4"
-                        placeholder="อธิบายรายละเอียดของปัญหาที่พบ..."
-                        required
-                    ></textarea>
-
+                    <label for="description">รายละเอียดปัญหา</label>
+                    <textarea id="description" rows="4" placeholder="อธิบายรายละเอียดของปัญหาที่พบ..." required></textarea>
                 </div>
 
-
-
-                <!-- CATEGORY -->
-
                 <div class="form-group">
-
-                    <label for="category">
-                        หมวดหมู่
-                    </label>
-
-                    <select
-                        id="category"
-                        required
-                    >
-
-                        <option value="">
-                            -- เลือกหมวดหมู่ --
-                        </option>
-
-                        <option value="ESP32">
-                            ESP32
-                        </option>
-
-                        <option value="ESP8266">
-                            ESP8266
-                        </option>
-
-                        <option value="Arduino">
-                            Arduino
-                        </option>
-
-                        <option value="Servo">
-                            Servo
-                        </option>
-
-                        <option value="Sensor">
-                            Sensor
-                        </option>
-
-                        <option value="WiFi">
-                            WiFi
-                        </option>
-
-                        <option value="Hardware">
-                            Hardware
-                        </option>
-
+                    <label for="category">หมวดหมู่</label>
+                    <select id="category" required>
+                        <option value="">-- เลือกหมวดหมู่ --</option>
+                        <option value="ESP32">ESP32</option>
+                        <option value="ESP8266">ESP8266</option>
+                        <option value="Arduino">Arduino</option>
+                        <option value="Servo">Servo</option>
+                        <option value="Sensor">Sensor</option>
+                        <option value="WiFi">WiFi</option>
+                        <option value="Hardware">Hardware</option>
                     </select>
-
                 </div>
 
-
-                <!-- CLASS -->
-
                 <div class="form-group">
-
-                    <label for="class_name">
-                        ระดับ Class
-                    </label>
-
+                    <label for="class_name">ระดับ Class</label>
                     <div class="class-picker" id="classPicker" role="group" aria-label="เลือกระดับ Class">
-                        <label class="class-check">
-                            <input type="checkbox" name="class_name" value="idektep Lv.1">
-                            <span class="check-ui"></span><span>idektep Lv.1</span>
-                        </label>
-                        <label class="class-check">
-                            <input type="checkbox" name="class_name" value="idektep Lv.2">
-                            <span class="check-ui"></span><span>idektep Lv.2</span>
-                        </label>
-                        <label class="class-check">
-                            <input type="checkbox" name="class_name" value="idektep Lv.3">
-                            <span class="check-ui"></span><span>idektep Lv.3</span>
-                        </label>
-                        <label class="class-check">
-                            <input type="checkbox" name="class_name" value="idektep Lv.4">
-                            <span class="check-ui"></span><span>idektep Lv.4</span>
-                        </label>
-                        <label class="class-check">
-                            <input type="checkbox" name="class_name" value="idektep Lv.5">
-                            <span class="check-ui"></span><span>idektep Lv.5</span>
-                        </label>
+                        <label class="class-check"><input type="checkbox" name="class_name" value="idektep Lv.1"><span class="check-ui"></span><span>idektep Lv.1</span></label>
+                        <label class="class-check"><input type="checkbox" name="class_name" value="idektep Lv.2"><span class="check-ui"></span><span>idektep Lv.2</span></label>
+                        <label class="class-check"><input type="checkbox" name="class_name" value="idektep Lv.3"><span class="check-ui"></span><span>idektep Lv.3</span></label>
+                        <label class="class-check"><input type="checkbox" name="class_name" value="idektep Lv.4"><span class="check-ui"></span><span>idektep Lv.4</span></label>
+                        <label class="class-check"><input type="checkbox" name="class_name" value="idektep Lv.5"><span class="check-ui"></span><span>idektep Lv.5</span></label>
                     </div>
                     <small>เลือกได้มากกว่า 1 Class · ระบบจะบันทึกเป็นรายการเดียว</small>
-
                 </div>
-
 
             </div>
 
-
-
-            <!-- ==================================================
-                 PROBLEM DETAILS
-            ================================================== -->
-
             <div class="form-section">
 
-
-                <div class="form-section-title">
-
-                    <span>
-                        🔎
-                    </span>
-
-                    รายละเอียดเพิ่มเติม
-
-                </div>
-
-
-
-                <!-- SYMPTOMS -->
+                <div class="form-section-title"><span></span>รายละเอียดเพิ่มเติม</div>
 
                 <div class="form-group">
-
-                    <label for="symptoms">
-                        อาการที่พบ
-                    </label>
-
-                    <textarea
-                        id="symptoms"
-                        rows="3"
-                        placeholder="อธิบายอาการที่เกิดขึ้น..."
-                    ></textarea>
-
+                    <label for="symptoms">อาการที่พบ</label>
+                    <textarea id="symptoms" rows="3" placeholder="อธิบายอาการที่เกิดขึ้น..."></textarea>
                 </div>
 
-
-
-                <!-- CAUSES -->
-
                 <div class="form-group">
-
-                    <label for="causes">
-                        สาเหตุที่คาดว่าเกิดจาก
-                    </label>
-
-                    <textarea
-                        id="causes"
-                        rows="3"
-                        placeholder="อธิบายสาเหตุที่เป็นไปได้..."
-                    ></textarea>
-
+                    <label for="causes">สาเหตุที่คาดว่าเกิดจาก</label>
+                    <textarea id="causes" rows="3" placeholder="อธิบายสาเหตุที่เป็นไปได้..."></textarea>
                 </div>
 
-
-
-                <!-- STATUS -->
-
                 <div class="form-group">
-
-                    <label for="status">
-                        สถานะการเผยแพร่
-                    </label>
-
+                    <label for="status">สถานะการเผยแพร่</label>
                     <select id="status">
-
-                        <option value="pending">
-                            🟡 รอตรวจสอบ
-                        </option>
-
-                        <option value="published">
-                            🟢 เผยแพร่
-                        </option>
-
-                        <option value="rejected">
-                            🔴 ไม่เผยแพร่
-                        </option>
-
+                        <option value="pending">รอตรวจสอบ</option>
+                        <option value="published">เผยแพร่</option>
+                        <option value="rejected">ไม่เผยแพร่</option>
                     </select>
-
                 </div>
 
-
             </div>
-
-
-
-            <!-- ==================================================
-                 IMAGE
-            ================================================== -->
 
             <div class="form-section">
 
-
-                <div class="form-section-title">
-
-                    <span>
-                        🖼️
-                    </span>
-
-                    รูปภาพปัญหา
-
-                </div>
-
-
+                <div class="form-section-title"><span></span>รูปภาพปัญหา</div>
 
                 <div class="form-group">
-
-                    <label for="problemImage">
-                        อัปโหลดรูปภาพ
-                    </label>
-
-                    <input
-                        type="file"
-                        id="problemImage"
-                        accept="image/jpeg,image/png,image/webp"
-                    >
-
-                    <small>
-                        รองรับ JPG, PNG, WEBP ขนาดไม่เกิน 5 MB
-                    </small>
-
-
-                    <div
-                        id="problemImagePreview"
-                        class="image-preview"
-                    >
-                    </div>
-
+                    <label for="problemImage">อัปโหลดรูปภาพ</label>
+                    <input type="file" id="problemImage" accept="image/jpeg,image/png,image/webp">
+                    <small>รองรับ JPG, PNG, WEBP ขนาดไม่เกิน 5 MB</small>
+                    <div id="problemImagePreview" class="image-preview"></div>
                 </div>
-
 
             </div>
 
-
-
-            <!-- MESSAGE -->
-
-            <div
-                id="formMessage"
-                class="form-message"
-            ></div>
-
-
-
-            <!-- SAVE -->
+            <div id="formMessage" class="form-message"></div>
 
             <div class="modal-actions">
-
-
-                <button
-                    type="submit"
-                    class="save-button"
-                    id="saveProblemButton"
-                >
-
-                    💾
-                    บันทึกปัญหา
-
-                </button>
-
-
+                <button type="submit" class="save-button" id="saveProblemButton">บันทึกปัญหา</button>
             </div>
 
-
         </form>
-
 
     </div>
 
@@ -866,303 +1164,88 @@
      MODAL : SOLUTIONS
 ================================================== -->
 
-<div
-    id="solutionModal"
-    class="modal"
->
-
+<div id="solutionModal" class="modal">
 
     <div class="modal-content solution-modal">
 
-
-        <!-- HEADER -->
-
         <div class="modal-header">
 
-
             <div class="modal-title-area">
-
-                <div class="modal-icon">
-                    🛠️
-                </div>
-
+                <div class="modal-icon"></div>
                 <div>
-
-                    <h2>
-                        วิธีแก้ไข
-                    </h2>
-
-                    <p
-                        id="solutionProblemTitle"
-                        class="modal-subtitle"
-                    >
-                    </p>
-
+                    <h2>วิธีแก้ไข</h2>
+                    <p id="solutionProblemTitle" class="modal-subtitle"></p>
                 </div>
-
             </div>
 
-
-
-            <button
-                id="closeSolutionModal"
-                class="close-button"
-                type="button"
-                aria-label="ปิด"
-            >
-
-                ×
-
-            </button>
-
+            <button id="closeSolutionModal" class="close-button" type="button" aria-label="ปิด">×</button>
 
         </div>
-
-
-
-        <!-- ADD STEP -->
 
         <div class="solution-toolbar">
-
-
             <div>
-
-                <h3>
-                    ขั้นตอนการแก้ไข
-                </h3>
-
-                <p>
-                    เพิ่มหรือแก้ไขขั้นตอนของวิธีแก้ไข
-                </p>
-
+                <h3>ขั้นตอนการแก้ไข</h3>
+                <p>เพิ่มหรือแก้ไขขั้นตอนของวิธีแก้ไข</p>
             </div>
-
-
-
-            <button
-                id="addSolutionButton"
-                class="add-button solution-add-button"
-                type="button"
-            >
-
-                ＋ เพิ่มขั้นตอน
-
-            </button>
-
-
+            <button id="addSolutionButton" class="add-button solution-add-button" type="button">+ เพิ่มขั้นตอน</button>
         </div>
 
+        <div id="solutionList" class="solution-list"></div>
 
-
-        <!-- SOLUTION LIST -->
-
-        <div
-            id="solutionList"
-            class="solution-list"
-        >
-        </div>
-
-
-
-        <!-- ==================================================
-             SOLUTION FORM
-        ================================================== -->
-
-        <div
-            id="solutionFormBox"
-            class="solution-form-box"
-            style="display:none;"
-        >
-
+        <div id="solutionFormBox" class="solution-form-box" style="display:none;">
 
             <div class="solution-form-header">
-
                 <div>
-
-                    <h3 id="solutionFormTitle">
-                        เพิ่มขั้นตอน
-                    </h3>
-
-                    <p>
-                        กรอกข้อมูลขั้นตอนการแก้ไข
-                    </p>
-
+                    <h3 id="solutionFormTitle">เพิ่มขั้นตอน</h3>
+                    <p>กรอกข้อมูลขั้นตอนการแก้ไข</p>
                 </div>
-
             </div>
-
-
 
             <form id="solutionForm">
 
-
-                <input
-                    type="hidden"
-                    id="editingSolutionId"
-                >
-
-
-
-                <!-- STEP NUMBER -->
+                <input type="hidden" id="editingSolutionId">
 
                 <div class="form-group">
-
-                    <label for="stepNumber">
-                        ขั้นตอนที่
-                    </label>
-
-                    <input
-                        type="number"
-                        id="stepNumber"
-                        min="1"
-                        placeholder="1"
-                        required
-                    >
-
+                    <label for="stepNumber">ขั้นตอนที่</label>
+                    <input type="number" id="stepNumber" min="1" placeholder="1" required>
                 </div>
 
-
-
-                <!-- TITLE -->
-
                 <div class="form-group">
-
-                    <label for="solutionTitle">
-                        หัวข้อขั้นตอน
-                    </label>
-
-                    <input
-                        type="text"
-                        id="solutionTitle"
-                        placeholder="เช่น ตรวจสอบสาย USB"
-                        required
-                    >
-
+                    <label for="solutionTitle">หัวข้อขั้นตอน</label>
+                    <input type="text" id="solutionTitle" placeholder="เช่น ตรวจสอบสาย USB" required>
                 </div>
 
-
-
-                <!-- DESCRIPTION -->
-
                 <div class="form-group">
-
-                    <label for="solutionDescription">
-                        รายละเอียด
-                    </label>
-
-                    <textarea
-                        id="solutionDescription"
-                        rows="5"
-                        placeholder="อธิบายวิธีแก้ไขอย่างละเอียด..."
-                    ></textarea>
-
+                    <label for="solutionDescription">รายละเอียด</label>
+                    <textarea id="solutionDescription" rows="5" placeholder="อธิบายวิธีแก้ไขอย่างละเอียด..."></textarea>
                 </div>
 
-
-
-                <!-- STATUS -->
-
                 <div class="form-group">
-
-                    <label for="solutionStatus">
-                        สถานะ
-                    </label>
-
+                    <label for="solutionStatus">สถานะ</label>
                     <select id="solutionStatus">
-
-                        <option value="pending">
-                            🟡 รอตรวจสอบ
-                        </option>
-
-                        <option value="published">
-                            🟢 เผยแพร่
-                        </option>
-
-                        <option value="rejected">
-                            🔴 ไม่เผยแพร่
-                        </option>
-
+                        <option value="pending">รอตรวจสอบ</option>
+                        <option value="published">เผยแพร่</option>
+                        <option value="rejected">ไม่เผยแพร่</option>
                     </select>
-
                 </div>
-
-
-
-                <!-- IMAGE -->
 
                 <div class="form-group">
-
-                    <label for="solutionImage">
-                        รูปภาพของขั้นตอนนี้
-                    </label>
-
-                    <input
-                        type="file"
-                        id="solutionImage"
-                        accept="image/jpeg,image/png,image/webp"
-                    >
-
-                    <small>
-                        รองรับ JPG, PNG, WEBP ขนาดไม่เกิน 5 MB
-                    </small>
-
-
-                    <div
-                        id="solutionImagePreview"
-                        class="image-preview"
-                    >
-                    </div>
-
+                    <label for="solutionImage">รูปภาพของขั้นตอนนี้</label>
+                    <input type="file" id="solutionImage" accept="image/jpeg,image/png,image/webp">
+                    <small>รองรับ JPG, PNG, WEBP ขนาดไม่เกิน 5 MB</small>
+                    <div id="solutionImagePreview" class="image-preview"></div>
                 </div>
 
-
-
-                <!-- MESSAGE -->
-
-                <div
-                    id="solutionFormMessage"
-                    class="form-message"
-                ></div>
-
-
-
-                <!-- BUTTONS -->
+                <div id="solutionFormMessage" class="form-message"></div>
 
                 <div class="solution-form-buttons">
-
-
-                    <button
-                        type="submit"
-                        class="save-button"
-                        id="saveSolutionButton"
-                    >
-
-                        💾
-                        บันทึกขั้นตอน
-
-                    </button>
-
-
-
-                    <button
-                        type="button"
-                        id="cancelSolutionButton"
-                        class="cancel-button"
-                    >
-
-                        ยกเลิก
-
-                    </button>
-
-
+                    <button type="submit" class="save-button" id="saveSolutionButton">บันทึกขั้นตอน</button>
+                    <button type="button" id="cancelSolutionButton" class="cancel-button">ยกเลิก</button>
                 </div>
-
 
             </form>
 
-
         </div>
-
 
     </div>
 
@@ -1175,9 +1258,7 @@
 ================================================== -->
 
 <script src="js/supabase.js"></script>
-
 <script src="js/dashboard.js"></script>
-
 
 
 <!-- ==================================================
@@ -1185,39 +1266,15 @@
 ================================================== -->
 
 <script>
-
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
-
-        setTimeout(
-            function () {
-
-                const loading =
-                    document.getElementById("pageLoading");
-
-                if (loading) {
-
-                    loading.classList.add("hidden");
-
-                    setTimeout(
-                        function () {
-
-                            loading.remove();
-
-                        },
-                        400
-                    );
-
-                }
-
-            },
-            500
-        );
-
-    }
-);
-
+document.addEventListener("DOMContentLoaded", function () {
+    setTimeout(function () {
+        const loading = document.getElementById("pageLoading");
+        if (loading) {
+            loading.classList.add("hidden");
+            setTimeout(function () { loading.remove(); }, 400);
+        }
+    }, 500);
+});
 </script>
 
 
