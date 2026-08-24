@@ -974,11 +974,114 @@ async function loadSolutions() {
 
 
     // ==============================
+    // LOAD SOLUTION IMAGES
+    // ==============================
+
+    const solutionIds =
+        solutions
+            .map(
+                (solution) =>
+                    solution.id
+            )
+            .filter(Boolean);
+
+
+    let solutionImages = [];
+
+
+    if (
+        solutionIds.length > 0
+    ) {
+
+        const {
+            data: images,
+            error: imageError
+        } =
+            await supabaseClient
+
+                .from(
+                    "solution_images"
+                )
+
+                .select(`
+                    id,
+                    solution_id,
+                    image_url,
+                    caption,
+                    created_at
+                `)
+
+                .in(
+                    "solution_id",
+                    solutionIds
+                )
+
+                .order(
+                    "created_at",
+                    {
+                        ascending: true
+                    }
+                );
+
+
+        if (imageError) {
+
+            console.warn(
+                "Load solution_images error:",
+                imageError
+            );
+
+        } else {
+
+            solutionImages =
+                images || [];
+
+        }
+
+    }
+
+
+    const imagesBySolution =
+        new Map();
+
+
+    solutionImages.forEach(
+        (image) => {
+
+            const key =
+                String(
+                    image.solution_id
+                );
+
+
+            if (
+                !imagesBySolution.has(
+                    key
+                )
+            ) {
+
+                imagesBySolution.set(
+                    key,
+                    []
+                );
+
+            }
+
+
+            imagesBySolution
+                .get(key)
+                .push(image);
+
+        }
+    );
+
+
+    // ==============================
     // DISPLAY SOLUTIONS
     // ==============================
 
     solutions.forEach(
-        solution => {
+        (solution) => {
 
             const div =
                 document.createElement(
@@ -988,6 +1091,110 @@ async function loadSolutions() {
 
             div.className =
                 "solution-card";
+
+
+            const images =
+                imagesBySolution.get(
+                    String(
+                        solution.id
+                    )
+                ) || [];
+
+
+            const imageHtml =
+                images
+                    .filter(
+                        (image) =>
+                            image &&
+                            image.image_url
+                    )
+                    .map(
+                        (image) => {
+
+                            const imageUrl =
+                                getSolutionImageUrl(
+                                    image.image_url
+                                );
+
+
+                            return `
+
+                                <div
+                                    class="solution-image"
+                                    style="
+                                        margin-top:16px;
+                                        text-align:center;
+                                    "
+                                >
+
+                                    <img
+                                        src="${escapeHtml(
+                                            imageUrl
+                                        )}"
+                                        alt="${escapeHtml(
+                                            image.caption ||
+                                            solution.title ||
+                                            "รูปภาพขั้นตอน"
+                                        )}"
+                                        loading="lazy"
+                                        style="
+                                            display:block;
+                                            width:100%;
+                                            max-width:800px;
+                                            max-height:600px;
+                                            height:auto;
+                                            object-fit:contain;
+                                            margin:0 auto;
+                                            border-radius:10px;
+                                            cursor:pointer;
+                                            background:#f8fafc;
+                                            border:1px solid #e2e8f0;
+                                        "
+                                        onclick="window.open('${escapeHtml(
+                                            imageUrl
+                                        )}', '_blank')"
+                                        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+                                    >
+
+                                    <div
+                                        style="
+                                            display:none;
+                                            padding:15px;
+                                            color:#dc2626;
+                                            border:1px solid #fecaca;
+                                            border-radius:8px;
+                                            margin-top:8px;
+                                        "
+                                    >
+                                        ❌ ไม่สามารถโหลดรูปภาพได้
+
+                                    </div>
+
+                                    ${
+                                        image.caption
+                                            ? `
+                                                <p
+                                                    style="
+                                                        margin:8px 0 0;
+                                                        color:#64748b;
+                                                        font-size:14px;
+                                                    "
+                                                >
+                                                    ${escapeHtml(
+                                                        image.caption
+                                                    )}
+                                                </p>
+                                            `
+                                            : ""
+                                    }
+
+                                </div>
+
+                            `;
+
+                        }
+                    )
+                    .join("");
 
 
             div.innerHTML = `
@@ -1004,6 +1211,7 @@ async function loadSolutions() {
 
                 </div>
 
+
                 <h3>
 
                     ${escapeHtml(
@@ -1012,6 +1220,7 @@ async function loadSolutions() {
                     )}
 
                 </h3>
+
 
                 <p>
 
@@ -1022,6 +1231,9 @@ async function loadSolutions() {
 
                 </p>
 
+
+                ${imageHtml}
+
             `;
 
 
@@ -1030,6 +1242,96 @@ async function loadSolutions() {
             );
 
         }
+    );
+
+}
+
+
+// ========================================
+// GET SOLUTION IMAGE URL
+// ========================================
+
+function getSolutionImageUrl(
+    imageUrl
+) {
+
+    if (!imageUrl) {
+
+        return "";
+
+    }
+
+
+    // ถ้าเป็น Public URL อยู่แล้ว
+    if (
+        imageUrl.startsWith(
+            "http://"
+        ) ||
+        imageUrl.startsWith(
+            "https://"
+        )
+    ) {
+
+        return imageUrl;
+
+    }
+
+
+    let path =
+        imageUrl;
+
+
+    if (
+        path.startsWith("/")
+    ) {
+
+        path =
+            path.substring(1);
+
+    }
+
+
+    // รองรับ URL ที่บันทึกเป็น Supabase Storage path
+    const storageMarker =
+        "/storage/v1/object/public/solution-images/";
+
+
+    const markerIndex =
+        path.indexOf(
+            storageMarker
+        );
+
+
+    if (
+        markerIndex !== -1
+    ) {
+
+        path =
+            path.substring(
+                markerIndex +
+                storageMarker.length
+            );
+
+    }
+
+
+    const {
+        data
+    } =
+        supabaseClient.storage
+
+            .from(
+                "solution-images"
+            )
+
+            .getPublicUrl(
+                path
+            );
+
+
+    return (
+        data?.publicUrl ||
+        imageUrl
     );
 
 }
