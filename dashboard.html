@@ -666,12 +666,11 @@
                     <select
                         id="class_name"
                         name="class_name"
+                        multiple
+                        size="5"
                         required
+                        style="min-height:140px;"
                     >
-
-                        <option value="">
-                            -- เลือก Class --
-                        </option>
 
                         <option value="idektep Lv.1">
                             idektep Lv.1
@@ -696,7 +695,7 @@
                     </select>
 
                     <small>
-                        ระบุระดับ Class ของปัญหานี้
+                        สามารถเลือกได้มากกว่า 1 Class (กด Ctrl ค้างไว้แล้วคลิก หรือใช้ Shift เพื่อเลือกเป็นช่วง)
                     </small>
 
                 </div>
@@ -817,16 +816,22 @@
                         อัปโหลดรูปภาพ
                     </label>
 
-                    <input
-                        type="file"
-                        id="problemImage"
-                        accept="image/jpeg,image/png,image/webp"
+                    <div
+                        id="problemImageDropZone"
+                        class="image-drop-zone"
+                        style="border:2px dashed #cbd5e1;border-radius:12px;padding:24px;text-align:center;background:#f8fafc;cursor:pointer;transition:all .2s ease;"
                     >
-
-                    <small>
-                        รองรับ JPG, PNG, WEBP ขนาดไม่เกิน 5 MB
-                    </small>
-
+                        <div style="font-size:32px;margin-bottom:8px;">🖼️</div>
+                        <strong style="display:block;color:#334155;">ลากรูปภาพมาวางที่นี่</strong>
+                        <span style="display:block;margin:6px 0;color:#64748b;">หรือคลิกเพื่อเลือกไฟล์</span>
+                        <small style="color:#94a3b8;">JPG, PNG, WEBP ขนาดไม่เกิน 5 MB</small>
+                        <input
+                            type="file"
+                            id="problemImage"
+                            accept="image/jpeg,image/png,image/webp"
+                            style="display:none;"
+                        >
+                    </div>
 
                     <div
                         id="problemImagePreview"
@@ -1113,16 +1118,22 @@
                         รูปภาพของขั้นตอนนี้
                     </label>
 
-                    <input
-                        type="file"
-                        id="solutionImage"
-                        accept="image/jpeg,image/png,image/webp"
+                    <div
+                        id="solutionImageDropZone"
+                        class="image-drop-zone"
+                        style="border:2px dashed #cbd5e1;border-radius:12px;padding:24px;text-align:center;background:#f8fafc;cursor:pointer;transition:all .2s ease;"
                     >
-
-                    <small>
-                        รองรับ JPG, PNG, WEBP ขนาดไม่เกิน 5 MB
-                    </small>
-
+                        <div style="font-size:32px;margin-bottom:8px;">🖼️</div>
+                        <strong style="display:block;color:#334155;">ลากรูปภาพมาวางที่นี่</strong>
+                        <span style="display:block;margin:6px 0;color:#64748b;">หรือคลิกเพื่อเลือกไฟล์</span>
+                        <small style="color:#94a3b8;">JPG, PNG, WEBP ขนาดไม่เกิน 5 MB</small>
+                        <input
+                            type="file"
+                            id="solutionImage"
+                            accept="image/jpeg,image/png,image/webp"
+                            style="display:none;"
+                        >
+                    </div>
 
                     <div
                         id="solutionImagePreview"
