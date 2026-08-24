@@ -1,119 +1,221 @@
 <!DOCTYPE html>
 <html lang="th">
-
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เข้าสู่ระบบ · Support Problem</title>
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>เข้าสู่ระบบ </title>
-
-    <link
-        rel="stylesheet"
-        href="css/style.css"
-    >
-   
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
 
     <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-     <link rel="stylesheet" href="css/leading-company.css">
 
+    <style>
+        :root{
+            --ink:#0B0D10;
+            --panel:#15181D;
+            --panel-2:#1B1F25;
+            --border:#282D34;
+            --border-bright:#3A414A;
+            --accent:#5EE6A6;
+            --accent-soft:rgba(94,230,166,.10);
+            --text:#EDEFF1;
+            --text-muted:#83898F;
+            --text-faint:#565C63;
+            --danger:#F0716D;
+        }
+
+        *{box-sizing:border-box;margin:0;padding:0;}
+
+        body.login-page{
+            min-height:100vh;
+            background:var(--ink);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:24px;
+            font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;
+            color:var(--text);
+        }
+
+        .login-container{
+            width:100%;
+            max-width:392px;
+        }
+
+        .login-card{
+            background:var(--panel);
+            border:1px solid var(--border);
+            border-radius:16px;
+            padding:48px 40px 36px;
+        }
+
+        .logo{
+            display:flex;
+            justify-content:center;
+            margin-bottom:24px;
+        }
+
+        .logo img{
+            width:38px;
+            height:38px;
+            border-radius:9px;
+            display:block;
+        }
+
+        h1{
+            font-family:'Chakra Petch',sans-serif;
+            font-weight:600;
+            font-size:20px;
+            line-height:1.35;
+            text-align:center;
+            color:var(--text);
+            letter-spacing:.005em;
+        }
+
+        h1 .light{
+            color:var(--text-muted);
+            font-weight:500;
+        }
+
+        .subtitle{
+            text-align:center;
+            font-size:13.5px;
+            color:var(--text-muted);
+            margin-top:8px;
+            margin-bottom:34px;
+        }
+
+        .form-group{
+            margin-bottom:16px;
+        }
+
+        .form-group label{
+            display:block;
+            font-size:12.5px;
+            font-weight:500;
+            color:var(--text-muted);
+            margin-bottom:7px;
+        }
+
+        .form-group input{
+            width:100%;
+            background:var(--panel-2);
+            border:1px solid var(--border);
+            border-radius:9px;
+            padding:12px 14px;
+            font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;
+            font-size:14.5px;
+            color:var(--text);
+            transition:border-color .15s ease, box-shadow .15s ease;
+        }
+
+        .form-group input::placeholder{
+            color:var(--text-faint);
+        }
+
+        .form-group input:hover{
+            border-color:var(--border-bright);
+        }
+
+        .form-group input:focus{
+            outline:none;
+            border-color:var(--accent);
+            box-shadow:0 0 0 3px var(--accent-soft);
+        }
+
+        button#loginButton{
+            width:100%;
+            margin-top:10px;
+            padding:13px 14px;
+            background:var(--accent);
+            color:#062017;
+            border:none;
+            border-radius:9px;
+            font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;
+            font-size:14.5px;
+            font-weight:600;
+            cursor:pointer;
+            transition:opacity .15s ease, transform .12s ease;
+        }
+
+        button#loginButton:hover{
+            opacity:.9;
+        }
+
+        button#loginButton:active{
+            transform:scale(.98);
+        }
+
+        .message{
+            min-height:18px;
+            text-align:center;
+            font-size:13px;
+            margin-top:16px;
+        }
+
+        .message.error{ color:var(--danger); }
+        .message.success{ color:var(--accent); }
+
+        .back-home{
+            text-align:center;
+            margin-top:28px;
+        }
+
+        .back-home a{
+            font-size:13px;
+            color:var(--text-muted);
+            text-decoration:none;
+            transition:color .15s ease;
+        }
+
+        .back-home a:hover{
+            color:var(--text);
+        }
+
+        @media (max-width:480px){
+            .login-card{ padding:40px 26px 30px; border-radius:14px; }
+        }
+    </style>
 </head>
-
 <body class="login-page">
 
     <div class="login-container">
-
         <div class="login-card">
-
             <div class="logo">
-              <a class="logo-text brand-link" href="index.html" aria-label="Support Problem home">
-            <span class="brand-mark"><img src="logo.png" alt="Support Problem"></span>
-        </a>
+                <a class="logo-text brand-link" href="index.html" aria-label="Support Problem home">
+                    <span class="brand-mark"><img src="logo.png" alt="Support Problem"></span>
+                </a>
             </div>
 
-            <h1>
-               Support Problemfor Coach & Trainer
-
-            </h1>
-
-            <p class="subtitle">
-                ศูนย์รวมปัญหาและวิธีแก้ไขระบบ IoT
-            </p>
-
+            <h1>Support Problem <span class="light">for Coach &amp; Trainer</span></h1>
+            <p class="subtitle">ศูนย์รวมปัญหาและวิธีแก้ไขระบบ IoT</p>
 
             <form id="loginForm">
-
                 <div class="form-group">
-
-                    <label for="email">
-                        Email
-                    </label>
-
-                    <input
-                        type="email"
-                        id="email"
-                        placeholder="กรอก Email"
-                        required
-                    >
-
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="กรอก Email" required>
                 </div>
-
-
                 <div class="form-group">
-
-                    <label for="password">
-                        Password
-                    </label>
-
-                    <input
-                        type="password"
-                        id="password"
-                        placeholder="กรอก Password"
-                        required
-                    >
-
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="กรอก Password" required>
                 </div>
-
-
-                <button
-                    type="submit"
-                    id="loginButton"
-                >
-                    เข้าสู่ระบบ
-                </button>
-
+                <button type="submit" id="loginButton">เข้าสู่ระบบ</button>
             </form>
 
-
-            <div
-                id="message"
-                class="message"
-            ></div>
-
-
-            <div class="back-home">
-
-                <a href="index.html">
-                    ← กลับหน้าหลัก
-                </a>
-
-            </div>
-
+            <div id="message" class="message"></div>
         </div>
 
+        <div class="back-home">
+            <a href="index.html">← กลับหน้าหลัก</a>
+        </div>
     </div>
-
 
     <!-- Supabase configuration -->
     <script src="js/supabase.js"></script>
-
     <!-- Login system -->
     <script src="js/login.js"></script>
-
 </body>
-
 </html>
