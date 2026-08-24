@@ -2394,8 +2394,94 @@ async function manageSolutions(
     }
 
 
+    // โหลดรูปของแต่ละขั้นตอน
+    const solutionIds =
+        (data || [])
+            .map((item) => item.id)
+            .filter(Boolean);
+
+    let imageRows = [];
+
+    if (solutionIds.length > 0) {
+
+        const {
+            data: images,
+            error: imageError
+        } =
+            await supabaseClient
+                .from("solution_images")
+                .select(
+                    "id, solution_id, image_url, caption, created_at"
+                )
+                .in(
+                    "solution_id",
+                    solutionIds
+                )
+                .order(
+                    "created_at",
+                    {
+                        ascending: true
+                    }
+                );
+
+        if (imageError) {
+
+            console.warn(
+                "LOAD SOLUTION IMAGES ERROR:",
+                imageError
+            );
+
+        } else {
+
+            imageRows =
+                images || [];
+
+        }
+
+    }
+
+
+    const imagesBySolution =
+        new Map();
+
+    imageRows.forEach((image) => {
+
+        const key =
+            String(image.solution_id);
+
+        if (
+            !imagesBySolution.has(key)
+        ) {
+
+            imagesBySolution.set(
+                key,
+                []
+            );
+
+        }
+
+        imagesBySolution
+            .get(key)
+            .push(image);
+
+    });
+
+
+    const solutionsWithImages =
+        (data || []).map((solution) => ({
+
+            ...solution,
+
+            images:
+                imagesBySolution.get(
+                    String(solution.id)
+                ) || []
+
+        }));
+
+
     renderSolutionList(
-        data || []
+        solutionsWithImages
     );
 
 
@@ -2421,6 +2507,9 @@ async function manageSolutions(
 // RENDER SOLUTION LIST
 // ============================================================
 
+
+// ============================================================
+
 function renderSolutionList(
     solutions
 ) {
@@ -2433,6 +2522,7 @@ function renderSolutionList(
 
 
     if (
+        !solutions ||
         solutions.length === 0
     ) {
 
@@ -2458,81 +2548,174 @@ function renderSolutionList(
     list.innerHTML =
         solutions
             .map(
-                (sol) => `
+                (sol) => {
 
-                <div
-                    style="
-                        background:#f8fafc;
-                        border:1px solid #e2e8f0;
-                        border-radius:8px;
-                        padding:12px 16px;
-                        margin-bottom:10px;
-                        display:flex;
-                        justify-content:space-between;
-                        align-items:flex-start;
-                    "
-                >
+                    const images =
+                        Array.isArray(sol.images)
+                            ? sol.images
+                            : [];
 
-                    <div>
+                    const imageHtml =
+                        images
+                            .filter(
+                                (image) =>
+                                    image &&
+                                    image.image_url
+                            )
+                            .map(
+                                (image) => `
 
-                        <strong
+                                    <div
+                                        style="
+                                            margin-top:12px;
+                                            padding:8px;
+                                            background:#fff;
+                                            border:1px solid #e2e8f0;
+                                            border-radius:8px;
+                                        "
+                                    >
+
+                                        <img
+                                            src="${escapeHtml(image.image_url)}"
+                                            alt="${escapeHtml(
+                                                image.caption ||
+                                                sol.title ||
+                                                "รูปภาพขั้นตอน"
+                                            )}"
+                                            style="
+                                                display:block;
+                                                width:100%;
+                                                max-width:520px;
+                                                max-height:320px;
+                                                object-fit:contain;
+                                                margin:auto;
+                                                border-radius:6px;
+                                                cursor:pointer;
+                                            "
+                                            loading="lazy"
+                                            onclick="window.open('${escapeHtml(image.image_url)}','_blank')"
+                                            onerror="this.parentElement.innerHTML='<div style=&quot;color:#dc2626;text-align:center;padding:15px;&quot;>❌ ไม่สามารถโหลดรูปภาพได้</div>'"
+                                        >
+
+                                        ${
+                                            image.caption
+                                                ? `
+                                                    <div
+                                                        style="
+                                                            text-align:center;
+                                                            color:#64748b;
+                                                            font-size:12px;
+                                                            margin-top:6px;
+                                                        "
+                                                    >
+                                                        ${escapeHtml(
+                                                            image.caption
+                                                        )}
+                                                    </div>
+                                                `
+                                                : ""
+                                        }
+
+                                    </div>
+
+                                `
+                            )
+                            .join("");
+
+
+                    return `
+
+                        <div
                             style="
-                                color:#1e293b;
+                                background:#f8fafc;
+                                border:1px solid #e2e8f0;
+                                border-radius:8px;
+                                padding:12px 16px;
+                                margin-bottom:10px;
+                                display:flex;
+                                justify-content:space-between;
+                                align-items:flex-start;
+                                gap:15px;
                             "
                         >
 
-                            ขั้นตอนที่
-                            ${sol.step_number}:
+                            <div
+                                style="
+                                    flex:1;
+                                    min-width:0;
+                                "
+                            >
 
-                            ${escapeHtml(
-                                sol.title ||
-                                ""
-                            )}
+                                <strong
+                                    style="
+                                        color:#1e293b;
+                                    "
+                                >
 
-                        </strong>
+                                    ขั้นตอนที่
+                                    ${escapeHtml(
+                                        String(
+                                            sol.step_number ??
+                                            ""
+                                        )
+                                    )}:
 
+                                    ${escapeHtml(
+                                        sol.title ||
+                                        ""
+                                    )}
 
-                        <p
-                            style="
-                                margin:4px 0 0 0;
-                                font-size:14px;
-                                color:#475569;
-                                white-space:pre-line;
-                            "
-                        >
-
-                            ${escapeHtml(
-                                sol.description ||
-                                ""
-                            )}
-
-                        </p>
-
-                    </div>
+                                </strong>
 
 
-                    <button
-                        type="button"
-                        class="btn-del-sol"
-                        data-id="${sol.id}"
-                        style="
-                            background:#fee2e2;
-                            color:#dc2626;
-                            border:none;
-                            padding:4px 8px;
-                            border-radius:4px;
-                            cursor:pointer;
-                            font-size:12px;
-                        "
-                    >
+                                <p
+                                    style="
+                                        margin:4px 0 0 0;
+                                        font-size:14px;
+                                        color:#475569;
+                                        white-space:pre-line;
+                                    "
+                                >
 
-                        🗑️ ลบ
+                                    ${escapeHtml(
+                                        sol.description ||
+                                        ""
+                                    )}
 
-                    </button>
+                                </p>
 
-                </div>
+                                ${imageHtml}
 
-            `
+                            </div>
+
+
+                            <button
+                                type="button"
+                                class="btn-del-sol"
+                                data-id="${escapeHtml(
+                                    String(sol.id)
+                                )}"
+                                style="
+                                    background:#fee2e2;
+                                    color:#dc2626;
+                                    border:none;
+                                    padding:4px 8px;
+                                    border-radius:4px;
+                                    cursor:pointer;
+                                    font-size:12px;
+                                    flex-shrink:0;
+                                "
+                            >
+
+                                🗑️ ลบ
+
+                            </button>
+
+                        </div>
+
+                    `;
+
+                }
             )
             .join("");
 
@@ -2561,6 +2744,8 @@ function renderSolutionList(
 // ============================================================
 // OPEN ADD SOLUTION
 // ============================================================
+
+
 
 function openAddSolutionForm() {
 
