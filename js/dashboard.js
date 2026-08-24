@@ -1186,18 +1186,11 @@ function resetProblemForm() {
 
         form.reset();
 
-        // Reset Class checkboxes explicitly
-        if ($("class_name")) {
-            Array.from(
-                $("class_name").querySelectorAll(
-                    'input[type="checkbox"][name="class_name"]'
-                )
-            ).forEach(checkbox => {
-                checkbox.checked = false;
-            });
-        }
-
     }
+
+    document.querySelectorAll('input[name="class_name"]').forEach((el) => {
+        el.checked = false;
+    });
 
 
     const hiddenId =
@@ -1285,27 +1278,7 @@ function editProblem(id) {
     }
 
 
-    if ($("class_name")) {
-
-        const savedClasses = String(
-            problem.class_name || ""
-        )
-            .split(",")
-            .map(value => value.trim())
-            .filter(Boolean);
-
-        Array.from(
-            $("class_name").querySelectorAll(
-                'input[type="checkbox"][name="class_name"]'
-            )
-        ).forEach(checkbox => {
-            checkbox.checked =
-                savedClasses.includes(
-                    checkbox.value
-                );
-        });
-
-    }
+    setSelectedClasses(problem.class_name || "");
 
 
     if ($("symptoms")) {
@@ -1352,6 +1325,81 @@ function editProblem(id) {
 
 }
 
+
+// ============================================================
+// CLASS SELECTION
+// ============================================================
+function getSelectedClasses() {
+    return Array.from(document.querySelectorAll('input[name="class_name"]:checked'))
+        .map((el) => el.value.trim())
+        .filter(Boolean);
+}
+
+function setSelectedClasses(value) {
+    const values = String(value || "")
+        .split(",")
+        .map((v) => v.trim())
+        .filter(Boolean);
+    document.querySelectorAll('input[name="class_name"]').forEach((el) => {
+        el.checked = values.includes(el.value);
+    });
+}
+
+// ============================================================
+// IMAGE DROP / PASTE
+// ============================================================
+function setFileInputFile(input, file) {
+    if (!input || !file) return false;
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    input.files = dt.files;
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+    return true;
+}
+
+function setupDropPaste(inputId, previewId) {
+    const input = $(inputId);
+    const preview = $(previewId);
+    if (!input || !preview) return;
+
+    const zone = document.createElement("div");
+    zone.className = "dropzone";
+    zone.innerHTML = `<div class="dropzone-title">วางรูปภาพที่นี่ หรือคลิกเพื่อเลือกไฟล์</div><div class="dropzone-subtitle">ลากไฟล์ • Ctrl+V • JPG / PNG / WEBP • สูงสุด 5 MB</div>`;
+    input.parentNode.insertBefore(zone, input);
+    zone.appendChild(input);
+    zone.addEventListener("click", (e) => { if (e.target !== input) input.click(); });
+    ["dragenter", "dragover"].forEach((eventName) => zone.addEventListener(eventName, (e) => { e.preventDefault(); zone.classList.add("is-dragover"); }));
+    ["dragleave", "drop"].forEach((eventName) => zone.addEventListener(eventName, (e) => { e.preventDefault(); zone.classList.remove("is-dragover"); }));
+    zone.addEventListener("drop", (e) => {
+        const file = Array.from(e.dataTransfer?.files || []).find((f) => f.type.startsWith("image/"));
+        if (!file) return;
+        try { validateImageFile(file); setFileInputFile(input, file); } catch (err) { showMessage(err.message, "error"); }
+    });
+    zone.addEventListener("paste", (e) => {
+        const item = Array.from(e.clipboardData?.items || []).find((i) => i.type.startsWith("image/"));
+        if (!item) return;
+        const file = item.getAsFile();
+        if (!file) return;
+        try { validateImageFile(file); setFileInputFile(input, file); } catch (err) { showMessage(err.message, "error"); }
+    });
+    input.addEventListener("focus", () => zone.classList.add("is-focus"));
+    input.addEventListener("blur", () => zone.classList.remove("is-focus"));
+    zone.setAttribute("tabindex", "0");
+}
+
+function setupGlobalImagePaste() {
+    document.addEventListener("paste", (e) => {
+        const active = document.activeElement;
+        const target = active?.closest?.(".dropzone");
+        if (target) return;
+        const input = document.querySelector("#problemImage, #solutionImage");
+        const item = Array.from(e.clipboardData?.items || []).find((i) => i.type.startsWith("image/"));
+        if (input && item) {
+            const file = item.getAsFile();
+            if (file) { try { validateImageFile(file); setFileInputFile(input, file); } catch (err) { showMessage(err.message, "error"); } }
+        }
+    });
+}
 
 // ============================================================
 // GET FILE FROM INPUT
@@ -1734,17 +1782,7 @@ async function saveProblem(
             : "";
 
 
-    const className =
-        $("class_name")
-            ? Array.from(
-                $("class_name").querySelectorAll(
-                    'input[type="checkbox"][name="class_name"]:checked'
-                )
-            )
-                .map(checkbox => checkbox.value)
-                .filter(Boolean)
-                .join(", ")
-            : "";
+    const className = getSelectedClasses().join(", ");
 
 
     const symptoms =
@@ -3156,151 +3194,6 @@ function setupImagePreview(
 
 
 // ============================================================
-// DRAG & DROP IMAGE UPLOAD
-// ============================================================
-
-function setupImageDropZone(
-    inputId,
-    dropZoneId
-) {
-    const input = $(inputId);
-    const dropZone = $(dropZoneId);
-
-    if (!input || !dropZone) return;
-
-    const setDropZoneState = (active) => {
-        dropZone.style.borderColor = active ? "#2563eb" : "#cbd5e1";
-        dropZone.style.background = active ? "#eff6ff" : "#f8fafc";
-        dropZone.style.transform = active ? "scale(1.01)" : "scale(1)";
-    };
-
-    const openFilePicker = () => {
-        input.click();
-    };
-
-    dropZone.addEventListener("click", openFilePicker);
-
-    dropZone.addEventListener("keydown", (event) => {
-        if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            openFilePicker();
-        }
-    });
-
-    // ให้กด Ctrl+V หลังจากคลิก/โฟกัสช่องนี้ เพื่อวางรูปจาก Clipboard ได้
-    dropZone.addEventListener("paste", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-
-        const items = event.clipboardData?.items || [];
-        let imageItem = null;
-
-        for (const item of items) {
-            if (item.type && item.type.startsWith("image/")) {
-                imageItem = item;
-                break;
-            }
-        }
-
-        if (!imageItem) {
-            showMessage("Clipboard ไม่มีรูปภาพ กรุณา Copy รูปภาพก่อนกด Ctrl+V", "error");
-            return;
-        }
-
-        const blob = imageItem.getAsFile();
-
-        if (!blob) {
-            showMessage("ไม่สามารถอ่านรูปภาพจาก Clipboard ได้", "error");
-            return;
-        }
-
-        const extensionMap = {
-            "image/jpeg": "jpg",
-            "image/png": "png",
-            "image/webp": "webp"
-        };
-
-        const extension = extensionMap[blob.type] || "png";
-        const file = new File(
-            [blob],
-            `pasted-image-${Date.now()}.${extension}`,
-            { type: blob.type }
-        );
-
-        try {
-            validateImageFile(file);
-
-            const dataTransfer = new DataTransfer();
-            dataTransfer.items.add(file);
-            input.files = dataTransfer.files;
-            input.dispatchEvent(
-                new Event("change", { bubbles: true })
-            );
-            setDropZoneState(false);
-        }
-        catch (error) {
-            showMessage(error.message, "error");
-        }
-    });
-
-    ["dragenter", "dragover"].forEach((eventName) => {
-        dropZone.addEventListener(eventName, (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            setDropZoneState(true);
-        });
-    });
-
-    ["dragleave", "dragend"].forEach((eventName) => {
-        dropZone.addEventListener(eventName, (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            setDropZoneState(false);
-        });
-    });
-
-    dropZone.addEventListener("drop", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        setDropZoneState(false);
-
-        const files = event.dataTransfer?.files;
-
-        if (!files || files.length === 0) {
-            return;
-        }
-
-        const file = files[0];
-
-        try {
-            validateImageFile(file);
-        }
-        catch (error) {
-            showMessage(error.message, "error");
-            return;
-        }
-
-        // ใส่ไฟล์ที่ลากลงไปใน input เพื่อให้ระบบบันทึกเดิม
-        // ใช้งานต่อได้เหมือนกับการเลือกไฟล์ตามปกติ
-        try {
-            const dataTransfer = new DataTransfer();
-            dataTransfer.items.add(file);
-            input.files = dataTransfer.files;
-            input.dispatchEvent(new Event("change", { bubbles: true }));
-        }
-        catch (error) {
-            console.error("SET DROPPED FILE ERROR:", error);
-            showMessage("ไม่สามารถรับไฟล์ที่ลากมาได้ กรุณาลองเลือกไฟล์แทน", "error");
-        }
-    });
-
-    input.addEventListener("change", () => {
-        setDropZoneState(false);
-    });
-}
-
-
-// ============================================================
 // SETUP EVENTS
 // ============================================================
 
@@ -3453,20 +3346,9 @@ function setupEvents() {
         "solutionImagePreview"
     );
 
-
-    // ========================================================
-    // IMAGE DRAG & DROP
-    // ========================================================
-
-    setupImageDropZone(
-        "problemImage",
-        "problemImageDropZone"
-    );
-
-    setupImageDropZone(
-        "solutionImage",
-        "solutionImageDropZone"
-    );
+    setupDropPaste("problemImage", "problemImagePreview");
+    setupDropPaste("solutionImage", "solutionImagePreview");
+    setupGlobalImagePaste();
 
 
     // ========================================================
