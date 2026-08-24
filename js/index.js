@@ -637,31 +637,6 @@ async function loadProblems() {
 
 
 // ==================================================
-// FILTER VALUE NORMALIZATION
-// ==================================================
-
-function normalizeFilterValue(value) {
-    return String(value ?? "")
-        .replace(/\u00A0/g, " ")
-        .trim()
-        .toLowerCase()
-        .replace(/\s+/g, " ");
-}
-
-function normalizeClassValue(value) {
-    let text = normalizeFilterValue(value);
-
-    if (!text || text === "all" || text === "ทั้งหมด") {
-        return "all";
-    }
-
-    // Keep "idektep lv.1" ... "idektep lv.5" consistent.
-    text = text.replace(/lv\s*\.\s*/g, "lv.");
-    return text;
-}
-
-
-// ==================================================
 // RENDER PROBLEMS
 // ==================================================
 
@@ -737,26 +712,66 @@ function renderProblems() {
 
 
 
+                const problemCategory =
+
+                    String(
+                        problem.category ??
+                        ""
+                    )
+                        .trim()
+                        .toLowerCase();
+
+
+                const selectedCategory =
+
+                    String(
+                        currentCategory ??
+                        "all"
+                    )
+                        .trim()
+                        .toLowerCase();
+
+
                 const matchCategory =
 
-                    currentCategory ===
+                    selectedCategory ===
                     "all"
 
                     ||
 
-                    problem.category ===
-                    currentCategory;
+                    problemCategory ===
+                    selectedCategory;
 
+
+                const problemClass =
+
+                    String(
+                        problem.class_name ??
+                        ""
+                    )
+                        .trim()
+                        .toLowerCase();
+
+
+                const selectedClass =
+
+                    String(
+                        currentClass ??
+                        "all"
+                    )
+                        .trim()
+                        .toLowerCase();
+
+
+                const classTokens = problemClass
+                    .split(",")
+                    .map((item) => item.trim())
+                    .filter(Boolean);
 
                 const matchClass =
-
-                    currentClass ===
-                    "all"
-
-                    ||
-
-                    problem.class_name ===
-                    currentClass;
+                    selectedClass === "all" ||
+                    classTokens.includes(selectedClass) ||
+                    problemClass.includes(selectedClass);
 
 
 
@@ -904,10 +919,15 @@ if (searchInput) {
 
 
 // ==================================================
-// CATEGORY
+// CATEGORY FILTER
 // ==================================================
 
-document.querySelectorAll("#categories .category-button")
+// จับเฉพาะปุ่มที่อยู่ใน #categories
+// เพื่อไม่ให้ปุ่ม Class ถูกนับเป็นหมวดหมู่
+document
+    .querySelectorAll(
+        "#categories .category-button"
+    )
     .forEach(
         button => {
 
@@ -915,8 +935,10 @@ document.querySelectorAll("#categories .category-button")
                 "click",
                 () => {
 
-
-                    document.querySelectorAll("#categories .category-button")
+                    document
+                        .querySelectorAll(
+                            "#categories .category-button"
+                        )
                         .forEach(
                             btn => {
 
@@ -934,7 +956,14 @@ document.querySelectorAll("#categories .category-button")
 
 
                     currentCategory =
-                        button.dataset.category;
+                        button.dataset.category ||
+                        "all";
+
+
+                    console.log(
+                        "CATEGORY SELECTED:",
+                        currentCategory
+                    );
 
 
                     renderProblems();
@@ -946,12 +975,15 @@ document.querySelectorAll("#categories .category-button")
     );
 
 
-
 // ==================================================
 // CLASS FILTER
 // ==================================================
 
-document.querySelectorAll("#classFilters .class-filter-button")
+// จับเฉพาะปุ่ม Class ที่อยู่ใน #classFilters
+document
+    .querySelectorAll(
+        "#classFilters .class-filter-button"
+    )
     .forEach(
         button => {
 
@@ -959,7 +991,10 @@ document.querySelectorAll("#classFilters .class-filter-button")
                 "click",
                 () => {
 
-                    document.querySelectorAll("#classFilters .class-filter-button")
+                    document
+                        .querySelectorAll(
+                            "#classFilters .class-filter-button"
+                        )
                         .forEach(
                             btn => {
 
@@ -970,12 +1005,22 @@ document.querySelectorAll("#classFilters .class-filter-button")
                             }
                         );
 
+
                     button.classList.add(
                         "active"
                     );
 
+
                     currentClass =
-                        (button.dataset.class || "all").trim();
+                        button.dataset.class ||
+                        "all";
+
+
+                    console.log(
+                        "CLASS SELECTED:",
+                        currentClass
+                    );
+
 
                     renderProblems();
 
@@ -1668,11 +1713,12 @@ if (submitProblemForm) {
                         .value;
 
 
-                const className =
-                    document
-                        .getElementById("submitClass")
-                        ?.value ||
-                    "";
+                const className = Array.from(
+                    document.querySelectorAll('input[name="submit_class_name"]:checked')
+                )
+                    .map((el) => el.value.trim())
+                    .filter(Boolean)
+                    .join(", ");
 
 
                 const symptoms =
@@ -2081,7 +2127,7 @@ if (submitProblemForm) {
                         false;
 
                     submitButton.textContent =
-                        "🚀 ส่งปัญหาให้ Admin ตรวจสอบ";
+                        "🚀 ส่งปัญหาให้ Coach & Trainer ตรวจสอบ";
 
                 }
 
@@ -2095,25 +2141,34 @@ if (submitProblemForm) {
 
 
 // ==================================================
+// IMAGE DROP / PASTE FOR SUBMISSION
+// ==================================================
+function setupSubmitImageDropPaste() {
+    const input = document.getElementById("submitProblemImage");
+    const preview = document.getElementById("problemImagePreview");
+    if (!input || !preview) return;
+    const zone = document.createElement("div");
+    zone.className = "dropzone";
+    zone.innerHTML = `<div class="dropzone-title">ลากรูปมาวาง หรือคลิกเพื่อเลือกไฟล์</div><div class="dropzone-subtitle">รองรับ Ctrl+V · JPG / PNG / WEBP · สูงสุด 5 MB</div>`;
+    input.parentNode.insertBefore(zone, input); zone.appendChild(input);
+    zone.addEventListener("click", (e) => { if (e.target !== input) input.click(); });
+    const accept = (file) => {
+        if (!file || !file.type.startsWith("image/")) return;
+        if (file.size > 5 * 1024 * 1024) { alert("รูปภาพต้องมีขนาดไม่เกิน 5 MB"); return; }
+        const dt = new DataTransfer(); dt.items.add(file); input.files = dt.files; input.dispatchEvent(new Event("change", { bubbles: true }));
+    };
+    ["dragenter","dragover"].forEach((n) => zone.addEventListener(n, (e)=>{e.preventDefault();zone.classList.add("is-dragover");}));
+    ["dragleave","drop"].forEach((n) => zone.addEventListener(n, (e)=>{e.preventDefault();zone.classList.remove("is-dragover");}));
+    zone.addEventListener("drop", (e)=>accept(Array.from(e.dataTransfer?.files||[])[0]));
+    document.addEventListener("paste", (e)=>{ const item=Array.from(e.clipboardData?.items||[]).find(i=>i.type.startsWith("image/")); if(item) accept(item.getAsFile()); });
+}
+
+// ==================================================
 // START
 // ==================================================
+
+setupSubmitImageDropPaste();
 
 checkLogin();
 
 loadProblems();
-
-// ==================================================
-// FILTER DIAGNOSTIC
-// ==================================================
-console.log(
-    "Filter ready:",
-    document.querySelectorAll("#categories .category-button").length,
-    "category buttons,",
-    document.querySelectorAll("#classFilters .class-filter-button").length,
-    "class buttons"
-);
-
-if (!document.querySelectorAll("#classFilters .class-filter-button").length) {
-    console.warn("CLASS FILTER BUTTONS NOT FOUND");
-}
-
