@@ -1276,8 +1276,21 @@ function editProblem(id) {
 
     if ($("class_name")) {
 
-        $("class_name").value =
-            problem.class_name || "";
+        const savedClasses = String(
+            problem.class_name || ""
+        )
+            .split(",")
+            .map(value => value.trim())
+            .filter(Boolean);
+
+        Array.from(
+            $("class_name").options
+        ).forEach(option => {
+            option.selected =
+                savedClasses.includes(
+                    option.value
+                );
+        });
 
     }
 
@@ -1710,7 +1723,12 @@ async function saveProblem(
 
     const className =
         $("class_name")
-            ? $("class_name").value
+            ? Array.from(
+                $("class_name").selectedOptions
+            )
+                .map(option => option.value)
+                .filter(Boolean)
+                .join(", ")
             : "";
 
 
@@ -3123,6 +3141,88 @@ function setupImagePreview(
 
 
 // ============================================================
+// DRAG & DROP IMAGE UPLOAD
+// ============================================================
+
+function setupImageDropZone(
+    inputId,
+    dropZoneId
+) {
+    const input = $(inputId);
+    const dropZone = $(dropZoneId);
+
+    if (!input || !dropZone) return;
+
+    const setDropZoneState = (active) => {
+        dropZone.style.borderColor = active ? "#2563eb" : "#cbd5e1";
+        dropZone.style.background = active ? "#eff6ff" : "#f8fafc";
+        dropZone.style.transform = active ? "scale(1.01)" : "scale(1)";
+    };
+
+    const openFilePicker = () => {
+        input.click();
+    };
+
+    dropZone.addEventListener("click", openFilePicker);
+
+    ["dragenter", "dragover"].forEach((eventName) => {
+        dropZone.addEventListener(eventName, (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            setDropZoneState(true);
+        });
+    });
+
+    ["dragleave", "dragend"].forEach((eventName) => {
+        dropZone.addEventListener(eventName, (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            setDropZoneState(false);
+        });
+    });
+
+    dropZone.addEventListener("drop", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        setDropZoneState(false);
+
+        const files = event.dataTransfer?.files;
+
+        if (!files || files.length === 0) {
+            return;
+        }
+
+        const file = files[0];
+
+        try {
+            validateImageFile(file);
+        }
+        catch (error) {
+            showMessage(error.message, "error");
+            return;
+        }
+
+        // ใส่ไฟล์ที่ลากลงไปใน input เพื่อให้ระบบบันทึกเดิม
+        // ใช้งานต่อได้เหมือนกับการเลือกไฟล์ตามปกติ
+        try {
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            input.files = dataTransfer.files;
+            input.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+        catch (error) {
+            console.error("SET DROPPED FILE ERROR:", error);
+            showMessage("ไม่สามารถรับไฟล์ที่ลากมาได้ กรุณาลองเลือกไฟล์แทน", "error");
+        }
+    });
+
+    input.addEventListener("change", () => {
+        setDropZoneState(false);
+    });
+}
+
+
+// ============================================================
 // SETUP EVENTS
 // ============================================================
 
@@ -3273,6 +3373,21 @@ function setupEvents() {
     setupImagePreview(
         "solutionImage",
         "solutionImagePreview"
+    );
+
+
+    // ========================================================
+    // IMAGE DRAG & DROP
+    // ========================================================
+
+    setupImageDropZone(
+        "problemImage",
+        "problemImageDropZone"
+    );
+
+    setupImageDropZone(
+        "solutionImage",
+        "solutionImageDropZone"
     );
 
 
